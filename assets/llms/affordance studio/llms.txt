@@ -1,0 +1,37 @@
+# Affordance Design Studio
+
+> Human-centered design, AI-powered outcomes. We bridge human needs and intelligent systems, creating digital affordances that don't just look intuitive — they think intuitive. Founded by Shandar Junaid (Certified Usability Analyst) with 20+ years of UX leadership at Adobe, Citrix, Wipro, Reliance, and Paylocity. Based in Bengaluru, India.
+
+## Core Services
+
+- [UX/AI Design Consulting](https://affordance.design/#services): Strategic guidance for integrating AI into human-centered design — AI integration strategy, experience architecture, interaction design.
+- [AI Consulting & Implementation](https://affordance.design/#services): Machine learning pipelines and intelligent agents for user experiences — intelligent agents, AI/ML integration, API synthesis.
+- [Product Engineering](https://affordance.design/#services): End-to-end solution architecture from concept to deployment — rapid prototyping, MVP acceleration, scale optimization.
+- [Workshops & Training](https://affordance.design/#services): Educational programs to build internal AI design capabilities — design thinking workshops, AI literacy training, custom curriculum.
+
+## Frameworks
+
+- [IX Framework — Intelligent Experiences](https://affordance.design/ix.html): Our proprietary framework where AI + UX = IX. Five lenses — Intent, Interpretation, Interaction, Inference & Iteration, Impact — for designing adaptive systems that serve human intent first.
+
+## Vibe to Viable (V2V) — AI Product Bootcamp
+
+- [V2V Bootcamp](https://affordance.design/bootcamp.html): Live, cohort-based bootcamp (3-day or 5-day) where participants go from raw idea to a deployed, authenticated product using Claude Code, Supabase, and the V2V methodology. Max 10 per cohort. Certified Vibe Coder (CVC) credential awarded.
+- [V2V Curriculum](https://affordance.design/curriculum.html): Full chapter-by-chapter breakdown of the bootcamp — foundation, build, agent OS, backend, and ship phases.
+- [V2V Programs](https://affordance.design/programs.html): Programme overview with format comparison, pricing, and what participants ship.
+
+## Products
+
+- [TimeLineX](https://timelinex.in): AI-powered timeline intelligence engine — generates interactive chronological timelines using Gemini Pro, with 2D/3D visualization.
+- [CTRL+SURVIVE](https://affordance.design/ctrl+survive): A darkly humorous career survival runner game — navigate education, corporate, layoffs, and AI disruption across 300 seconds.
+- [Project Workflow Protocol](https://affordance.design/protocol): An open-source set of Skills for Claude Code that standardize how software projects are planned, built, verified, and shipped. Zero dependencies, MIT licensed.
+
+## Contact
+
+- Email: hello@affordancedesign.in
+- LinkedIn: https://linkedin.com/company/affordance-design
+- Location: Bengaluru, India
+- [Contact Form](https://affordance.design/#contact): Available on the main site.
+
+## Optional
+
+- [llms-full.txt](https://affordance.design/llms-full.txt): Extended version with detailed service descriptions, IX framework breakdown, bootcamp curriculum, pricing, and methodology.

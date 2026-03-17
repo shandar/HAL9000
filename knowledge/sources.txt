@@ -1,0 +1,7 @@
+# HAL9000 — Knowledge Sources
+# Add one URL per line. HAL fetches these at boot.
+# Supports llms.txt, llms-full.txt, or any plain text URL.
+#
+# Examples:
+# https://example.com/llms.txt
+# https://example.com/llms-full.txt

@@ -1,0 +1,170 @@
+# Shandar Junaid — Full Portfolio Context
+
+> Designer, Strategist, Builder, and Mentor | Founder of Affordance Design Studio
+> Designing Intelligence with Purpose
+
+## Identity
+
+Shandar Junaid is a designer, strategist, builder, and mentor — founder of Affordance Design Studio. For over two decades, he has led design and product innovation at Adobe, Citrix, Wipro, Paylocity, and other global organizations — shaping products used by millions across the world.
+
+## Current Focus
+
+Building a new generation of responsible, human-centered AI products that merge usability, ethics, and intelligence. Through Affordance Design, he is transforming how people learn, work, and create — with ventures like TimeLineX and CTRL+Survive. He also trains the next generation of builders through the Vibe to Viable bootcamp.
+
+## Approach
+
+His approach blends empathy with engineering. Each product starts with a real human problem and scales through design systems like IX (Intelligent Experiences) and frameworks such as ROOTS — crafted to ensure that every algorithm, workflow, and interface serves human intent.
+
+## Vision
+
+Design is not decoration, but direction — a roadmap to build intelligence that feels human.
+
+## Contact Information
+
+- Primary Email: shandarjunaid@gmail.com
+- Studio Email: hello@affordancedesign.in
+- Personal Website: https://shandarjunaid.com
+- Studio Website: https://affordance.design
+- LinkedIn: https://linkedin.com/in/shandarjunaid
+
+## Stats
+
+- 25+ years of user-centered design
+- 15 years of strategy and consulting
+- 5K+ students trained
+- 200+ workshops conducted
+- 195+ builders trained through Vibe to Viable bootcamp
+- 56 products shipped by bootcamp participants
+- 3 bootcamp cohorts completed
+- 5 institutions (guest lectures on AI, design thinking, and vibe coding)
+- Certified Usability Analyst (CUA) — Human Factors International, 2012
+
+## Career Timeline
+
+### Wipro (2006-2010)
+Usability & UX Practice Manager — India / USA
+Built and led a 100-designer UX practice, delivering enterprise products for Fortune 500 clients including Best Buy, Pearson, and SanDisk. Helped set up Wipro's Centre of Excellence for UX.
+
+### Infostretch (2013-2014)
+Manager UI/UX — India
+Set up a 15-member design team from scratch, establishing UX design practices and building the leadership pipeline for sustained design excellence.
+
+### HFI (2014-2015)
+User Experience Consultant — South Africa
+Led a 15-designer team on-site for Standard Bank's digital banking redesign in South Africa, serving 12M+ customers. Introduced CUA-certified usability benchmarking practices.
+
+### Reliance (2016-2017)
+Design Head, E-commerce — India
+Built an 8-member design team for AJIO, Reliance's e-commerce platform. Redesigned the shopping experience, increasing user engagement by 25%.
+
+### Adobe (2018-2022)
+Design Evangelist / Strategic Dev Manager — India
+Influenced the Adobe XD product roadmap based on direct user feedback. Trained 5,000+ designers at enterprise organizations on design tools and thinking, improving team productivity by 20%.
+
+### Citrix (2022-2024)
+Director of Product Design — India
+Led a product design team of 12 designers and 3 researchers, shipping enterprise software used by 400K+ organizations worldwide. Introduced the 4IAB design process.
+
+### Paylocity (2024-2025)
+Director of Product Design — USA
+Led design for HR & payroll products serving 37,000+ clients. Introduced usability benchmarking for 10,000+ users and drove design system maturity with AI-assisted workflows.
+
+## Strengths
+
+- Design Strategy: Redesigned AJIO at Reliance, increasing engagement by 25%. Streamlined Adobe tool workflows, boosting team productivity by 20%.
+- Stakeholder Alignment: Managed Fortune 500 client relationships — Best Buy, Pearson, and SanDisk at Wipro; Standard Bank at HFI.
+- Team Building: Built design orgs with embedded research — 9+3 at Citrix, 15+5 at HFI — across India, US, and South Africa.
+- Frameworks & Publishing: Created the IX Framework. Published two books with Pearson: Digital Media and Android.
+- Research & Measurement: Introduced usability benchmarking at Paylocity for 10,000+ users. CUA-certified analyst.
+
+## Products & Creations
+
+### TimeLineX
+AI-powered timeline intelligence engine. A deterministic, hallucination-resistant timeline intelligence engine. Generates interactive chronological timelines with 2D visualization and immersive 3D experience. 100+ users and 80 paid users in just 1 month of launch. Credits-based usage system.
+- Status: Live
+- URL: https://timelinex.in
+- Tech: React 18, Three.js, React Three Fiber, D3.js, Custom RAG + Gemini
+
+### CTRL+Survive
+A darkly humorous career survival runner simulating modern working life. Navigate 300 seconds across 4 stages: Education, Corporate, Layoff, and the AI Era. Balance Relevance, Burnout, Savings, and Adaptability. 100+ users in the first week of launch.
+- Status: Live
+- URL: https://affordance.design/ctrl+survive
+- Tech: Claude Code, PhaserJS, TypeScript
+
+### Project Workflow Protocol
+An open-source set of Skills for Claude Code that standardize how software projects are planned, built, verified, and shipped. Zero dependencies, stack-agnostic.
+- Status: Open Source
+- URL: https://affordance.design/protocol
+
+### IX Framework
+Intelligent Experiences design methodology. A comprehensive design methodology for building AI-powered systems. Combines AI intelligence with UX design through five lenses: Intent, Interpretation, Interaction, Inference & Iteration, and Impact.
+- Status: Live
+- URL: https://affordance.design/ix
+
+### Vibe to Viable
+AI bootcamp — idea to deployed product. An intensive bootcamp that takes participants from zero to a fully deployed product using AI-native tools. Covers prompt engineering, full-stack development with Claude Code, Supabase backend, and the PWP build discipline. 195+ builders trained, 56 products shipped across 3 cohorts.
+- Status: Live
+- URL: https://affordance.design/bootcamp
+- Tech: Claude Code, Supabase, Figma Make, Google AI Studio, Netlify, Git
+- Formats: 3-Day Sprint (18 chapters) and 5-Day Deep Dive (30 chapters)
+- Credential: Certified Vibe Coder (CVC)
+
+## Mentorship & Teaching
+
+Certified Usability Analyst and lifelong mentor. Trained 195+ builders through the Vibe to Viable bootcamp and guest lectured at 5 institutions on AI, design thinking, and vibe coding.
+
+Institutions:
+- Chitkara University
+- Ecole Intuit Labs
+- Techno India University
+- Spread Design Barn
+- UID / Karnavati University
+
+## Design Leadership Principles
+
+- Empathise: Understand people before designing for them
+- Be Flexible: Adapt to the needs of the project and team
+- Be Curious: Question everything, explore possibilities
+- Show Positivity: Bring energy and optimism to every challenge
+
+## Client Work
+
+- Vodafone: New SIM onboarding app for the UK region (2015)
+- Starwood Hotels: In-suite app for guests on tablets, connected to IOT interfaces (2018)
+- Wells Fargo: Interactive app for booking meeting rooms, used on tablets across all meeting rooms (2012)
+- Celebrity Cruises: Website and branding (2020)
+- Scoma's: Interactive iPad app for restaurant tables — menu and billing (2014)
+
+## Case Studies
+
+- ESI Software: Crash simulation software makeover — 30% workflow reduction, 2x faster task completion
+- Standard Bank (via HFI): Commercial banking dashboard for relationship managers across 6 cities and 30 branches in South Africa
+- Canara Bank: NEFT optimization — reduced abandonment, zero customer support needed
+- Zoffio: B2B and B2C e-commerce — improved shopping cart completion rate
+- Buttercups: B2C e-commerce — improved mobile bounce rates with custom "Find your fit" quiz
+
+## Citrix Leadership Details
+
+Products led: Citrix Enterprise Browser, Citrix Workspace Application, Toolbar for Remote Desktops
+
+Process innovations:
+- 4IAB Meeting Process: Researcher, UX designer, PM, and Dev representative to control feature creep
+- Design Sign-off step in JIRA for pixel-perfect dev interpretation
+- Separated UI copy/content process from designers to dedicated Content team
+- Design Critique Sessions: fortnightly sharing and feedback across the team
+- UX Brief Evangelism: structured delivery of stories and assets
+- Innovation Workshop: futuristic scenarios with PM, Engineering, Research, and Design
+
+## Affordance Design Studio
+
+Founded after 25+ years in design leadership. Bridging UX and AI to create digital affordances that don't just look intuitive — they think intuitive.
+
+Services:
+- UI/UX Design Consulting
+- AI Consulting & Implementation
+- Product Engineering
+- Workshops & Training
+
+## Certifications
+
+- Certified Usability Analyst (CUA) — Human Factors International, 2012

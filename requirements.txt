@@ -1,8 +1,9 @@
 # HAL9000 dependencies
 
-# Core AI
-anthropic>=0.25.0
-openai>=1.12.0          # Whisper STT
+# Core AI — multi-provider
+anthropic>=0.25.0       # Claude
+openai>=1.12.0          # GPT-4o + Whisper STT
+google-genai>=1.0.0     # Gemini
 
 # Vision
 opencv-python>=4.9.0
@@ -13,8 +14,23 @@ soundfile>=0.12.1
 numpy>=1.26.0
 
 # Voice output
+edge-tts>=6.1.0         # free TTS (default provider)
 elevenlabs>=1.1.0
 pygame>=2.5.2           # audio playback
+
+# Web UI
+flask>=3.0.0
+
+# Web search
+duckduckgo-search>=6.0.0
+
+# MCP server (Claude Code integration)
+mcp>=1.0.0
+
+# Local voice cloning (optional — requires Python 3.11)
+# TTS>=0.22.0
+# torch>=2.5,<2.6
+# transformers>=4.40,<4.45
 
 # Utilities
 python-dotenv>=1.0.0

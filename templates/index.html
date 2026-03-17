@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HAL 9000">
+  <meta name="theme-color" content="#050507">
+  <link rel="manifest" href="/assets/manifest.json">
+  <link rel="apple-touch-icon" href="/assets/HAL.png">
+  <title>HAL 9000</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050507;
+      --surface: #0a0a0e;
+      --surface-2: #111116;
+      --border: #1e1e28;
+      --text: #c8c8d0;
+      --text-dim: #4a4a58;
+      --red: #ff1744;
+      --red-glow: rgba(255, 23, 68, 0.3);
+      --red-dim: #661020;
+      --green: #00e676;
+      --green-glow: rgba(0, 230, 118, 0.12);
+      --amber: #ffc107;
+      --cyan: #00bcff;
+      --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    }
+
+    body {
+      font-family: var(--mono);
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Full viewport grid ──────────────────────── */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr auto;
+      gap: 0;
+      height: 100vh;
+      padding: 8px;
+      gap: 8px;
+    }
+
+    /* ── Top bar — brushed metal header ─────────── */
+    .top-bar {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      padding: 6px 12px;
+      background:
+        linear-gradient(180deg, #16161c 0%, #0e0e14 40%, #0a0a10 100%);
+      border: 1px solid #2a2a36;
+      border-top-color: #333340;
+      border-bottom-color: #18181e;
+      border-radius: 4px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 1px 3px rgba(0,0,0,0.5);
+      font-size: 0.5rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      gap: 6px;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-right: auto;
+    }
+
+    .top-bar-title {
+      color: var(--red);
+      font-weight: 700;
+      font-size: 0.55rem;
+      text-shadow: 0 0 8px var(--red-glow), 0 0 20px rgba(255,23,68,0.15);
+    }
+
+    .top-bar-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      border: 1px solid rgba(0,0,0,0.4);
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+      transition: all 0.4s;
+    }
+
+    .status-dot.connected {
+      background: var(--green);
+      box-shadow:
+        inset 0 1px 2px rgba(0,0,0,0.3),
+        0 0 6px var(--green),
+        0 0 14px rgba(0,230,118,0.25);
+    }
+    .status-dot.disconnected {
+      background: var(--red);
+      box-shadow:
+        inset 0 1px 2px rgba(0,0,0,0.3),
+        0 0 6px var(--red),
+        0 0 14px var(--red-glow);
+    }
+
+    /* ── Toolbar divider ───────────────────────── */
+    .tb-divider {
+      width: 1px;
+      height: 20px;
+      background: linear-gradient(180deg, transparent 0%, #2a2a36 30%, #2a2a36 70%, transparent 100%);
+      flex-shrink: 0;
+    }
+
+    /* ── Toolbar voice selector (compact) ──────── */
+    .tb-voice {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background:
+        linear-gradient(180deg, #0c0c12 0%, #08080e 100%);
+      border: 1px solid #222230;
+      border-radius: 3px;
+      padding: 2px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .tb-voice.disabled {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    .tb-voice-label {
+      font-size: 0.38rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      color: #444455;
+      padding: 0 6px;
+      white-space: nowrap;
+      border-right: 1px solid #1a1a24;
+      margin-right: 2px;
+    }
+
+    .tb-voice-opt {
+      padding: 3px 7px;
+      font-family: var(--mono);
+      font-size: 0.38rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #444455;
+      cursor: pointer;
+      transition: all 0.25s;
+      border: 1px solid transparent;
+      border-radius: 2px;
+      background: transparent;
+      white-space: nowrap;
+    }
+
+    .tb-voice-opt:hover {
+      color: #666677;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .tb-voice-opt.active {
+      background: linear-gradient(180deg, #1c0a10 0%, #150810 100%);
+      border-color: var(--red-dim);
+      color: var(--red);
+      text-shadow: 0 0 4px var(--red-glow);
+      box-shadow: 0 0 6px rgba(255,23,68,0.08);
+    }
+
+    .tb-voice-opt.switching {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* ── Left column: HAL + Camera ──────────────── */
+    .left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    /* HAL panel */
+    .hal-panel {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      border: 1px solid #2a2a36;
+      border-top-color: #333340;
+      border-bottom-color: #0a0a10;
+      border-radius: 6px;
+      overflow: hidden;
+      flex: 1 1 0;
+      min-height: 0;
+      box-shadow:
+        inset 0 2px 8px rgba(0,0,0,0.6),
+        0 1px 0 rgba(255,255,255,0.02);
+      transition: flex 0.4s ease;
+    }
+
+    .hal-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      transition: filter 0.8s ease;
+    }
+
+    .hal-image.off { filter: brightness(0.3) saturate(0.2); }
+    .hal-image.active { filter: brightness(1.1) saturate(1.2); }
+
+    .hal-panel::after {
+      content: '';
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      top: 25%;
+      left: 25%;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--red-glow) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.8s;
+      pointer-events: none;
+    }
+
+    .hal-panel.active::after {
+      opacity: 1;
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* ── HAL image subsystem buttons (on the blank strip) ── */
+    .hal-controls {
+      position: absolute;
+      z-index: 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      /* JS positions this dynamically like the waveform */
+    }
+
+    .hal-ctrl-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      background:
+        linear-gradient(180deg, #2a2a32 0%, #1a1a22 40%, #141418 100%);
+      border: 1px solid #3a3a44;
+      border-top-color: #4a4a54;
+      border-bottom-color: #111118;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 2px 4px rgba(0,0,0,0.6),
+        0 1px 0 rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .hal-ctrl-btn::before {
+      content: '';
+      position: absolute;
+      inset: 1px;
+      border-radius: 3px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .hal-ctrl-btn svg {
+      width: 16px;
+      height: 16px;
+      color: #666672;
+      transition: all 0.25s;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+    }
+
+    .hal-ctrl-btn:hover {
+      border-color: #4a4a58;
+      background:
+        linear-gradient(180deg, #32323c 0%, #222230 40%, #1a1a22 100%);
+    }
+
+    .hal-ctrl-btn:hover svg {
+      color: #888894;
+    }
+
+    .hal-ctrl-btn:active {
+      box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.6),
+        0 0 1px rgba(0,0,0,0.4);
+    }
+
+    .hal-ctrl-btn:active::before { opacity: 0; }
+
+    /* ON state — green glow */
+    .hal-ctrl-btn.on {
+      border-color: rgba(0,230,118,0.3);
+      background:
+        linear-gradient(180deg, #1a2a20 0%, #0e1a14 40%, #0a1410 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(0,230,118,0.08),
+        0 2px 4px rgba(0,0,0,0.6),
+        0 0 8px rgba(0,230,118,0.12);
+    }
+
+    .hal-ctrl-btn.on svg {
+      color: var(--green);
+      filter: drop-shadow(0 0 4px rgba(0,230,118,0.4));
+    }
+
+    .hal-ctrl-btn.on:hover {
+      border-color: rgba(0,230,118,0.4);
+      box-shadow:
+        inset 0 1px 0 rgba(0,230,118,0.08),
+        0 2px 4px rgba(0,0,0,0.6),
+        0 0 12px rgba(0,230,118,0.2);
+    }
+
+    /* Disabled state */
+    .hal-ctrl-btn.disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* Waveform — overlays the red block in the HAL image */
+    .waveform-overlay {
+      position: absolute;
+      z-index: 8;
+      pointer-events: none;
+      overflow: hidden;
+      /* JS sets left/top/width/height dynamically */
+    }
+
+    .waveform-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .waveform-overlay.active .waveform-canvas {
+      opacity: 1;
+    }
+
+    /* ── Power button — circular in top bar ───── */
+    .power-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background:
+        linear-gradient(180deg, #1a1a22 0%, #111118 50%, #0d0d14 100%);
+      border: 2px solid #2a2a36;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 2px 4px rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .power-btn svg {
+      width: 14px;
+      height: 14px;
+      color: #555566;
+      transition: all 0.3s;
+    }
+
+    .power-btn:hover {
+      border-color: var(--green);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 0 10px rgba(0,230,118,0.2),
+        0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .power-btn:hover svg {
+      color: var(--green);
+      filter: drop-shadow(0 0 4px rgba(0,230,118,0.4));
+    }
+
+    .power-btn:active {
+      transform: scale(0.92);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .power-btn.running {
+      border-color: var(--red);
+      background:
+        linear-gradient(180deg, #1c0a10 0%, #140810 50%, #100610 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,23,68,0.06),
+        0 0 10px rgba(255,23,68,0.15),
+        0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .power-btn.running svg {
+      color: var(--red);
+      filter: drop-shadow(0 0 4px var(--red-glow));
+    }
+
+    .power-btn.running:hover {
+      border-color: var(--text-dim);
+      box-shadow:
+        0 0 8px rgba(0,0,0,0.4),
+        0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .power-btn.running:hover svg {
+      color: var(--text-dim);
+      filter: none;
+    }
+
+    /* Camera HUD */
+    .cam-panel {
+      flex: 1 1 0;
+      position: relative;
+      background: #000;
+      border: 1px solid #2a2a36;
+      border-top-color: #333340;
+      border-bottom-color: #0a0a10;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      box-shadow:
+        inset 0 2px 8px rgba(0,0,0,0.6),
+        0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .cam-panel.inactive {
+      flex: 0 0 0;
+      height: 0;
+      min-height: 0;
+      border: none;
+      overflow: hidden;
+      box-shadow: none;
+      opacity: 0;
+      transition: all 0.4s ease;
+    }
+
+    .cam-panel:not(.inactive) {
+      transition: all 0.4s ease;
+    }
+
+    .cam-offline {
+      color: var(--text-dim);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .cam-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .cam-hud-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Scanlines */
+    .cam-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 3px
+      );
+      pointer-events: none;
+    }
+
+    /* Corner brackets */
+    .cam-corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .cam-corner::before, .cam-corner::after {
+      content: '';
+      position: absolute;
+      background: var(--red);
+      opacity: 0.5;
+    }
+    .cam-corner.tl { top: 8px; left: 8px; }
+    .cam-corner.tl::before { width: 14px; height: 1px; }
+    .cam-corner.tl::after { width: 1px; height: 14px; }
+    .cam-corner.tr { top: 8px; right: 8px; }
+    .cam-corner.tr::before { width: 14px; height: 1px; right: 0; }
+    .cam-corner.tr::after { width: 1px; height: 14px; right: 0; }
+    .cam-corner.bl { bottom: 8px; left: 8px; }
+    .cam-corner.bl::before { width: 14px; height: 1px; bottom: 0; }
+    .cam-corner.bl::after { width: 1px; height: 14px; bottom: 0; }
+    .cam-corner.br { bottom: 8px; right: 8px; }
+    .cam-corner.br::before { width: 14px; height: 1px; bottom: 0; right: 0; }
+    .cam-corner.br::after { width: 1px; height: 14px; bottom: 0; right: 0; }
+
+    .cam-top-bar {
+      position: absolute;
+      top: 8px;
+      left: 30px;
+      right: 30px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .cam-label {
+      font-size: 0.5rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--red);
+      opacity: 0.7;
+      text-shadow: 0 0 4px rgba(255,23,68,0.3);
+    }
+
+    .cam-rec {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cam-rec-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--red);
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.15; }
+    }
+
+    .cam-bottom-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 30px;
+      right: 30px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .cam-speaking {
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--amber);
+      opacity: 0;
+      transition: opacity 0.3s;
+      text-shadow: 0 0 4px rgba(255,193,7,0.3);
+    }
+    .cam-speaking.active { opacity: 1; animation: speakPulse 0.8s ease-in-out infinite; }
+    @keyframes speakPulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+    /* ── Right column: Log + Terminal ────────────── */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    /* (Subsystem toggles + voice selector moved to top bar) */
+
+    /* ── Chat window ──────────────────────────── */
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background:
+        linear-gradient(180deg, #0c0c12 0%, #08080e 100%);
+      border: 1px solid #2a2a36;
+      border-top-color: #333340;
+      border-bottom-color: #0a0a10;
+      border-radius: 6px;
+      min-height: 0;
+      overflow: hidden;
+      box-shadow:
+        inset 0 2px 8px rgba(0,0,0,0.4),
+        0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .panel-header {
+      font-size: 0.46rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #444455;
+      padding: 8px 12px 7px;
+      border-bottom: 1px solid #1a1a24;
+      flex-shrink: 0;
+      background:
+        linear-gradient(180deg, #131318 0%, #0e0e14 100%);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* Message bubbles */
+    .msg {
+      max-width: 85%;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 0.62rem;
+      line-height: 1.55;
+      animation: msgIn 0.3s ease;
+      position: relative;
+    }
+
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(6px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .msg-label {
+      font-size: 0.4rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+      display: block;
+    }
+
+    /* HAL messages — left aligned */
+    .msg.hal {
+      align-self: flex-start;
+      background:
+        linear-gradient(135deg, rgba(255,23,68,0.08) 0%, rgba(255,23,68,0.03) 100%);
+      border: 1px solid rgba(255,23,68,0.12);
+      border-radius: 2px 8px 8px 8px;
+      color: #d0d0d8;
+    }
+    .msg.hal .msg-label { color: var(--red); }
+
+    /* User messages — right aligned */
+    .msg.user {
+      align-self: flex-end;
+      background:
+        linear-gradient(135deg, rgba(0,230,118,0.08) 0%, rgba(0,230,118,0.03) 100%);
+      border: 1px solid rgba(0,230,118,0.12);
+      border-radius: 8px 2px 8px 8px;
+      color: #d0d0d8;
+    }
+    .msg.user .msg-label { color: var(--green); }
+
+    /* System messages — centered, subtle */
+    .msg.system {
+      align-self: center;
+      background: rgba(255,193,7,0.04);
+      border: 1px solid rgba(255,193,7,0.08);
+      border-radius: 4px;
+      font-size: 0.5rem;
+      color: #888898;
+      max-width: 90%;
+      text-align: center;
+    }
+    .msg.system .msg-label { color: var(--amber); }
+
+    /* Tool messages — left, compact */
+    .msg.tool {
+      align-self: flex-start;
+      background: rgba(0,188,255,0.04);
+      border: 1px solid rgba(0,188,255,0.08);
+      border-radius: 2px 6px 6px 6px;
+      font-size: 0.5rem;
+      color: #777788;
+      max-width: 90%;
+    }
+    .msg.tool .msg-label { color: var(--cyan); }
+
+    .chat-empty {
+      color: #333344;
+      font-size: 0.55rem;
+      text-align: center;
+      padding: 3rem 1rem;
+      letter-spacing: 0.1em;
+    }
+
+    .chat-empty-icon {
+      font-size: 1.4rem;
+      display: block;
+      margin-bottom: 8px;
+      opacity: 0.4;
+    }
+
+    /* Chat input area */
+    .chat-input-wrap {
+      flex-shrink: 0;
+      padding: 6px;
+      border-top: 1px solid #1a1a24;
+      background:
+        linear-gradient(180deg, #0e0e14 0%, #0a0a10 100%);
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+    }
+
+    .chat-input {
+      flex: 1;
+      background:
+        linear-gradient(180deg, #0c0c12 0%, #08080e 100%);
+      border: 1px solid #222230;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--text);
+      resize: none;
+      outline: none;
+      min-height: 34px;
+      max-height: 80px;
+      line-height: 1.4;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+      transition: border-color 0.3s;
+    }
+
+    .chat-input::placeholder {
+      color: #333344;
+      letter-spacing: 0.05em;
+    }
+
+    .chat-input:focus {
+      border-color: var(--red-dim);
+      box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.4),
+        0 0 8px rgba(255,23,68,0.08);
+    }
+
+    .chat-send-btn {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      background:
+        linear-gradient(180deg, #1a1a22 0%, #111118 50%, #0d0d14 100%);
+      border: 1px solid #2a2a36;
+      border-top-color: #333340;
+      border-bottom-color: #0a0a10;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .chat-send-btn svg {
+      width: 14px;
+      height: 14px;
+      color: #444455;
+      transition: color 0.3s;
+    }
+
+    .chat-send-btn:hover {
+      border-color: var(--red-dim);
+    }
+    .chat-send-btn:hover svg {
+      color: var(--red);
+      filter: drop-shadow(0 0 4px var(--red-glow));
+    }
+
+    .chat-send-btn:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .chat-send-btn.sending {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    /* Mic button — click to listen */
+    .chat-mic-btn {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      background:
+        linear-gradient(180deg, #1a1a22 0%, #111118 50%, #0d0d14 100%);
+      border: 1px solid #2a2a36;
+      border-top-color: #333340;
+      border-bottom-color: #0a0a10;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .chat-mic-btn svg {
+      width: 14px;
+      height: 14px;
+      color: #444455;
+      transition: color 0.3s;
+    }
+
+    .chat-mic-btn:hover {
+      border-color: rgba(0,230,118,0.3);
+    }
+    .chat-mic-btn:hover svg {
+      color: var(--green);
+      filter: drop-shadow(0 0 4px rgba(0,230,118,0.3));
+    }
+
+    .chat-mic-btn:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .chat-mic-btn.listening {
+      border-color: var(--red);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 0 8px var(--red-glow),
+        0 0 20px rgba(255,23,68,0.15);
+      animation: micPulse 1.5s ease-in-out infinite;
+    }
+
+    .chat-mic-btn.listening svg {
+      color: var(--red);
+      filter: drop-shadow(0 0 6px var(--red-glow));
+    }
+
+    @keyframes micPulse {
+      0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 0 8px var(--red-glow), 0 0 20px rgba(255,23,68,0.15); }
+      50% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 0 14px var(--red-glow), 0 0 30px rgba(255,23,68,0.25); }
+    }
+
+    /* Typing indicator */
+    .typing-indicator {
+      align-self: flex-start;
+      padding: 8px 12px;
+      display: none;
+    }
+
+    .typing-indicator.active { display: flex; gap: 4px; align-items: center; }
+
+    .typing-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--red);
+      opacity: 0.4;
+      animation: typingBounce 1.2s ease-in-out infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* Terminal panel */
+    .terminal-panel {
+      height: 180px;
+      display: flex;
+      flex-direction: column;
+      background:
+        linear-gradient(180deg, #0c0c12 0%, #08080e 100%);
+      border: 1px solid #2a2a36;
+      border-top-color: #333340;
+      border-bottom-color: #0a0a10;
+      border-radius: 6px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow:
+        inset 0 2px 8px rgba(0,0,0,0.4),
+        0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .terminal-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 8px;
+      font-size: 0.58rem;
+      line-height: 1.6;
+      color: var(--green);
+      text-shadow: 0 0 4px rgba(0,230,118,0.15);
+    }
+
+    .terminal-line {
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .terminal-line.error { color: var(--red); }
+    .terminal-line.info { color: var(--text-dim); }
+
+    /* ── Bottom bar — spans full width ──────────── */
+    .bottom-bar {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 16px;
+      font-size: 0.44rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #333344;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    }
+
+    /* ── Scrollbar ──────────────────────────────── */
+    .chat-messages::-webkit-scrollbar,
+    .terminal-scroll::-webkit-scrollbar { width: 3px; }
+    .chat-messages::-webkit-scrollbar-track,
+    .terminal-scroll::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb,
+    .terminal-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Toast Notifications ──────────────────── */
+    .toast-container {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      min-width: 280px;
+      max-width: 420px;
+      padding: 10px 14px 10px 12px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      line-height: 1.4;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      animation: toastIn 0.3s ease-out;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6), 0 0 1px rgba(0,0,0,0.8);
+      border: 1px solid;
+    }
+
+    .toast.removing {
+      animation: toastOut 0.3s ease-in forwards;
+    }
+
+    .toast-error {
+      background: linear-gradient(135deg, #1a0a0e 0%, #120608 100%);
+      border-color: #3d1520;
+      color: #ff8a9e;
+    }
+
+    .toast-error .toast-icon { color: var(--red); }
+
+    .toast-warn {
+      background: linear-gradient(135deg, #1a150a 0%, #12100a 100%);
+      border-color: #3d3015;
+      color: #ffd580;
+    }
+
+    .toast-warn .toast-icon { color: var(--amber); }
+
+    .toast-info {
+      background: linear-gradient(135deg, #0a1520 0%, #080e14 100%);
+      border-color: #152a3d;
+      color: #80d4ff;
+    }
+
+    .toast-info .toast-icon { color: var(--cyan); }
+
+    .toast-icon {
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .toast-body {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 2px;
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      color: inherit;
+      opacity: 0.5;
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 0 2px;
+      flex-shrink: 0;
+    }
+
+    .toast-close:hover { opacity: 1; }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(40px); }
+    }
+
+    /* ── Choice Sheet — slides up from bottom of chat ── */
+    .choice-sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 5, 7, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .choice-sheet-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .choice-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 51;
+      background:
+        linear-gradient(180deg, #141418 0%, #0e0e14 40%, #0a0a10 100%);
+      border: 1px solid #2a2a36;
+      border-bottom: none;
+      border-top-color: #3a3a48;
+      border-radius: 10px 10px 0 0;
+      padding: 0;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow:
+        0 -4px 24px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      max-height: 70%;
+      overflow-y: auto;
+    }
+
+    .choice-sheet.active {
+      transform: translateY(0);
+    }
+
+    .choice-sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: #333344;
+      border-radius: 2px;
+      margin: 10px auto 0;
+    }
+
+    .choice-sheet-title {
+      font-family: var(--mono);
+      font-size: 0.52rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+      padding: 14px 16px 8px;
+      text-align: center;
+    }
+
+    .choice-sheet-items {
+      padding: 4px 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .choice-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background:
+        linear-gradient(180deg, #16161c 0%, #101016 100%);
+      border: 1px solid #222230;
+      border-top-color: #2a2a36;
+      border-bottom-color: #18181e;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.03),
+        0 2px 4px rgba(0,0,0,0.4);
+      user-select: none;
+    }
+
+    .choice-item:hover {
+      border-color: var(--red-dim);
+      background:
+        linear-gradient(180deg, #1c0a10 0%, #150810 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,23,68,0.05),
+        0 2px 8px rgba(0,0,0,0.5),
+        0 0 12px rgba(255,23,68,0.08);
+    }
+
+    .choice-item:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .choice-item-num {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        linear-gradient(180deg, #1e1e28 0%, #141418 100%);
+      border: 1px solid #2a2a36;
+      border-radius: 50%;
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .choice-item-text {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+    }
+
+    .choice-item-desc {
+      font-size: 0.48rem;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .choice-sheet-dismiss {
+      display: block;
+      width: calc(100% - 20px);
+      margin: 0 10px 12px;
+      padding: 8px;
+      background:
+        linear-gradient(180deg, #141418 0%, #0e0e14 100%);
+      border: 1px solid #222230;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 0.48rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .choice-sheet-dismiss:hover {
+      color: var(--text);
+      border-color: #333344;
+    }
+
+    /* ── Responsive — stack on small screens ──── */
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr auto;
+        overflow-y: auto;
+      }
+      body { overflow: auto; height: auto; }
+      .cam-panel { min-height: 200px; }
+      .terminal-panel { height: 150px; }
+      .top-bar { flex-wrap: wrap; }
+      .tb-voice-label { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+  <div class="dashboard">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <button class="power-btn" id="power-btn" onclick="togglePower()" title="Activate HAL">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v6"/><path d="M16.24 7.76a6 6 0 1 1-8.49 0"/></svg>
+        </button>
+        <span class="top-bar-title">HAL 9000</span>
+        <span id="hal-status-label">Offline</span>
+      </div>
+
+      <div class="tb-divider"></div>
+
+      <!-- Voice provider selector -->
+      <div class="tb-voice disabled" id="voice-selector">
+        <span class="tb-voice-label">TTS</span>
+        <div class="tb-voice-opt" data-provider="edge" onclick="switchVoice('edge')">Edge</div>
+        <div class="tb-voice-opt" data-provider="elevenlabs" onclick="switchVoice('elevenlabs')">11Labs</div>
+        <div class="tb-voice-opt" data-provider="local" onclick="switchVoice('local')">XTTS</div>
+      </div>
+
+      <div class="tb-divider"></div>
+
+      <div class="top-bar-status">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Connecting</span>
+      </div>
+    </div>
+
+    <!-- Left column -->
+    <div class="left-col">
+      <!-- HAL image panel -->
+      <div class="hal-panel" id="hal-panel">
+        <img src="/assets/HAL.png" alt="HAL 9000" class="hal-image off" id="hal-image" />
+        <div class="hal-controls" id="hal-controls">
+          <button class="hal-ctrl-btn disabled" data-sub="vision" onclick="toggleSub('vision')" title="Vision">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          </button>
+          <button class="hal-ctrl-btn disabled" data-sub="hearing" onclick="toggleSub('hearing')" title="Hearing">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/></svg>
+          </button>
+          <button class="hal-ctrl-btn disabled" data-sub="voice" onclick="toggleSub('voice')" title="Voice">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          </button>
+        </div>
+        <div class="waveform-overlay" id="waveform-wrap">
+          <canvas class="waveform-canvas" id="waveform-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Camera panel -->
+      <div class="cam-panel inactive" id="cam-panel">
+        <span class="cam-offline" id="cam-offline-label">Camera offline</span>
+        <img class="cam-video" id="cam-video" alt="HAL Vision" style="display:none" />
+
+        <!-- HUD overlays -->
+        <div class="cam-hud-overlay" id="cam-hud" style="display:none">
+          <div class="cam-scanlines"></div>
+          <div class="cam-corner tl"></div>
+          <div class="cam-corner tr"></div>
+          <div class="cam-corner bl"></div>
+          <div class="cam-corner br"></div>
+
+          <div class="cam-top-bar">
+            <span class="cam-label">Visual Feed</span>
+            <div class="cam-rec">
+              <div class="cam-rec-dot"></div>
+              <span class="cam-label">REC</span>
+            </div>
+          </div>
+
+          <div class="cam-bottom-bar">
+            <span class="cam-label" id="cam-timestamp"></span>
+            <span class="cam-speaking" id="cam-speaking">Speaking</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div class="right-col">
+      <!-- Chat window -->
+      <div class="chat-panel" style="position:relative;">
+        <div class="panel-header">Chat</div>
+        <!-- Choice sheet overlay -->
+        <div class="choice-sheet-backdrop" id="choice-backdrop" onclick="dismissChoiceSheet()"></div>
+        <div class="choice-sheet" id="choice-sheet">
+          <div class="choice-sheet-handle"></div>
+          <div class="choice-sheet-title" id="choice-title">Select an option</div>
+          <div class="choice-sheet-items" id="choice-items"></div>
+          <button class="choice-sheet-dismiss" onclick="dismissChoiceSheet()">Dismiss</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-empty">
+            <span class="chat-empty-icon">&#9673;</span>
+            Type a message or speak to HAL
+          </div>
+        </div>
+        <div class="typing-indicator" id="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+        <div class="chat-input-wrap">
+          <textarea class="chat-input" id="chat-input" placeholder="Message HAL..." rows="1"></textarea>
+          <button class="chat-mic-btn" id="chat-mic-btn" onclick="voiceInput()" title="Click to speak">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+          </button>
+          <button class="chat-send-btn" id="chat-send-btn" onclick="sendChat()">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Terminal -->
+      <div class="terminal-panel">
+        <div class="panel-header">Terminal</div>
+        <div class="terminal-scroll" id="terminal-container">
+          <div class="terminal-line info">HAL9000 v1.0 — awaiting activation</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="bottom-bar">
+      <span id="bottom-time"></span>
+      <span>HAL 9000 v1.0</span>
+    </div>
+
+  </div>
+
+  <script>
+    let isRunning = false;
+    let eventSource = null;
+    let videoActive = false;
+    let chatSending = false;
+
+    // ── DOM refs ───────────────────────────────────
+    const halPanel = document.getElementById('hal-panel');
+    const halImage = document.getElementById('hal-image');
+    const halStatusLabel = document.getElementById('hal-status-label');
+    const powerBtn = document.getElementById('power-btn');
+    // subsystems now live on HAL image (halControls)
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const chatSendBtn = document.getElementById('chat-send-btn');
+    const chatMicBtn = document.getElementById('chat-mic-btn');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const terminalContainer = document.getElementById('terminal-container');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const camPanel = document.getElementById('cam-panel');
+    const camVideo = document.getElementById('cam-video');
+    const camHud = document.getElementById('cam-hud');
+    const camOfflineLabel = document.getElementById('cam-offline-label');
+    const camSpeaking = document.getElementById('cam-speaking');
+    const camTimestamp = document.getElementById('cam-timestamp');
+    const bottomTime = document.getElementById('bottom-time');
+    const voiceSelector = document.getElementById('voice-selector');
+    const waveformWrap = document.getElementById('waveform-wrap');
+    const waveformCanvas = document.getElementById('waveform-canvas');
+    const halControls = document.getElementById('hal-controls');
+    const wfCtx = waveformCanvas.getContext('2d');
+
+    // ── Toast Notifications ─────────────────────
+    const toastContainer = document.getElementById('toastContainer');
+
+    function showToast(type, title, message, duration = 5000) {
+      const icons = { error: '\u26A0', warn: '\u26A0', info: '\u24D8' };
+      const toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      toast.innerHTML =
+        '<span class="toast-icon">' + (icons[type] || '\u24D8') + '</span>' +
+        '<div class="toast-body">' +
+          '<div class="toast-title">' + escapeHtml(title) + '</div>' +
+          '<div>' + escapeHtml(message) + '</div>' +
+        '</div>' +
+        '<button class="toast-close" onclick="dismissToast(this.parentElement)">\u2715</button>';
+      toastContainer.appendChild(toast);
+
+      // Auto-dismiss
+      if (duration > 0) {
+        setTimeout(() => dismissToast(toast), duration);
+      }
+
+      // Keep max 5 toasts
+      while (toastContainer.children.length > 5) {
+        toastContainer.removeChild(toastContainer.firstChild);
+      }
+    }
+
+    function dismissToast(el) {
+      if (!el || !el.parentElement) return;
+      el.classList.add('removing');
+      setTimeout(() => { if (el.parentElement) el.parentElement.removeChild(el); }, 300);
+    }
+
+    // Detect errors from log entries and show toasts
+    function checkForErrors(entries) {
+      entries.forEach(entry => {
+        const text = (entry.text || '').toLowerCase();
+        if (entry.role === 'system' && (text.includes('error') || text.includes('failed'))) {
+          showToast('error', 'System Error', entry.text);
+        } else if (entry.role === 'tool' && text.startsWith('[error]')) {
+          showToast('warn', 'Tool Failed', entry.text);
+        }
+      });
+    }
+
+    // ── Web Audio API for real waveform ──────────
+    let audioCtx = null;
+    let analyser = null;
+    let freqData = null;
+    let lastSpeechId = 0;
+
+    // ── API helper ─────────────────────────────────
+    async function api(path, method = 'GET', body = null) {
+      const opts = { method };
+      if (body) {
+        opts.headers = { 'Content-Type': 'application/json' };
+        opts.body = JSON.stringify(body);
+      }
+      const res = await fetch('/api/' + path, opts);
+      return res.json();
+    }
+
+    // ── Power / subsystem controls ─────────────────
+    async function togglePower() {
+      powerBtn.disabled = true;
+      powerBtn.style.opacity = '0.4';
+      addTerminalLine(isRunning ? '> Shutting down HAL engine...' : '> Booting HAL engine...');
+      const status = await api(isRunning ? 'stop' : 'start', 'POST');
+      applyStatus(status);
+      addTerminalLine(status.running ? '> Engine online. All systems operational.' : '> Engine offline.');
+      powerBtn.disabled = false;
+      powerBtn.style.opacity = '';
+    }
+
+    async function toggleSub(name) {
+      if (!isRunning) return;
+      const status = await api('toggle/' + name, 'POST');
+      applyStatus(status);
+      addTerminalLine('> Toggled ' + name + ': ' + (status[name] ? 'ON' : 'OFF'));
+    }
+
+    async function switchVoice(provider) {
+      if (!isRunning) return;
+      voiceSelector.querySelectorAll('.tb-voice-opt').forEach(o => o.classList.add('switching'));
+      addTerminalLine('> Switching voice to ' + provider + '...');
+      const result = await api('voice_provider', 'POST', { provider });
+      voiceSelector.querySelectorAll('.tb-voice-opt').forEach(o => {
+        o.classList.remove('switching');
+        o.classList.toggle('active', o.dataset.provider === result.provider);
+      });
+      addTerminalLine('> Voice provider: ' + result.provider);
+    }
+
+    // ── Chat — send typed message ──────────────────
+    async function sendChat() {
+      const text = chatInput.value.trim();
+      if (!text || chatSending) return;
+      if (!isRunning) {
+        addChatMsg('system', 'Activate HAL first');
+        return;
+      }
+
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+      chatSending = true;
+      chatSendBtn.classList.add('sending');
+      typingIndicator.classList.add('active');
+
+      addTerminalLine('> [you] ' + text);
+
+      try {
+        const result = await api('chat', 'POST', { text });
+        if (result.error) {
+          addTerminalLine('> [error] ' + result.error, 'error');
+          showToast('error', 'Chat Error', result.error);
+        }
+      } catch (err) {
+        addTerminalLine('> [error] ' + err.message, 'error');
+        showToast('error', 'Connection Error', err.message);
+      } finally {
+        chatSending = false;
+        chatSendBtn.classList.remove('sending');
+        typingIndicator.classList.remove('active');
+        chatInput.focus();
+      }
+    }
+
+    // ── Voice input — click mic, speak, HAL listens ──
+    let micListening = false;
+
+    async function voiceInput() {
+      if (micListening || chatSending) return;
+      if (!isRunning) {
+        addChatMsg('system', 'Activate HAL first');
+        return;
+      }
+
+      micListening = true;
+      chatMicBtn.classList.add('listening');
+      typingIndicator.classList.add('active');
+      addTerminalLine('> [mic] Listening...');
+
+      try {
+        // Single call: record → transcribe → think → respond (no round-trip)
+        const result = await api('voice_chat', 'POST', {});
+        if (result.error && !result.heard) {
+          addTerminalLine('> [mic] ' + result.error, 'info');
+        } else if (result.error) {
+          addTerminalLine('> [mic heard] ' + result.heard);
+          showToast('error', 'Voice Error', result.error);
+        } else if (result.heard) {
+          addTerminalLine('> [mic heard] ' + result.heard);
+        }
+      } catch (err) {
+        addTerminalLine('> [mic error] ' + err.message, 'error');
+        showToast('error', 'Mic Error', err.message);
+      } finally {
+        micListening = false;
+        chatMicBtn.classList.remove('listening');
+        typingIndicator.classList.remove('active');
+      }
+    }
+
+    // Chat input: Enter to send, Shift+Enter for newline, auto-resize
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChat();
+      }
+    });
+
+    chatInput.addEventListener('input', () => {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 80) + 'px';
+    });
+
+    // ── Choice Sheet ─────────────────────────────────
+    const choiceBackdrop = document.getElementById('choice-backdrop');
+    const choiceSheet = document.getElementById('choice-sheet');
+    const choiceTitle = document.getElementById('choice-title');
+    const choiceItems = document.getElementById('choice-items');
+
+    function showChoiceSheet(title, choices) {
+      choiceTitle.textContent = title || 'Select an option';
+      choiceItems.innerHTML = '';
+
+      choices.forEach((choice, i) => {
+        const item = document.createElement('div');
+        item.className = 'choice-item';
+        item.innerHTML =
+          '<span class="choice-item-num">' + (i + 1) + '</span>' +
+          '<div><div class="choice-item-text">' + escapeHtml(choice.label) + '</div>' +
+          (choice.desc ? '<div class="choice-item-desc">' + escapeHtml(choice.desc) + '</div>' : '') +
+          '</div>';
+        item.onclick = () => selectChoice(choice.label, i + 1);
+        choiceItems.appendChild(item);
+      });
+
+      // Animate in
+      requestAnimationFrame(() => {
+        choiceBackdrop.classList.add('active');
+        choiceSheet.classList.add('active');
+      });
+    }
+
+    function dismissChoiceSheet() {
+      choiceSheet.classList.remove('active');
+      choiceBackdrop.classList.remove('active');
+    }
+
+    function selectChoice(label, num) {
+      dismissChoiceSheet();
+      // Send the choice as a user message
+      chatInput.value = String(num);
+      sendChat();
+    }
+
+    /**
+     * Detect if HAL's message contains numbered choices.
+     * Patterns detected:
+     *   - "1. Option text" / "2. Option text" (numbered list)
+     *   - "One, Option text" / "Two, Option text" (spoken numbers)
+     *   - Lines starting with a number followed by period/colon/comma
+     * Returns { title, choices[] } or null.
+     */
+    function parseChoices(text) {
+      /*
+       * Detect DISAMBIGUATION choices only — not informational lists.
+       * Heuristics:
+       *  - Items must be SHORT labels (< 80 chars each)
+       *  - 2–6 items (disambiguation, not educational)
+       *  - Numbers must start at 1 and be sequential
+       *  - Title (text before list) should be brief (< 120 chars)
+       *  - Items should NOT contain multiple sentences
+       */
+
+      function isDisambiguation(title, items) {
+        // Too many items → probably informational content
+        if (items.length > 6) return false;
+        // Every item must be a short label (not a paragraph)
+        const allShort = items.every(label => label.length < 80 && !label.includes('. '));
+        if (!allShort) return false;
+        // Title should be brief (a question or prompt, not a paragraph)
+        if (title && title.length > 120) return false;
+        return true;
+      }
+
+      // Try numbered list first (most common)
+      const numMatches = [...text.matchAll(/(?:^|\n)\s*(\d+)[.):\-]\s+(.+)/g)];
+      if (numMatches.length >= 2) {
+        // Numbers must start at 1 and be sequential
+        const nums = numMatches.map(m => parseInt(m[1]));
+        if (nums[0] !== 1 || !nums.every((n, i) => n === i + 1)) return null;
+
+        const firstIdx = text.indexOf(numMatches[0][0].trim());
+        let title = text.substring(0, firstIdx).trim();
+        title = title.replace(/[:\-]+$/, '').trim();
+
+        const labels = numMatches.map(m => m[2].trim().replace(/[.?!]$/, ''));
+        if (!isDisambiguation(title, labels)) return null;
+
+        if (!title) title = 'Choose an option';
+        const choices = labels.map(l => ({ label: l, desc: '' }));
+        return { title, choices };
+      }
+
+      // Try spoken numbers: "One, ..." "Two, ..."
+      const spokenMatches = [...text.matchAll(/(?:^|\n)\s*(One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten)[,.:]\s+(.+)/gi)];
+      if (spokenMatches.length >= 2) {
+        const firstIdx = text.indexOf(spokenMatches[0][0].trim());
+        let title = text.substring(0, firstIdx).trim();
+        title = title.replace(/[:\-]+$/, '').trim();
+
+        const labels = spokenMatches.map(m => m[2].trim().replace(/[.?!]$/, ''));
+        if (!isDisambiguation(title, labels)) return null;
+
+        if (!title) title = 'Choose an option';
+        const choices = labels.map(l => ({ label: l, desc: '' }));
+        return { title, choices };
+      }
+
+      return null;
+    }
+
+    // ── Chat message rendering ─────────────────────
+    let chatInitialized = false;
+
+    function addChatMsg(role, text) {
+      if (!chatInitialized) { chatMessages.innerHTML = ''; chatInitialized = true; }
+
+      let displayText = text;
+
+      // Check if HAL's message contains choices → show choice sheet + strip from bubble
+      if (role === 'hal') {
+        const parsed = parseChoices(text);
+        if (parsed && parsed.choices.length >= 2 && parsed.choices.length <= 10) {
+          showChoiceSheet(parsed.title, parsed.choices);
+          // Strip the numbered list from the chat bubble — show only the title/question
+          displayText = parsed.title || '';
+          if (!displayText) displayText = text.split(/\n/)[0]; // fallback: first line
+        }
+      }
+
+      const div = document.createElement('div');
+      div.className = 'msg ' + role;
+
+      const roleLabel = role === 'hal' ? 'HAL'
+        : role === 'user' ? 'YOU'
+        : role === 'tool' ? 'TOOL'
+        : 'SYS';
+
+      div.innerHTML = '<span class="msg-label">' + roleLabel + '</span>' + escapeHtml(displayText);
+      chatMessages.appendChild(div);
+
+      // Keep last 150 messages
+      while (chatMessages.children.length > 150) {
+        chatMessages.removeChild(chatMessages.firstChild);
+      }
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function appendLogEntries(entries) {
+      if (!entries.length) return;
+      entries.forEach(entry => {
+        addChatMsg(entry.role, entry.text);
+        // Mirror to terminal
+        const prefix = entry.role === 'tool' ? '[tool] ' : '[' + entry.role + '] ';
+        addTerminalLine(prefix + entry.text, entry.role === 'tool' ? '' : 'info');
+      });
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    // ── Status application ─────────────────────────
+    function applyStatus(s) {
+      isRunning = s.running;
+
+      halImage.classList.toggle('off', !s.running);
+      halImage.classList.toggle('active', s.running);
+      halPanel.classList.toggle('active', s.running);
+      halStatusLabel.textContent = s.running ? 'Online' : 'Offline';
+
+      powerBtn.classList.toggle('running', s.running);
+      powerBtn.title = s.running ? 'Deactivate HAL' : 'Activate HAL';
+
+      // Camera
+      const shouldShowVideo = s.running && s.vision && s.has_camera;
+      if (shouldShowVideo && !videoActive) {
+        camVideo.src = '/api/video?' + Date.now();
+        camVideo.style.display = 'block';
+        camHud.style.display = 'block';
+        camOfflineLabel.style.display = 'none';
+        camPanel.classList.remove('inactive');
+        videoActive = true;
+      } else if (!shouldShowVideo && videoActive) {
+        camVideo.src = '';
+        camVideo.style.display = 'none';
+        camHud.style.display = 'none';
+        camOfflineLabel.style.display = '';
+        camPanel.classList.add('inactive');
+        videoActive = false;
+      }
+
+      camSpeaking.classList.toggle('active', !!s.speaking);
+
+      // Trigger real audio playback when new speech arrives
+      if (s.speech_id && s.speech_id > lastSpeechId) {
+        playSpeechAudio(s.speech_id);
+      }
+
+      // Voice provider selector (toolbar)
+      voiceSelector.classList.toggle('disabled', !s.running);
+      if (s.voice_provider) {
+        voiceSelector.querySelectorAll('.tb-voice-opt').forEach(o => {
+          o.classList.toggle('active', o.dataset.provider === s.voice_provider);
+        });
+      }
+
+      // Subsystem buttons (HAL image)
+      halControls.querySelectorAll('.hal-ctrl-btn').forEach(btn => {
+        const sub = btn.dataset.sub;
+        const enabled = s[sub];
+        btn.classList.toggle('disabled', !s.running);
+        btn.classList.toggle('on', enabled && s.running);
+      });
+
+    }
+
+    // ── Terminal ────────────────────────────────────
+    function addTerminalLine(text, type = '') {
+      const div = document.createElement('div');
+      div.className = 'terminal-line' + (type ? ' ' + type : '');
+      div.textContent = text;
+      terminalContainer.appendChild(div);
+      while (terminalContainer.children.length > 100) {
+        terminalContainer.removeChild(terminalContainer.firstChild);
+      }
+      terminalContainer.scrollTop = terminalContainer.scrollHeight;
+    }
+
+    // ── Timestamps ─────────────────────────────────
+    function updateTimestamps() {
+      const now = new Date();
+      const ts = now.toISOString().replace('T', ' ').substring(0, 19);
+      camTimestamp.textContent = ts;
+      bottomTime.textContent = ts;
+    }
+    setInterval(updateTimestamps, 1000);
+    updateTimestamps();
+
+    // ── SSE ─────────────────────────────────────────
+    function connectSSE() {
+      if (eventSource) eventSource.close();
+      eventSource = new EventSource('/api/stream');
+
+      eventSource.onopen = () => {
+        statusDot.classList.add('connected');
+        statusDot.classList.remove('disconnected');
+        statusText.textContent = 'Connected';
+        addTerminalLine('> SSE connected', 'info');
+      };
+
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        applyStatus(data.status);
+        appendLogEntries(data.log);
+        checkForErrors(data.log);
+      };
+
+      eventSource.onerror = () => {
+        statusDot.classList.remove('connected');
+        statusDot.classList.add('disconnected');
+        statusText.textContent = 'Reconnecting';
+        showToast('warn', 'Connection Lost', 'Attempting to reconnect to HAL...', 3000);
+      };
+    }
+
+    connectSSE();
+
+    // ── Waveform Visualizer (fits red block in HAL image) ──
+    let wfSpeaking = false;
+    const WF_BARS = 32;
+    let WF_W = 0, WF_H = 0, WF_GAP = 1;
+
+    // Positions within the original HAL.png (850x1236)
+    const IMG_W = 850, IMG_H = 1236;
+    // Red waveform block
+    const BLOCK_LEFT = 124 / IMG_W;
+    const BLOCK_TOP = 1016 / IMG_H;
+    const BLOCK_W = 605 / IMG_W;
+    const BLOCK_H = 144 / IMG_H;
+    // Blank strip (between eye and red block) — buttons go here
+    const STRIP_TOP = 880 / IMG_H;     // 71.2%
+    const STRIP_H = 120 / IMG_H;       // 9.7%
+
+    function wfResize() {
+      // Calculate where the image actually renders inside the panel
+      // (object-fit: contain causes letterboxing)
+      const panelRect = halPanel.getBoundingClientRect();
+      const pW = panelRect.width;
+      const pH = panelRect.height;
+      if (pW < 1 || pH < 1) return;
+
+      const imgAspect = IMG_W / IMG_H;
+      const panelAspect = pW / pH;
+
+      let rendW, rendH, offX, offY;
+      if (panelAspect > imgAspect) {
+        // Panel is wider than image — image fits to height, centered horizontally
+        rendH = pH;
+        rendW = pH * imgAspect;
+        offX = (pW - rendW) / 2;
+        offY = 0;
+      } else {
+        // Panel is taller than image — image fits to width, centered vertically
+        rendW = pW;
+        rendH = pW / imgAspect;
+        offX = 0;
+        offY = (pH - rendH) / 2;
+      }
+
+      // Position the overlay exactly over the red block within the rendered image
+      const oLeft = offX + BLOCK_LEFT * rendW;
+      const oTop = offY + BLOCK_TOP * rendH;
+      const oWidth = BLOCK_W * rendW;
+      const oHeight = BLOCK_H * rendH;
+
+      waveformWrap.style.left = oLeft + 'px';
+      waveformWrap.style.top = oTop + 'px';
+      waveformWrap.style.width = oWidth + 'px';
+      waveformWrap.style.height = oHeight + 'px';
+
+      // Position the control buttons on the blank strip
+      const sTop = offY + STRIP_TOP * rendH;
+      const sH = STRIP_H * rendH;
+      halControls.style.left = offX + 'px';
+      halControls.style.top = sTop + 'px';
+      halControls.style.width = rendW + 'px';
+      halControls.style.height = sH + 'px';
+
+      // Scale buttons proportionally — keep smaller than strip to avoid clipping
+      const btnSize = Math.max(16, Math.min(36, Math.round(sH * 0.55)));
+      const iconSize = Math.round(btnSize * 0.44);
+      const btnGap = Math.round(btnSize * 0.3);
+      halControls.style.gap = btnGap + 'px';
+      halControls.querySelectorAll('.hal-ctrl-btn').forEach(btn => {
+        btn.style.width = btnSize + 'px';
+        btn.style.height = btnSize + 'px';
+        btn.style.borderRadius = Math.round(btnSize * 0.12) + 'px';
+        btn.querySelector('svg').style.width = iconSize + 'px';
+        btn.querySelector('svg').style.height = iconSize + 'px';
+      });
+
+      // Set canvas resolution for crisp rendering
+      const dpr = window.devicePixelRatio || 1;
+      const cw = Math.round(oWidth * dpr);
+      const ch = Math.round(oHeight * dpr);
+      if (cw < 1 || ch < 1) return;
+      waveformCanvas.width = cw;
+      waveformCanvas.height = ch;
+      WF_W = cw;
+      WF_H = ch;
+    }
+
+    // Resize on load, window resize, and when HAL panel changes size
+    wfResize();
+    window.addEventListener('resize', wfResize);
+    new ResizeObserver(wfResize).observe(halPanel);
+
+    function ensureAudioCtx() {
+      if (audioCtx) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 128;
+      analyser.smoothingTimeConstant = 0.75;
+      freqData = new Uint8Array(analyser.frequencyBinCount);
+    }
+
+    async function playSpeechAudio(speechId) {
+      if (speechId <= lastSpeechId) return;
+      lastSpeechId = speechId;
+
+      ensureAudioCtx();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+      try {
+        const resp = await fetch('/api/speech');
+        if (!resp.ok || resp.status === 204) return;
+
+        const arrayBuf = await resp.arrayBuffer();
+        if (!arrayBuf.byteLength) return;
+
+        const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
+        const source = audioCtx.createBufferSource();
+        source.buffer = audioBuf;
+
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+
+        wfResize(); // ensure canvas matches current size
+        waveformWrap.classList.add('active');
+        wfSpeaking = true;
+
+        source.onended = () => {
+          wfSpeaking = false;
+          fetch('/api/speech_done', { method: 'POST' }).catch(() => {});
+        };
+
+        source.start();
+      } catch (err) {
+        console.error('[Waveform] Audio playback error:', err);
+        wfSpeaking = false;
+        fetch('/api/speech_done', { method: 'POST' }).catch(() => {});
+      }
+    }
+
+    function wfDraw() {
+      if (WF_W < 1 || WF_H < 1) { requestAnimationFrame(wfDraw); return; }
+      wfCtx.clearRect(0, 0, WF_W, WF_H);
+
+      if (analyser && wfSpeaking) {
+        analyser.getByteFrequencyData(freqData);
+      }
+
+      const padX = Math.round(WF_W * 0.03);
+      const padY = Math.round(WF_H * 0.1);
+      const drawW = WF_W - padX * 2;
+      const drawH = WF_H - padY * 2;
+      const barW = Math.max(1, Math.floor(drawW / WF_BARS) - WF_GAP);
+
+      for (let i = 0; i < WF_BARS; i++) {
+        const val = (analyser && wfSpeaking) ? freqData[i] || 0 : 0;
+        const norm = val / 255;
+        const h = norm * drawH;
+        const x = padX + i * (barW + WF_GAP);
+        const y = padY + (drawH - h) / 2;
+
+        if (h < 1) continue;
+
+        const alpha = 0.5 + norm * 0.5;
+        wfCtx.fillStyle = `rgba(255, 23, 68, ${alpha})`;
+        wfCtx.fillRect(x, y, barW, h);
+
+        if (h > 2) {
+          wfCtx.fillStyle = `rgba(255, 100, 130, ${alpha * 0.7})`;
+          wfCtx.fillRect(x, y, barW, 1);
+          wfCtx.fillRect(x, y + h - 1, barW, 1);
+        }
+      }
+
+      if (!wfSpeaking) {
+        waveformWrap.classList.remove('active');
+      }
+
+      requestAnimationFrame(wfDraw);
+    }
+    requestAnimationFrame(wfDraw);
+
+    // PWA Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/assets/sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

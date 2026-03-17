@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "hal-9000": {
+      "command": "/Users/shandarjunaid/Downloads/HAL9000/.venv/bin/python",
+      "args": ["/Users/shandarjunaid/Downloads/HAL9000/hal_mcp_server.py"]
+    }
+  }
+}

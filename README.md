@@ -1,65 +1,231 @@
-# HAL9000 — Personal AI Agent
+# HAL 9000 — Local Multimodal AI Agent
 
 > "I am completely operational, and all my circuits are functioning perfectly."
 
-A local AI agent that sees you via webcam, hears you via microphone, thinks via Claude claude-sonnet-4-5 (vision), and speaks back with HAL's iconic calm voice.
+A local, multimodal AI agent that **sees** you via webcam, **hears** your voice, **thinks** via LLM, **speaks** with a cloned voice, **acts** on your Mac, and **integrates** with Claude Code via MCP. Runs entirely on your machine with a browser-based control panel.
+
+---
+
+## What HAL Can Do
+
+| Capability | How |
+|------------|-----|
+| **See** | Webcam feed with browser HUD — scanlines, corner brackets, REC indicator |
+| **Hear** | Continuous mic listening with VAD + OpenAI Whisper STT |
+| **Think** | Multi-provider LLM (GPT-4o, Claude, Gemini) with function calling |
+| **Speak** | 3 voice providers — Edge TTS (free/fast), ElevenLabs (paid/best), XTTS (local/cloned) |
+| **Act** | 31 OS-level tools — shell, apps, files, web search, memory, clipboard, app automation, Claude Code delegation |
+| **Chat** | Browser chat window with text input + mic button — type or speak to HAL |
+| **Disambiguate** | Smart choice sheet UI — HAL presents numbered options, user clicks to select |
+| **Integrate** | MCP server exposes 18 tools to Claude Code/Desktop for bidirectional AI collaboration |
+| **Remember** | Persistent memory survives restarts — facts stored in `memory/facts.json` |
+| **Know** | Knowledge base from local files + remote llms.txt URLs loaded at boot |
 
 ---
 
 ## Architecture
 
 ```
-Webcam → Frame sampler  ─┐
-                          ├→ Claude claude-sonnet-4-5 (vision + tools) → ElevenLabs voice
-Mic    → Whisper STT    ─┘
+┌──────────────────────────────────────────────────────────┐
+│                     HAL9000 ENGINE                        │
+│                                                          │
+│  Vision ──┐                                              │
+│            ├──→ Brain (LLM + function calling)           │
+│  Hearing ─┘       │              │                       │
+│  Chat UI ─┘       ▼              ▼                       │
+│                 Voice          Tools (31)                 │
+│           (Edge/11Labs/XTTS) (OS agent layer)            │
+│                   │                                      │
+│                   ▼                                      │
+│          Browser Audio + Waveform                        │
+│                                                          │
+│  Knowledge (files + URLs)   Memory (persistent JSON)     │
+└──────────────────────────────────────────────────────────┘
+         │                              │
+    Flask Server                  MCP Server
+    localhost:9000              (Claude Code integration)
 ```
 
-## Setup
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full system diagram.
+
+---
+
+## Quick Start
 
 ```bash
 cd HAL9000
 python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env             # fill in your 4 API keys
-python hal9000.py
+cp .env.example .env              # fill in your API keys
+python server.py                  # start the web control panel
 ```
 
-## API keys needed
+Open **http://localhost:9000** → click **Activate**.
 
-| Key | Where |
-|-----|-------|
-| `ANTHROPIC_API_KEY` | console.anthropic.com |
-| `OPENAI_API_KEY` | platform.openai.com (Whisper) |
-| `ELEVENLABS_API_KEY` | elevenlabs.io |
-| `ELEVENLABS_VOICE_ID` | Your chosen voice ID from ElevenLabs |
+### Claude Code Integration
 
-## Project structure
+```bash
+# Register HAL as an MCP server for Claude Code
+claude mcp add hal-9000 -- python /path/to/HAL9000/hal_mcp_server.py
+```
+
+Now Claude Code can see through your webcam, speak aloud, control your Mac, and access HAL's memory.
+
+---
+
+## API Keys
+
+| Key | Where | Required |
+|-----|-------|----------|
+| `OPENAI_API_KEY` | platform.openai.com | **Yes** — GPT-4o brain + Whisper STT |
+| `ANTHROPIC_API_KEY` | console.anthropic.com | Only if `AI_PROVIDER=anthropic` |
+| `GEMINI_API_KEY` | aistudio.google.com | Only if `AI_PROVIDER=gemini` |
+| `ELEVENLABS_API_KEY` | elevenlabs.io | Only if `TTS_PROVIDER=elevenlabs` |
+| `ELEVENLABS_VOICE_ID` | ElevenLabs voice library | Only if `TTS_PROVIDER=elevenlabs` |
+
+**No API key needed for the default voice** — Edge TTS is free.
+
+---
+
+## Voice Providers
+
+HAL supports 3 TTS providers, switchable at runtime from the dashboard:
+
+| Provider | Cost | Speed | Quality | Config |
+|----------|------|-------|---------|--------|
+| **Edge TTS** (default) | Free | ~0.7s | Good — deep male voice | `TTS_PROVIDER=edge` |
+| **ElevenLabs** | Paid | ~1.2s | Best — natural prosody | `TTS_PROVIDER=elevenlabs` |
+| **XTTS** (local) | Free | ~4.5s | Good — voice cloning | `TTS_PROVIDER=local` (requires Python 3.11) |
+
+Switch from the dashboard UI or set `TTS_PROVIDER` in `.env`.
+
+---
+
+## Web Dashboard
+
+Access at **http://localhost:9000** after starting the server.
+
+| Panel | Description |
+|-------|-------------|
+| **HAL panel** | HAL 9000 eye with real-time waveform visualization overlaid on red block during speech |
+| **HAL image controls** | 3D-style Vision/Hearing/Voice buttons positioned on the HAL image strip |
+| **Webcam HUD** | Live MJPEG feed with scanlines, corner brackets, REC indicator — collapses when vision is off |
+| **Voice selector** | Segmented switch to swap between Edge/ElevenLabs/XTTS at runtime |
+| **Chat window** | Message bubbles with text input + mic button — Enter to send, Shift+Enter for newline |
+| **Choice sheet** | Slide-up modal for disambiguation — auto-detects when HAL presents numbered options |
+| **Power button** | Circular SVG power icon in top toolbar — activates/deactivates HAL |
+| **Terminal** | System log with green terminal aesthetic |
+| **Status bar** | Connection status, timestamp, version |
+| **Boot greeting** | Time-aware creative HAL-style greeting with 20 randomized boot lines |
+
+The UI uses a sci-fi industrial aesthetic — brushed metal bezels, LED indicator lights, recessed panels.
+
+**PWA support**: Add to Home Screen on mobile for a native app experience.
+
+---
+
+## Project Structure
 
 ```
 HAL9000/
-├── hal9000.py          # Entry point — main loop
-├── config.py           # All settings + env loading
+├── server.py              # Flask web server + API endpoints (localhost only)
+├── hal9000.py             # HAL engine — lifecycle, main loop, browser audio
+├── hal_mcp_server.py      # MCP server for Claude Code/Desktop integration
+├── config.py              # Settings + env loading with safe parsing
 ├── requirements.txt
 ├── .env.example
+├── .mcp.json              # Project MCP config for Claude Code
+│
 ├── core/
-│   ├── vision.py       # Webcam frame capture + encoding
-│   ├── hearing.py      # Mic recording + Whisper STT
-│   ├── brain.py        # Claude API — vision + conversation
-│   └── voice.py        # ElevenLabs TTS + audio playback
-└── README.md
+│   ├── brain.py           # Multi-provider LLM + function calling (thread-safe)
+│   ├── vision.py          # Webcam capture + MJPEG stream
+│   ├── hearing.py         # Mic recording + VAD + Whisper STT
+│   ├── voice.py           # Multi-provider TTS (Edge/ElevenLabs/XTTS)
+│   ├── tools/              # Tool registry + 31 tools across 7 domain modules
+│   │   ├── __init__.py     # Registry, execute(), format converters, security
+│   │   ├── shell.py        # run_shell (whitelisted commands)
+│   │   ├── apps.py         # open/quit/list apps, open URLs, app_action
+│   │   ├── files.py        # list/read/write/search/info
+│   │   ├── macos.py        # volume, brightness, notifications, clipboard, screenshot
+│   │   ├── web.py          # web_search, fetch_url
+│   │   ├── memory.py       # remember, recall, forget, list_memories
+│   │   └── delegation.py   # open_claude_code, delegate_to_claude_code
+│   └── knowledge.py       # Knowledge loader (files + URLs)
+│
+├── knowledge/             # Drop .md/.txt files here — HAL reads at boot
+│   ├── sources.txt        # Remote URLs to fetch (llms.txt, etc.)
+│   └── *.txt              # Local knowledge files
+│
+├── memory/                # Persistent memory (created at runtime)
+│   └── facts.json
+│
+├── assets/
+│   ├── HAL.png            # Dashboard hero image
+│   ├── manifest.json      # PWA manifest
+│   ├── sw.js              # Service worker for PWA
+│   └── voice/             # XTTS reference clips (optional)
+│
+├── templates/
+│   └── index.html         # Web dashboard + chat UI + waveform visualizer
+│
+└── docs/
+    ├── ARCHITECTURE.md    # System architecture + data flow
+    ├── TOOLS.md           # Tool reference + security model
+    ├── ROADMAP.md         # Future plans + feature roadmap
+    └── PLAN-agent-os.md   # Original agent OS implementation plan (completed)
 ```
 
-## Voice commands
+---
 
-- Say **"reset"** or **"clear memory"** — wipes conversation history
-- Say **"goodbye HAL"** — clean shutdown
-- Press **q** in the camera window — also quits
+## Security
 
-## PWP commit convention
+HAL has been security-hardened:
+
+| Measure | Detail |
+|---------|--------|
+| **Command whitelist** | `run_shell` only allows 77 approved commands (ls, git, npm, etc.) |
+| **Blocked commands** | `sudo`, `shutdown`, `diskutil`, etc. are explicitly blocked |
+| **AppleScript escaping** | All user strings escaped before osascript interpolation |
+| **Localhost binding** | Flask binds to `127.0.0.1` by default (override with `HAL_HOST`) |
+| **Input length limits** | Chat input capped at 2000 chars |
+| **Secret file blocking** | `read_file` refuses to read `.env`, `credentials.json`, etc. |
+| **Safe config parsing** | Malformed env vars fall back to defaults instead of crashing |
+| **No `shell=True`** | All subprocess calls use argument lists, never shell interpretation |
+
+---
+
+## Configuration
+
+All settings in `.env`. See `.env.example` for the full list.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `AI_PROVIDER` | `openai` | Brain provider: openai, anthropic, gemini |
+| `TTS_PROVIDER` | `edge` | Voice provider: edge, elevenlabs, local |
+| `EDGE_VOICE` | `en-US-GuyNeural` | Edge TTS voice ID |
+| `FRAME_INTERVAL` | `2.0` | Seconds between webcam samples |
+| `MIC_RECORD_SECONDS` | `5` | Max recording duration per utterance |
+| `SILENCE_THRESHOLD` | `500` | Audio amplitude below this = silence |
+| `SERVER_PORT` | `9000` | Web server port |
+| `TOOL_MAX_ITERATIONS` | `5` | Max tool calls per conversation turn |
+| `HAL_HOST` | `127.0.0.1` | Server bind address (use `0.0.0.0` for LAN access) |
+
+---
+
+## Commit Convention
 
 ```
 feat(core): add wake word detection
 fix(vision): handle no-camera fallback
 chore(deps): update anthropic sdk
 ```
+
+---
+
+## Docs
+
+- [Architecture](docs/ARCHITECTURE.md) — System design, data flow, module responsibilities
+- [Tools Reference](docs/TOOLS.md) — All 31 tools with security model
+- [Roadmap](docs/ROADMAP.md) — Future plans and feature roadmap
+- [Changelog](CHANGELOG.md) — Version history and changes

@@ -1,0 +1,186 @@
+# Affordance Design Studio
+
+> Human-centered design, AI-powered outcomes. We bridge human needs and intelligent systems, creating digital affordances that don't just look intuitive — they think intuitive. Expert AI design consulting, research, and training. Based in Bengaluru, India.
+
+## About
+
+Affordance Design Studio is a design and AI consultancy founded by Shandar Junaid, a Certified Usability Analyst with 20+ years of UX leadership. The name "Affordance" comes from the subtle cues that tell you what a digital tool can actually do — our philosophy is signal, not noise.
+
+Prior experience includes UX Head at TATA Interactive Systems, Design Evangelist at Adobe, Design Director at Citrix, Usability Consultant at HFI, UX Head at Infostretch, Director of Product Design at Paylocity, Design Head at Reliance, and Usability Head at Wipro. 5,000+ students trained across universities and enterprise. 200+ workshops conducted on Design Thinking and AI-augmented development.
+
+### Mission
+
+Our mission is to make AI feel as natural and intuitive as any well-designed physical tool. When technology disappears into the background and users focus on their goals, we've succeeded. AI + UX = IX (Intelligent Experiences).
+
+---
+
+## Services
+
+### 01. UX/AI Design Consulting
+User-centered design that converts. Strategic guidance for integrating AI capabilities into human-centered design processes. Includes AI integration strategy, experience architecture, and interaction design.
+
+### 02. AI Consulting & Implementation
+Intelligent solutions for growth. Machine learning pipelines for intelligent user experiences. Includes intelligent agents, AI/ML integration, and API synthesis.
+
+### 03. Product Engineering
+End-to-end solution architecture from concept to deployment. Includes rapid prototyping, MVP acceleration, and scale optimization.
+
+### 04. Workshops & Training
+Upskill at speed. Educational programs to build internal AI design capabilities within your organization. Includes design thinking workshops, AI literacy training, and custom curriculum development.
+
+### Workshop Types
+- Corporate UX Training: Align teams on design thinking principles.
+- AI Adoption Programs: Demystified AI for non-tech leaders.
+- Hands-on Design Workshops: Collaborative sessions using proven design methodologies.
+- AI Enablement Sessions: Empower teams to use AI with confidence through practical training.
+
+---
+
+## IX Framework — Intelligent Experiences
+
+URL: https://affordance.design/ix.html
+
+AI without UX is cold automation. UX without AI is static and slow. IX unites them to create adaptive systems that serve human intent first. The IX Framework manages the complexity of systems that think, adapt, and respond.
+
+### The Five Lenses
+
+1. **Intent** — Begin with clarity of purpose. Intent shapes outcomes and should start with empathy, not efficiency. AI fails not because of bad technology but because of unclear intent.
+
+2. **Interpretation** — Translate data into meaning with transparency. Show how inputs map to inferences so people can steer, correct, and trust the system. Includes reason previews and correction UI.
+
+3. **Interaction** — Treat the interface as a dialogue. Adapt tone, pace, and modality to context and emotion. Make trust moves visible at key moments. Includes tone systems and adaptive states.
+
+4. **Inference & Iteration** — Shape how the system learns and keep learning aimed at the right thing. Build feedback loops, fairness checks, and human-in-the-loop pathways. Includes bias audits and iteration guardrails.
+
+5. **Impact** — Ask who benefits, who is burdened, and who might be left out. Measure human value: trust, inclusion, empowerment, and wellbeing — not just clicks. Includes who/whom analysis and redress plans.
+
+### Applied Model (5 Phases)
+
+1. Discovery — Define human intent, contextual interviews, emotional mapping. Outputs: Intent Map, Goal-state Journey, AI Opportunity Matrix.
+2. Data & Context — Map signals, signal-to-intent mapping, bias audits. Outputs: Signal Map, Context Layers Canvas, Data Ethics Charter.
+3. Dialogue Design — Interaction flows, tone systems, adaptive states. Outputs: Dialogue Flows, System Personality Sheet, Adaptive State Map.
+4. Learning Systems — Feedback loop architecture, human-in-the-loop oversight. Outputs: Feedback Loop Blueprint, Trust Moments Map, Bias Mitigation Plan.
+5. Impact — Measure trust, adaptivity metrics, fairness checks. Outputs: IX Impact Dashboard, Human Value Metrics, Inclusion Heatmap.
+
+### IX Artefacts
+
+- **IX Canvas** — One-page blueprint to define motivations, signals, dialogue, feedback, and impact.
+- **Personality Sheet** — Defines voice, tone shifts, vocabulary, and safety rails for AI systems.
+- **Feedback Blueprint** — How users teach the model. Routes for retraining and oversight.
+
+### Application Domains
+- Education: Adaptive learning that adjusts pace and celebrates effort.
+- Healthcare: Companion systems that shift tone on detected stress with transparency indicators.
+- Recruitment: Bias-aware screening with fairness visualizations and human-in-the-loop retraining.
+- Retail: Contextual commerce that explains recommendations and promotes mindful purchasing.
+
+---
+
+## Vibe to Viable (V2V) — AI Product Bootcamp
+
+URL: https://affordance.design/bootcamp.html
+
+A live, cohort-based bootcamp where participants go from raw idea to a deployed, authenticated product using Claude Code, Supabase, and the V2V build methodology. This is not a course — it is a live build lab.
+
+### Formats
+
+- **3-Day Sprint**: 18 guided chapters. Fast-track from idea to shipped product.
+- **5-Day Deep Dive** (Recommended): 30 deep-dive chapters. Adds Agent OS, backend deep dive, and extended iteration.
+
+### Pricing
+
+3-Day Sprint:
+- Builder (Students & solo builders): INR 7,200 / USD 79
+- Pro Builder (Founders, freelancers, teams): INR 17,200 / USD 189
+
+5-Day Deep Dive:
+- Builder: INR 10,800 / USD 119
+- Pro Builder: INR 26,300 / USD 289
+
+Claude API credits included with enrollment via Anthropic.
+
+### Cohort Details
+- Maximum 10 participants per batch
+- April cohort enrollments are open
+- Credential awarded: Certified Vibe Coder (CVC)
+
+### Track Record
+- 195+ builders trained
+- 56 products shipped
+- 3 completed cohorts
+- Tried and tested at UID Karnavati, Spread Design Barn, Ecole Intuit Lab
+
+### What Every Participant Ships
+- A working product at a real public URL
+- Supabase auth + database integration
+- Agent OS + custom Claude Code skills
+- PWP — a repeatable build protocol
+- Session recordings for every live day
+- Free Claude API credits (via Anthropic)
+- Certified Vibe Coder (CVC) credential
+
+### Tool Stack
+Claude Code (primary build environment), Google AI Studio (model testing), Figma Make (UI to component handoff), Supabase (auth, database, real-time), Netlify (CI/CD deployment), Git (version control), Agent OS (skills and automation), Project Workflow Protocol (Skills for Claude Code).
+
+### Curriculum Overview
+
+3-Day Sprint:
+- Day 1 — Foundation & Setup (6 chapters): Build brief, product architecture, scaffold, Figma Make integration, and build discipline
+- Day 2 — Intelligence Layer (6 chapters): Prompt architecture, modular AI workflows, model testing, and memory systems
+- Day 3 — Ship & Deploy (6 chapters): Git workflow, deployment, authentication, database, and public launch
+
+5-Day Deep Dive adds:
+- Day 3 (Alt) — Agent OS (6 chapters): Custom skills, hooks, MCP servers, and environment validation
+- Day 4 — Backend Deep Dive (6 chapters): Advanced auth, database architecture, iteration, and multi-model strategy
+- Day 5 — Final Ship (same as 3-Day Day 3)
+
+The full detailed curriculum with chapter descriptions, activities, and outputs is available to enrolled participants at https://affordance.design/curriculum.html
+
+---
+
+## Products
+
+### TimeLineX
+URL: https://timelinex.in
+AI-powered deterministic, hallucination-resistant timeline intelligence engine. Generates interactive chronological timelines based on user queries. Features rich 2D visualization, an immersive 3D experience, and a credits-based usage system. Built with React 18, Three.js, React Three Fiber, D3.js, and Custom RAG + Gemini.
+
+### CTRL+SURVIVE
+URL: https://affordance.design/ctrl+survive
+A darkly humorous career survival runner that simulates modern working life. Navigate 300 seconds across four stages — education, corporate, layoffs, and AI disruption — while balancing Relevance, Burnout, Savings, and Adaptability. 26 collectible power-ups, 27 authentic workplace obstacles, 7 failure conditions + 2 survival endings. Built with Claude Code and PhaserJS.
+
+### Project Workflow Protocol (PWP)
+URL: https://affordance.design/protocol
+GitHub: https://github.com/shandar/Project_Workflow_Protocol
+An open-source set of Skills for Claude Code that standardize how software projects are planned, built, verified, and shipped. Zero dependencies, stack-agnostic. Designed for solo developers, startup teams, and enterprise squads who use AI tools. MIT licensed.
+
+---
+
+## Process — The 4D Framework
+
+1. **Discover** — Understanding users, business goals, and technical constraints through research and stakeholder interviews.
+2. **Design** — Creating intuitive interfaces and interaction patterns that integrate AI while maintaining human-centered principles.
+3. **Deploy** — Implementing and launching with attention to performance, accessibility, and user adoption.
+4. **Drive** — Measuring success, gathering feedback, and continuously optimizing outcomes.
+
+---
+
+## Contact
+
+- Email: hello@affordancedesign.in
+- LinkedIn: https://linkedin.com/company/affordance-design
+- Founder LinkedIn: https://www.linkedin.com/in/shandarjunaid
+- Location: Bengaluru, India
+- Contact Form: https://affordance.design/#contact
+
+---
+
+## Site Map
+
+- https://affordance.design/ — Main marketing site (home page)
+- https://affordance.design/ix.html — IX (Intelligent Experiences) Framework
+- https://affordance.design/bootcamp.html — Vibe to Viable bootcamp landing page
+- https://affordance.design/curriculum.html — V2V full curriculum breakdown
+- https://affordance.design/programs.html — V2V programme overview
+- https://affordance.design/ctrl+survive — CTRL+SURVIVE game
+- https://affordance.design/protocol — Project Workflow Protocol
+- https://timelinex.in — TimeLineX product
