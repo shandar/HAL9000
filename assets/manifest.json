@@ -9,10 +9,16 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "/assets/HAL.png",
+      "src": "/assets/HAL-eye.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/assets/HAL-eye.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
