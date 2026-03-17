@@ -348,6 +348,27 @@
       pointer-events: none;
     }
 
+    /* Claude Code button — action, not toggle */
+    .hal-ctrl-btn.claude-btn {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .hal-ctrl-btn.claude-btn svg {
+      fill: #D97757;
+      filter: drop-shadow(0 0 3px rgba(217,119,87,0.3));
+    }
+    .hal-ctrl-btn.claude-btn:hover {
+      background: rgba(217,119,87,0.15);
+      border-color: rgba(217,119,87,0.4);
+    }
+    .hal-ctrl-btn.claude-btn:hover svg {
+      filter: drop-shadow(0 0 6px rgba(217,119,87,0.5));
+    }
+    .hal-ctrl-btn.claude-btn.disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
     /* Waveform — overlays the red block in the HAL image */
     .waveform-overlay {
       position: absolute;
@@ -1255,6 +1276,9 @@
           <button class="hal-ctrl-btn disabled" data-sub="voice" onclick="toggleSub('voice')" title="Voice">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
           </button>
+          <button class="hal-ctrl-btn claude-btn" onclick="openClaudeCode()" title="Open Claude Code CLI">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z" fill-rule="nonzero"/></svg>
+          </button>
         </div>
         <div class="waveform-overlay" id="waveform-wrap">
           <canvas class="waveform-canvas" id="waveform-canvas"></canvas>
@@ -1455,6 +1479,25 @@
         o.classList.remove('switching');
         o.classList.toggle('active', o.dataset.provider === result.provider);
       });
+    }
+
+    // ── Claude Code — open CLI in Terminal ─────────
+    async function openClaudeCode() {
+      if (!isRunning) return;
+      const claudeBtn = document.querySelector('.claude-btn');
+      claudeBtn.style.opacity = '0.4';
+      claudeBtn.style.pointerEvents = 'none';
+      try {
+        const result = await api('chat', 'POST', { text: 'open claude code terminal CLI' });
+        if (result.error) showToast('error', 'Claude Code', result.error);
+      } catch (err) {
+        showToast('error', 'Claude Code', err.message);
+      } finally {
+        setTimeout(() => {
+          claudeBtn.style.opacity = '';
+          claudeBtn.style.pointerEvents = '';
+        }, 3000);
+      }
     }
 
     // ── Chat — send typed message ──────────────────
@@ -1741,6 +1784,11 @@
 
       // Subsystem buttons (HAL image)
       halControls.querySelectorAll('.hal-ctrl-btn').forEach(btn => {
+        if (btn.classList.contains('claude-btn')) {
+          // Claude button: enabled when running, no on/off toggle
+          btn.classList.toggle('disabled', !s.running);
+          return;
+        }
         const sub = btn.dataset.sub;
         const enabled = s[sub];
         btn.classList.toggle('disabled', !s.running);
