@@ -9,3 +9,4 @@ __pycache__/
 .DS_Store
 memory/
 firebase-debug.log
+docs/
