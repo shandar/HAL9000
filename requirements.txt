@@ -1,0 +1,21 @@
+# HAL9000 dependencies
+
+# Core AI
+anthropic>=0.25.0
+openai>=1.12.0          # Whisper STT
+
+# Vision
+opencv-python>=4.9.0
+
+# Audio — mic recording
+pyaudio>=0.2.14
+soundfile>=0.12.1
+numpy>=1.26.0
+
+# Voice output
+elevenlabs>=1.1.0
+pygame>=2.5.2           # audio playback
+
+# Utilities
+python-dotenv>=1.0.0
+pillow>=10.2.0          # image encoding
