@@ -1,8 +1,8 @@
 // HAL9000 Service Worker — enables PWA "Add to Home Screen"
 // Minimal: just caches the shell for offline launch, all API calls go to network
 
-const CACHE_NAME = 'hal9000-v1';
-const SHELL_ASSETS = ['/', '/assets/HAL.png'];
+const CACHE_NAME = 'hal9000-v1.1';
+const SHELL_ASSETS = ['/', '/assets/HAL-eye.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

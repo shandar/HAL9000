@@ -1968,9 +1968,11 @@
     }
     requestAnimationFrame(wfDraw);
 
-    // PWA Service Worker
+    // PWA Service Worker — updateViaCache:'none' ensures SW file is always fetched fresh
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/assets/sw.js').catch(() => {});
+      navigator.serviceWorker.register('/assets/sw.js', { updateViaCache: 'none' })
+        .then(reg => { if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' }); })
+        .catch(() => {});
     }
   </script>
 </body>
