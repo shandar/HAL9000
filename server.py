@@ -37,17 +37,12 @@ def api_status():
 
 @app.route("/api/license")
 def api_license():
-    from core.license import get_license
-    lic = get_license()
-    return jsonify({
-        "tier": lic.tier,
-        "features": sorted(lic.features),
-        "valid": lic.valid,
-        "expires": lic.expires,
-        "max_memories": lic.max_memories,
-        "max_agents": lic.max_agents,
-        "email": lic.email,
-    })
+    try:
+        from core.license import get_license
+        lic = get_license()
+        return jsonify({"tier": lic.tier, "valid": lic.valid, "expires": lic.expires})
+    except ImportError:
+        return jsonify({"tier": "free", "valid": False, "expires": ""})
 
 
 @app.route("/api/start", methods=["POST"])

@@ -1,6 +1,8 @@
 .env
 .venv/
 hal_private.pem
+core/license.py
+core/license_keys.py
 __pycache__/
 *.pyc
 *.pyo

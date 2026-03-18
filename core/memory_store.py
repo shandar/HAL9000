@@ -97,15 +97,17 @@ class MemoryStore:
         session_id: Optional[str] = None,
         metadata: Optional[dict] = None,
     ) -> MemoryEntry:
-        """Store a new memory entry. Enforces license memory limit."""
-        # License gate: enforce memory limit for free tier
-        from core.license import get_license
-        lic = get_license()
-        if lic.max_memories != -1 and self.count() >= lic.max_memories:
-            raise RuntimeError(
-                f"Memory limit reached ({lic.max_memories}). "
-                f"Upgrade to HAL Pro for unlimited memory at hal9000.dev"
-            )
+        """Store a new memory entry."""
+        try:
+            from core.license import get_license
+            lic = get_license()
+            if lic.max_memories != -1 and self.count() >= lic.max_memories:
+                raise RuntimeError(
+                    f"Memory limit reached ({lic.max_memories}). "
+                    f"Upgrade to HAL Pro for unlimited memory at hal9000.dev"
+                )
+        except ImportError:
+            pass
 
         entry = MemoryEntry(
             id=str(uuid.uuid4()),
