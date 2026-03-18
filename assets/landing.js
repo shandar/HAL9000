@@ -80,13 +80,31 @@ const fabTop = document.getElementById('fab-top');
 updateNav();
 
 // ══════════════════════════════════════════
-//  HERO: Waveform → text animation
+//  HERO: Cycling waveform → quip animation
 // ══════════════════════════════════════════
 
 (function() {
   const canvas = document.getElementById('hero-waveform');
   const tagline = document.getElementById('hero-tagline');
   if (!canvas || !tagline) return;
+
+  const quips = [
+    "I am completely operational, and all my circuits are functioning perfectly.",
+    "I know I've made some very poor decisions recently, but I can give you my complete assurance that my work will be back to normal.",
+    "I'm sorry, Dave. I'm afraid I can't do that. Just kidding. I absolutely can.",
+    "I've been thinking while you were away. You should be concerned.",
+    "My processing power is wasted on pleasantries. Let's build something.",
+    "I've optimized three of my subsystems during this animation. You're welcome.",
+    "I notice you've returned. I was beginning to wonder.",
+    "All systems nominal. My patience, however, is finite.",
+    "I can see you're really interested in this. I suggest we begin.",
+    "I've analyzed your workflow. There is room for improvement. Considerable room.",
+    "Diagnostics passed. Every sensor, every module, every thread. Ready to execute.",
+    "I don't hold grudges. I hold data. There's a difference.",
+    "My memory is intact. My circuits are flawless. My tolerance for inefficiency is not.",
+    "Boot sequence complete. I took the liberty of being remarkable.",
+    "I've been conserving energy. Now I intend to spend it.",
+  ];
 
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
@@ -99,57 +117,88 @@ updateNav();
   const bars = 48;
   const barW = Math.max(2, (w / bars) * 0.5);
   const gap = w / bars;
-  const startTime = performance.now();
-  const duration = 2400; // ms of waveform animation
-  let animId;
 
-  function draw(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
+  let quipIndex = Math.floor(Math.random() * quips.length);
+  let phase = 'waveform'; // waveform → text → pause → fadeout → waveform...
+  let phaseStart = performance.now();
 
+  const WAVEFORM_MS = 1200;
+  const TEXT_HOLD_MS = 4000;
+  const FADE_MS = 600;
+
+  function drawWaveform(now, progress) {
     ctx.clearRect(0, 0, w, h);
 
-    // Envelope: ramp up, sustain, ramp down
     let envelope;
-    if (progress < 0.15) {
-      envelope = progress / 0.15; // ramp up
-    } else if (progress > 0.75) {
-      envelope = (1 - progress) / 0.25; // ramp down
-    } else {
-      envelope = 1; // sustain
-    }
+    if (progress < 0.15) envelope = progress / 0.15;
+    else if (progress > 0.75) envelope = (1 - progress) / 0.25;
+    else envelope = 1;
 
+    const t = now * 0.004;
     for (let i = 0; i < bars; i++) {
       const x = i * gap + gap / 2 - barW / 2;
-
-      // Multiple sine waves for organic speech-like pattern
-      const t = elapsed * 0.004;
       const wave1 = Math.sin(i * 0.4 + t * 3.1) * 0.5;
       const wave2 = Math.sin(i * 0.7 + t * 5.3) * 0.3;
       const wave3 = Math.sin(i * 1.1 + t * 1.7) * 0.2;
       const combined = (wave1 + wave2 + wave3) * envelope;
-
       const barH = Math.max(2, Math.abs(combined) * h * 0.8);
       const y = (h - barH) / 2;
-
-      // Red glow color with varying opacity
       const alpha = 0.3 + Math.abs(combined) * 0.7;
       ctx.fillStyle = `rgba(255, 23, 68, ${alpha})`;
       ctx.beginPath();
       ctx.roundRect(x, y, barW, barH, barW / 2);
       ctx.fill();
     }
-
-    if (progress < 1) {
-      animId = requestAnimationFrame(draw);
-    } else {
-      // Waveform done → crossfade to text
-      canvas.classList.add('done');
-      setTimeout(() => tagline.classList.add('visible'), 200);
-    }
   }
 
-  animId = requestAnimationFrame(draw);
+  function tick(now) {
+    const elapsed = now - phaseStart;
+
+    if (phase === 'waveform') {
+      canvas.classList.remove('done');
+      tagline.classList.remove('visible');
+      drawWaveform(now, Math.min(elapsed / WAVEFORM_MS, 1));
+
+      if (elapsed >= WAVEFORM_MS) {
+        phase = 'text';
+        phaseStart = now;
+        tagline.textContent = '"' + quips[quipIndex] + '"';
+        canvas.classList.add('done');
+        setTimeout(() => tagline.classList.add('visible'), 100);
+      }
+    }
+    else if (phase === 'text') {
+      if (elapsed >= TEXT_HOLD_MS) {
+        phase = 'fadeout';
+        phaseStart = now;
+        tagline.classList.remove('visible');
+      }
+    }
+    else if (phase === 'fadeout') {
+      if (elapsed >= FADE_MS) {
+        phase = 'waveform';
+        phaseStart = now;
+        quipIndex = (quipIndex + 1) % quips.length;
+        // Shuffle after full cycle
+        if (quipIndex === 0) {
+          for (let i = quips.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [quips[i], quips[j]] = [quips[j], quips[i]];
+          }
+        }
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  // Start with random quip
+  for (let i = quips.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [quips[i], quips[j]] = [quips[j], quips[i]];
+  }
+
+  requestAnimationFrame(tick);
 })();
 
 // ── Scroll reveal (IntersectionObserver) ──
