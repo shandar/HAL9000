@@ -200,8 +200,8 @@ section:not(.hero) {
   --surface-2: #141418;
   --border: #1e1e28;
   --text: #c8c8d0;
-  --text-dim: #5a5a6a;
-  --text-muted: #3a3a48;
+  --text-dim: #8a8a9a;
+  --text-muted: #5a5a6a;
   --red: #ff1744;
   --red-glow: rgba(255, 23, 68, 0.35);
   --red-dim: rgba(255, 23, 68, 0.08);
