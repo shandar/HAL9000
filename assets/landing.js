@@ -26,6 +26,15 @@ function updateNav() {
     nav.classList.remove('scrolled');
   }
 
+  // FAB: show after scrolling past first viewport
+  if (fabTop) {
+    if (scrollY > window.innerHeight * 0.8) {
+      fabTop.classList.add('visible');
+    } else {
+      fabTop.classList.remove('visible');
+    }
+  }
+
   // Determine active section
   let activeId = '';
   for (let i = navSections.length - 1; i >= 0; i--) {
@@ -63,6 +72,9 @@ document.querySelectorAll('.nav-link').forEach(link => {
     if (navLinksEl) navLinksEl.classList.remove('open');
   });
 });
+
+// ── Scroll-to-top FAB ──
+const fabTop = document.getElementById('fab-top');
 
 // Initial state
 updateNav();

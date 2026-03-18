@@ -1431,6 +1431,54 @@ section, footer, nav { position: relative; z-index: 2; }
 /* ═══════════════════════════════════════════
    FOOTER
 ═══════════════════════════════════════════ */
+
+/* ── Scroll-to-top FAB ── */
+.fab-top {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 999;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(14, 14, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(16px) scale(0.8);
+  pointer-events: none;
+  transition: opacity 0.4s, transform 0.4s, border-color 0.3s, color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.fab-top svg {
+  width: 20px;
+  height: 20px;
+}
+.fab-top.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.fab-top:hover {
+  border-color: rgba(255, 23, 68, 0.3);
+  color: var(--red);
+  box-shadow: 0 4px 24px rgba(255, 23, 68, 0.15), 0 4px 20px rgba(0,0,0,0.4);
+}
+.fab-top:active {
+  transform: translateY(0) scale(0.92);
+}
+
+@media (max-width: 580px) {
+  .fab-top { bottom: 20px; right: 20px; width: 40px; height: 40px; }
+  .fab-top svg { width: 18px; height: 18px; }
+}
+
 .footer {
   padding: 60px 0 40px;
   border-top: 1px solid var(--border);
