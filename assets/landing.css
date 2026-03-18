@@ -228,6 +228,39 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Global dot grid background (Affordance Studio style) ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.25) 100%);
+}
+
+/* ── Cross-hatch overlay (very subtle) ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,0.008) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.008) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.008) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.008) 75%);
+  background-size: 40px 40px;
+  background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+  opacity: 0.6;
+}
+
+/* All sections above the bg patterns */
+section, footer, nav { position: relative; z-index: 1; }
+
 /* ── Scrollbar ──────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
@@ -265,36 +298,60 @@ body {
   max-width: 600px;
 }
 
-/* ── Scroll reveal ─────────────────────── */
+/* ── Scroll reveal with entry animations ─────────────────────── */
 .reveal {
   opacity: 0;
-  transform: translateY(50px);
-  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(40px) scale(0.98);
+  filter: blur(4px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s ease;
 }
 .reveal.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+  filter: blur(0);
 }
 .reveal-left {
   opacity: 0;
-  transform: translateX(-60px);
-  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(-50px) scale(0.98);
+  filter: blur(3px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s ease;
 }
-.reveal-left.visible { opacity: 1; transform: translateX(0); }
+.reveal-left.visible { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
 .reveal-right {
   opacity: 0;
-  transform: translateX(60px);
-  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(50px) scale(0.98);
+  filter: blur(3px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.8s ease;
 }
-.reveal-right.visible { opacity: 1; transform: translateX(0); }
+.reveal-right.visible { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+
+/* ── Staggered children reveal ── */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(2px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.5s ease;
+}
+.reveal-stagger.visible > *:nth-child(1) { transition-delay: 0.05s; opacity: 1; transform: translateY(0); filter: blur(0); }
+.reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.1s; opacity: 1; transform: translateY(0); filter: blur(0); }
+.reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.15s; opacity: 1; transform: translateY(0); filter: blur(0); }
+.reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.2s; opacity: 1; transform: translateY(0); filter: blur(0); }
+.reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.25s; opacity: 1; transform: translateY(0); filter: blur(0); }
+.reveal-stagger.visible > *:nth-child(6) { transition-delay: 0.3s; opacity: 1; transform: translateY(0); filter: blur(0); }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .reveal-left, .reveal-right {
+  .reveal, .reveal-left, .reveal-right, .reveal-stagger > * {
     opacity: 1 !important;
     transform: none !important;
+    filter: none !important;
     transition: none !important;
   }
 }
@@ -473,9 +530,22 @@ body {
 /* ═══════════════════════════════════════════
    CAPABILITIES
 ═══════════════════════════════════════════ */
+/* ── Section divider (reusable) ── */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), rgba(255,23,68,0.12), var(--border), transparent);
+}
+
+/* ── Parallax content wrapper ── */
+[data-parallax-section] {
+  will-change: transform;
+}
+
 .capabilities {
   padding: 140px 0 100px;
   position: relative;
+  background: linear-gradient(180deg, var(--bg) 0%, rgba(14,14,20,0.4) 50%, var(--bg) 100%);
 }
 
 .cap-grid {
@@ -552,6 +622,9 @@ body {
 .architecture {
   padding: 100px 0 120px;
   position: relative;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .arch-flow {
@@ -617,6 +690,7 @@ body {
 ═══════════════════════════════════════════ */
 .cowork {
   padding: 100px 0 80px;
+  background: linear-gradient(180deg, var(--bg) 0%, rgba(10,10,14,0.6) 50%, var(--bg) 100%);
 }
 
 .cowork-strip {
@@ -733,6 +807,9 @@ body {
 ═══════════════════════════════════════════ */
 .integration {
   padding: 120px 0 80px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .terminal {
@@ -884,17 +961,9 @@ body {
 ═══════════════════════════════════════════ */
 .tutorial {
   padding: 100px 0 120px;
-  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 50%, var(--bg) 100%);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
   position: relative;
-}
-.tutorial::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border), rgba(255,23,68,0.15), var(--border), transparent);
 }
 
 /* ── Scenario Tabs ── */
@@ -1360,6 +1429,7 @@ body {
   padding: 60px 0 40px;
   border-top: 1px solid var(--border);
   text-align: center;
+  background: linear-gradient(180deg, var(--bg) 0%, #030305 100%);
 }
 
 .footer-quote {

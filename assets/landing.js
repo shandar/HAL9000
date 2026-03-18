@@ -68,28 +68,42 @@ document.querySelectorAll('.nav-link').forEach(link => {
 updateNav();
 
 // ── Scroll reveal (IntersectionObserver) ──
-const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-stagger');
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       entry.target.classList.add('visible');
     }
   });
-}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
 
 reveals.forEach(el => revealObserver.observe(el));
 
-// ── Parallax ──
+// ── Parallax (hero + section content) ──
 const parallaxElements = document.querySelectorAll('[data-parallax]');
+const sectionParallax = document.querySelectorAll('[data-parallax-section]');
 let ticking = false;
 
 function updateParallax() {
   const scrollY = window.scrollY;
+  const viewH = window.innerHeight;
+
+  // Hero parallax
   parallaxElements.forEach(el => {
     const speed = parseFloat(el.dataset.parallax);
     const offset = scrollY * speed;
     el.style.transform = `translateY(${offset}px)`;
   });
+
+  // Section content parallax — subtle Y shift based on scroll position relative to section
+  sectionParallax.forEach(el => {
+    const speed = parseFloat(el.dataset.parallaxSection) || 0.05;
+    const rect = el.getBoundingClientRect();
+    const center = rect.top + rect.height / 2;
+    const offset = (center - viewH / 2) * speed;
+    el.style.transform = `translateY(${offset}px)`;
+  });
+
   ticking = false;
 }
 
