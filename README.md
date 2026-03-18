@@ -33,11 +33,11 @@ A local, multimodal AI agent that **sees** you via webcam, **hears** your voice,
 | Capability | How |
 |------------|-----|
 | **See** | Webcam feed with browser HUD — scanlines, corner brackets, REC indicator |
-| **Hear** | Continuous mic listening with VAD + Whisper STT (API or local faster-whisper) |
+| **Hear** | Browser mic recording (Web Audio API, live waveform, silence detection) + Whisper STT (API or local faster-whisper) |
 | **Think** | Multi-provider LLM (GPT-4o, Claude, Gemini, **Ollama**) with function calling |
 | **Speak** | 3 voice providers — Edge TTS (free/fast), ElevenLabs (paid/best), XTTS (local/cloned) |
 | **Act** | 40 cross-platform tools — shell, apps, files, web search, memory, clipboard, app automation, Claude Code delegation, background tasks, artifacts, multi-agent orchestration |
-| **Chat** | Browser chat window with text input + mic button — type or speak to HAL |
+| **Chat** | Terminal-style chat with streaming responses, 35 slash commands (categorized menu, keyboard nav), mic button — type or speak to HAL |
 | **Disambiguate** | Smart choice sheet UI — HAL presents numbered options, user clicks to select |
 | **Integrate** | MCP server exposes 20 tools to Claude Code/Desktop for bidirectional AI collaboration |
 | **Remember** | Typed persistent memory — facts, decisions, preferences, session summaries |
@@ -54,8 +54,8 @@ A local, multimodal AI agent that **sees** you via webcam, **hears** your voice,
 │                                                          │
 │  Vision ──┐                                              │
 │            ├──→ Brain (LLM + function calling)           │
-│  Hearing ─┘       │              │                       │
-│  Chat UI ─┘       ▼              ▼                       │
+│  Browser ──┘       │              │                       │
+│  Mic + Chat        ▼              ▼                       │
 │                 Voice          Tools (40)                 │
 │           (Edge/11Labs/XTTS) (OS agent layer)            │
 │                   │                                      │
@@ -261,10 +261,11 @@ Access at **http://localhost:9000** after starting the server.
 | Panel | Description |
 |-------|-------------|
 | **HAL panel** | HAL 9000 eye with real-time waveform visualization overlaid on red block during speech |
-| **HAL image controls** | 3D-style Vision/Hearing/Voice/Claude buttons positioned on the HAL image strip |
+| **HAL image controls** | 3D-style Vision/Voice/Claude buttons positioned on the HAL image strip |
 | **Webcam HUD** | Live MJPEG feed with scanlines, corner brackets, REC indicator — collapses when vision is off |
 | **Voice selector** | Segmented switch to swap between Edge/ElevenLabs/XTTS at runtime |
-| **Chat window** | Message bubbles with text input + mic button — Enter to send, Shift+Enter for newline |
+| **Chat window** | Terminal-style chat with prompt prefixes, streaming responses, formatted lists, mic button — Enter to send, Shift+Enter for newline |
+| **Slash commands** | 35 categorized commands with keyboard navigation — type `/` to open menu |
 | **Choice sheet** | Slide-up modal for disambiguation — auto-detects when HAL presents numbered options |
 | **Task queue** | Collapsible panel showing background tasks and agents with live status |
 | **Workspace** | Tabbed artifact panel — code, diagrams, HTML — appears when artifacts are created |
