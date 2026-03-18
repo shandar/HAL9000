@@ -1,3 +1,72 @@
+// ══════════════════════════════════════════
+//  NAV: Sticky background + active section tracking
+// ══════════════════════════════════════════
+
+const nav = document.getElementById('nav');
+const navLinks = document.querySelectorAll('.nav-link[data-section]');
+const navSections = [];
+
+// Build section list for active tracking
+navLinks.forEach(link => {
+  const id = link.dataset.section;
+  const section = document.getElementById(id);
+  if (section) navSections.push({ id, el: section, link });
+});
+
+// Scroll handler: background + active state
+let navTicking = false;
+
+function updateNav() {
+  const scrollY = window.scrollY;
+
+  // Toggle scrolled class (background appearance)
+  if (scrollY > 80) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+
+  // Determine active section
+  let activeId = '';
+  for (let i = navSections.length - 1; i >= 0; i--) {
+    const { id, el } = navSections[i];
+    const top = el.getBoundingClientRect().top + scrollY - 120;
+    if (scrollY >= top) {
+      activeId = id;
+      break;
+    }
+  }
+
+  // Update active link
+  navLinks.forEach(link => {
+    if (link.dataset.section === activeId) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+
+  navTicking = false;
+}
+
+window.addEventListener('scroll', () => {
+  if (!navTicking) {
+    requestAnimationFrame(updateNav);
+    navTicking = true;
+  }
+}, { passive: true });
+
+// Close mobile menu on link click
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    const navLinksEl = document.getElementById('nav-links');
+    if (navLinksEl) navLinksEl.classList.remove('open');
+  });
+});
+
+// Initial state
+updateNav();
+
 // ── Scroll reveal (IntersectionObserver) ──
 const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
 const revealObserver = new IntersectionObserver((entries) => {
