@@ -1295,10 +1295,8 @@ section, footer, nav { position: relative; z-index: 2; }
   border-radius: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
-  cursor: pointer;
   transition: all 0.3s;
   position: relative;
-  overflow: hidden;
 }
 .tut-usecase:hover {
   border-color: rgba(255,23,68,0.15);
