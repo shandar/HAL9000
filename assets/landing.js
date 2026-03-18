@@ -375,6 +375,19 @@ function replayTimeline(timelineId) {
   animateTimeline(timelineId);
 }
 
+// ── Guide platform tab switching ──
+function switchGuideTab(btn) {
+  // Update tab buttons within the guide section
+  const parent = btn.closest('.guide');
+  if (!parent) return;
+  parent.querySelectorAll('.tut-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  // Show matching panel
+  parent.querySelectorAll('.guide-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('guide-' + btn.dataset.guide);
+  if (panel) panel.classList.add('active');
+}
+
 // ── Use case card toggle ──
 function toggleUseCase(card) {
   card.classList.toggle('open');

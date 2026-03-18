@@ -988,6 +988,13 @@ section, footer, nav { position: relative; z-index: 2; }
 .guide-table .required { color: var(--red); font-weight: 600; }
 .guide-table .optional { color: var(--text-muted); }
 
+/* ── Guide platform panels ── */
+.guide-panel {
+  display: none;
+  animation: tutFadeIn 0.5s ease;
+}
+.guide-panel.active { display: block; }
+
 /* ═══════════════════════════════════════════
    TUTORIAL
 ═══════════════════════════════════════════ */
@@ -1053,79 +1060,10 @@ section, footer, nav { position: relative; z-index: 2; }
   margin-top: 24px;
   padding: 32px;
   border-radius: 16px;
-  background: rgba(235, 235, 240, 0.95);
-  border: 1px solid rgba(200, 200, 210, 0.3);
-  box-shadow: 0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
-  color: #1a1a2e;
+  background: #16161e;
+  border: 1px solid #2a2a38;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03);
 }
-.tut-content-frame .tut-msg:not(.from-hal) .tut-bubble {
-  background: #fff;
-  border-color: rgba(0,0,0,0.08);
-  color: #1a1a2e;
-}
-.tut-content-frame .tut-msg.from-hal .tut-bubble {
-  background: linear-gradient(135deg, rgba(255,23,68,0.08), rgba(255,23,68,0.03));
-  border-color: rgba(255,23,68,0.15);
-  color: #1a1a2e;
-}
-.tut-content-frame .tut-bubble-label { color: #666; }
-.tut-content-frame .tut-bubble code {
-  background: rgba(0,0,0,0.06);
-  color: #c41234;
-}
-.tut-content-frame .tut-tool-call {
-  background: rgba(0,120,200,0.06);
-  border-color: rgba(0,120,200,0.2);
-  color: #0070c0;
-}
-.tut-content-frame .tut-tool-result { color: #555; }
-.tut-content-frame .tut-avatar.user { background: rgba(0,150,255,0.1); color: #0070c0; border-color: rgba(0,120,200,0.2); }
-.tut-content-frame .tut-avatar.hal { background: rgba(255,23,68,0.08); color: var(--red); border-color: rgba(255,23,68,0.2); }
-.tut-content-frame .tut-choice-sheet {
-  background: #fff;
-  border-color: rgba(0,0,0,0.1);
-}
-.tut-content-frame .tut-choice-sheet h5 { color: #1a1a2e; }
-.tut-content-frame .tut-choice-item { color: #444; }
-.tut-content-frame .tut-choice-item:hover { background: rgba(255,23,68,0.06); color: #1a1a2e; }
-.tut-content-frame .tut-choice-num { background: rgba(0,0,0,0.05); color: #666; }
-.tut-content-frame .tut-flow-node {
-  background: #fff;
-  border-color: rgba(0,0,0,0.1);
-  color: #1a1a2e;
-}
-.tut-content-frame .tut-flow-node small { color: #777; }
-.tut-content-frame .tut-flow-arrow { color: #999; }
-.tut-content-frame .tut-replay {
-  background: #fff;
-  border-color: rgba(0,0,0,0.1);
-  color: #666;
-}
-.tut-content-frame .tut-replay:hover { border-color: rgba(255,23,68,0.3); color: var(--red); }
-.tut-content-frame .tut-timeline::before {
-  background: linear-gradient(180deg, var(--red), #0070c0, var(--green));
-}
-.tut-content-frame .tut-tl-item {
-  background: #fff;
-  border-color: rgba(0,0,0,0.08);
-  color: #1a1a2e;
-}
-.tut-content-frame .tut-tl-content { color: #444; }
-.tut-content-frame .tut-usecase {
-  background: #fff;
-  border-color: rgba(0,0,0,0.08);
-}
-.tut-content-frame .tut-usecase:hover {
-  border-color: rgba(255,23,68,0.2);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-}
-.tut-content-frame .tut-usecase p { color: #555; }
-.tut-content-frame .tut-uc-chevron { color: #999; }
-.tut-content-frame .tut-uc-detail {
-  background: rgba(0,0,0,0.03);
-  border-color: rgba(0,0,0,0.06);
-}
-.tut-content-frame .tut-uc-detail .tut-uc-result { color: #444; }
 
 /* ── Conversation Flow ── */
 .tut-convo {

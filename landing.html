@@ -418,88 +418,224 @@ python server.py</div>
       <div class="reveal">
         <div class="section-label">Installation</div>
         <h2 class="section-title">Get Started</h2>
-        <p class="section-desc">HAL runs entirely on your Mac. No cloud infrastructure, no Docker, no containers. Just Python and your API keys.</p>
+        <p class="section-desc">HAL runs on macOS, Windows, and Linux. Pick your platform — same features everywhere.</p>
       </div>
 
-      <div class="guide-steps">
-        <div class="guide-step reveal" style="transition-delay:0.05s">
-          <div class="guide-step-num">1</div>
-          <div class="guide-step-content">
-            <h4>Prerequisites</h4>
-            <p>You need Python 3.10+, macOS (for system controls and AppleScript), and at least an OpenAI API key.</p>
+      <!-- Platform tabs -->
+      <div class="tut-tabs reveal" style="margin-top:40px; margin-bottom:0;">
+        <button class="tut-tab active" data-guide="mac" onclick="switchGuideTab(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          macOS
+        </button>
+        <button class="tut-tab" data-guide="win" onclick="switchGuideTab(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3 12V6.75l6-1.32v6.48L3 12zm17-9v8.75l-10 .08V5.21L20 3zm-10 9.34l10-.08V21l-10-1.66V12.25zM3 12.5l6 .09v6.73l-6-1.07V12.5z"/></svg>
+          Windows
+        </button>
+        <button class="tut-tab" data-guide="linux" onclick="switchGuideTab(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.345 1.884 1.345.899 0 1.666-.6 1.934-1.334.084-.135.14-.333.232-.467.545-.8.6-2.135-.133-2.735a1.02 1.02 0 00-.283-.133c.32-.533.196-1.066.054-1.468-.132-.382-.354-.6-.425-.665.233-.467.068-1-.1-1.333-.17-.334-.432-.467-.5-.467-.68 0-1.27.05-1.725.467-.463.467-1.18.733-1.2.733-.227.134-.43.267-.51.6-.04.135-.065.267-.06.4.003.4.266.733.6 1.066.247.307.554.535 1.06.737a3.1 3.1 0 00-.316.467c-.36.698-.19 1.534.203 2.2.136.234.39.534.62.735a.96.96 0 01-.18.338c-.262.354-.655.531-1.143.605-.488.073-1.07.015-1.534-.216-.932-.467-1.993-.533-2.852-.333-.86.2-1.524.667-1.857 1.333-.068.135-.118.27-.149.407-.728-.07-1.455-.332-1.655-.735-.1-.2-.088-.467.182-1.066.135-.267.092-.735.037-1.135a4.71 4.71 0 01-.055-.534c-.003-.2.037-.399.113-.533.06-.135.145-.2.245-.267.321-.2.59-.2.883-.333.297-.135.632-.332.852-.666.12-.2.165-.398.192-.601.02-.135.023-.267.02-.333a2.4 2.4 0 00-.026-.334c.273-.534.353-1.066.32-1.6-.04-.666-.233-1.333-.484-1.866-.622-1.333-1.685-2.867-2.384-3.6-.41-.467-.714-.867-.816-1.333-.1-.2-.145-.467-.145-.667 0-.467.095-.87.297-1.067.202-.2.466-.334.797-.334.23-.001.47.064.681.198.04-.053.18-.333.284-.666.023-.068.047-.134.072-.2-.12-.117-.348-.2-.404-.267-.12-.135-.143-.334-.02-.534.116-.2.336-.135.535.066.198.2.33.4.412.534.083-.266.28-.667.424-1 .138-.326.29-.665.36-.866.003-.04.002-.092-.025-.135-.272-.467-.566-.934-.776-1.467-.233-.6-.396-1.268-.322-1.934C8.92 1.467 10.2.467 11.504.333 11.84.306 12.17.297 12.504 0z"/></svg>
+          Linux
+        </button>
+      </div>
+
+      <!-- macOS guide -->
+      <div class="guide-panel active" id="guide-mac">
+        <div class="guide-steps">
+          <div class="guide-step reveal" style="transition-delay:0.05s">
+            <div class="guide-step-num">1</div>
+            <div class="guide-step-content">
+              <h4>Prerequisites</h4>
+              <p>Python 3.10+, Homebrew (recommended). For free mode: <a href="https://ollama.com" target="_blank" style="color:var(--cyan);">Ollama</a>. For paid mode: an OpenAI API key.</p>
+              <div class="guide-code"><span class="dim"># Install Python if needed</span>
+brew install python@3.12
+
+<span class="dim"># For free mode — install Ollama</span>
+brew install ollama && ollama pull llama3.1</div>
+            </div>
           </div>
-        </div>
 
-        <div class="guide-step reveal" style="transition-delay:0.1s">
-          <div class="guide-step-num">2</div>
-          <div class="guide-step-content">
-            <h4>Clone & Install</h4>
-            <div class="guide-code"><span class="dim"># Clone the repository</span>
-git clone https://github.com/shandar/HAL9000.git
+          <div class="guide-step reveal" style="transition-delay:0.1s">
+            <div class="guide-step-num">2</div>
+            <div class="guide-step-content">
+              <h4>Clone & Install</h4>
+              <div class="guide-code">git clone https://github.com/shandar/HAL9000.git
 cd HAL9000
-
-<span class="dim"># Create virtual environment and install</span>
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt</div>
+            </div>
           </div>
-        </div>
 
-        <div class="guide-step reveal" style="transition-delay:0.15s">
-          <div class="guide-step-num">3</div>
-          <div class="guide-step-content">
-            <h4>Configure API Keys</h4>
-            <p>Copy the example env file and add your keys.</p>
-            <div class="guide-code"><span class="dim"># Copy template and edit</span>
+          <div class="guide-step reveal" style="transition-delay:0.15s">
+            <div class="guide-step-num">3</div>
+            <div class="guide-step-content">
+              <h4>Configure</h4>
+              <div class="guide-code"><span class="dim"># Free mode (no API keys)</span>
+echo "FREE_MODE=true" > .env
+
+<span class="dim"># OR paid mode — copy template and add keys</span>
 cp .env.example .env
 nano .env</div>
-            <table class="guide-table" style="margin-top:16px;">
-              <thead>
-                <tr><th>Key</th><th>Required</th><th>Purpose</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>OPENAI_API_KEY</td><td class="required">Yes</td><td>GPT-4o brain + Whisper STT</td></tr>
-                <tr><td>ANTHROPIC_API_KEY</td><td class="optional">Optional</td><td>If using Claude as brain</td></tr>
-                <tr><td>GEMINI_API_KEY</td><td class="optional">Optional</td><td>If using Gemini as brain</td></tr>
-                <tr><td>ELEVENLABS_API_KEY</td><td class="optional">Optional</td><td>Premium voice (ElevenLabs)</td></tr>
-              </tbody>
-            </table>
-            <p style="margin-top:12px; font-size:0.82rem; color:var(--text-muted);">The default voice (Edge TTS) requires no API key — it's free.</p>
+              <table class="guide-table" style="margin-top:16px;">
+                <thead><tr><th>Key</th><th>Required</th><th>Purpose</th></tr></thead>
+                <tbody>
+                  <tr><td>FREE_MODE=true</td><td style="color:var(--green);font-weight:600;">Free</td><td>Skip all keys — uses Ollama + faster-whisper</td></tr>
+                  <tr><td>OPENAI_API_KEY</td><td class="optional">Paid</td><td>GPT-4o brain + Whisper STT</td></tr>
+                  <tr><td>ANTHROPIC_API_KEY</td><td class="optional">Paid</td><td>Claude as brain</td></tr>
+                  <tr><td>GEMINI_API_KEY</td><td class="optional">Paid</td><td>Gemini as brain</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
 
-        <div class="guide-step reveal" style="transition-delay:0.2s">
-          <div class="guide-step-num">4</div>
-          <div class="guide-step-content">
-            <h4>Launch HAL</h4>
-            <div class="guide-code"><span class="dim"># Start the web server</span>
-python server.py
-
-<span class="dim"># Open the dashboard</span>
+          <div class="guide-step reveal" style="transition-delay:0.2s">
+            <div class="guide-step-num">4</div>
+            <div class="guide-step-content">
+              <h4>Launch</h4>
+              <div class="guide-code">python server.py
 open http://localhost:9000</div>
-            <p>Click the <strong>power button</strong> in the top-left to activate HAL. He'll greet you.</p>
+              <p>Click the <strong>power button</strong> to activate HAL. Grant microphone + camera permissions when prompted.</p>
+            </div>
+          </div>
+
+          <div class="guide-step reveal" style="transition-delay:0.25s">
+            <div class="guide-step-num">5</div>
+            <div class="guide-step-content">
+              <h4>Connect Claude Code (optional)</h4>
+              <div class="guide-code">claude mcp add hal-9000 -- python /path/to/HAL9000/hal_mcp_server.py</div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="guide-step reveal" style="transition-delay:0.25s">
-          <div class="guide-step-num">5</div>
-          <div class="guide-step-content">
-            <h4>Connect Claude Code</h4>
-            <p>Register HAL's MCP server so Claude Code can use HAL's 20 tools — webcam, voice, macOS controls, memory, and context handoff.</p>
-            <div class="guide-code">claude mcp add hal-9000 -- python /path/to/HAL9000/hal_mcp_server.py</div>
+      <!-- Windows guide -->
+      <div class="guide-panel" id="guide-win">
+        <div class="guide-steps">
+          <div class="guide-step reveal" style="transition-delay:0.05s">
+            <div class="guide-step-num">1</div>
+            <div class="guide-step-content">
+              <h4>Prerequisites</h4>
+              <p>Python 3.10+ from <a href="https://python.org" target="_blank" style="color:var(--cyan);">python.org</a> (check "Add to PATH" during install). For free mode: <a href="https://ollama.com" target="_blank" style="color:var(--cyan);">Ollama for Windows</a>.</p>
+              <div class="guide-code"><span class="dim"># Verify Python</span>
+python --version
+
+<span class="dim"># For free mode — download Ollama from ollama.com, then:</span>
+ollama pull llama3.1
+
+<span class="dim"># Install build tools for pyaudio (required for microphone)</span>
+pip install pipwin
+pipwin install pyaudio</div>
+            </div>
+          </div>
+
+          <div class="guide-step reveal" style="transition-delay:0.1s">
+            <div class="guide-step-num">2</div>
+            <div class="guide-step-content">
+              <h4>Clone & Install</h4>
+              <div class="guide-code">git clone https://github.com/shandar/HAL9000.git
+cd HAL9000
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt</div>
+              <p style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);">Note: If <code>pyaudio</code> fails, install the <a href="https://visualstudio.microsoft.com/visual-cpp-build-tools/" target="_blank" style="color:var(--cyan);">Visual C++ Build Tools</a> or use <code>pipwin install pyaudio</code>.</p>
+            </div>
+          </div>
+
+          <div class="guide-step reveal" style="transition-delay:0.15s">
+            <div class="guide-step-num">3</div>
+            <div class="guide-step-content">
+              <h4>Configure</h4>
+              <div class="guide-code"><span class="dim"># Free mode (no API keys)</span>
+echo FREE_MODE=true > .env
+
+<span class="dim"># OR paid mode — copy template and add keys</span>
+copy .env.example .env
+notepad .env</div>
+            </div>
+          </div>
+
+          <div class="guide-step reveal" style="transition-delay:0.2s">
+            <div class="guide-step-num">4</div>
+            <div class="guide-step-content">
+              <h4>Launch</h4>
+              <div class="guide-code">python server.py</div>
+              <p>Open <strong>http://localhost:9000</strong> in your browser. Click power button to activate.</p>
+              <p style="font-size:0.82rem;color:var(--text-muted);margin-top:8px;">Windows may prompt for firewall access — allow it for localhost only.</p>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="guide-step reveal" style="transition-delay:0.3s">
-          <div class="guide-step-num">6</div>
+      <!-- Linux guide -->
+      <div class="guide-panel" id="guide-linux">
+        <div class="guide-steps">
+          <div class="guide-step reveal" style="transition-delay:0.05s">
+            <div class="guide-step-num">1</div>
+            <div class="guide-step-content">
+              <h4>Prerequisites</h4>
+              <p>Python 3.10+, system audio libraries, and optionally Ollama for free mode.</p>
+              <div class="guide-code"><span class="dim"># Ubuntu/Debian</span>
+sudo apt install python3 python3-venv python3-pip portaudio19-dev
+
+<span class="dim"># Fedora/RHEL</span>
+sudo dnf install python3 python3-pip portaudio-devel
+
+<span class="dim"># For free mode</span>
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull llama3.1
+
+<span class="dim"># Optional: notification + clipboard + screenshot tools</span>
+sudo apt install libnotify-bin xclip scrot   <span class="dim"># or wl-clipboard grim for Wayland</span></div>
+            </div>
+          </div>
+
+          <div class="guide-step reveal" style="transition-delay:0.1s">
+            <div class="guide-step-num">2</div>
+            <div class="guide-step-content">
+              <h4>Clone & Install</h4>
+              <div class="guide-code">git clone https://github.com/shandar/HAL9000.git
+cd HAL9000
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt</div>
+            </div>
+          </div>
+
+          <div class="guide-step reveal" style="transition-delay:0.15s">
+            <div class="guide-step-num">3</div>
+            <div class="guide-step-content">
+              <h4>Configure</h4>
+              <div class="guide-code"><span class="dim"># Free mode (no API keys)</span>
+echo "FREE_MODE=true" > .env
+
+<span class="dim"># OR paid mode</span>
+cp .env.example .env
+nano .env</div>
+            </div>
+          </div>
+
+          <div class="guide-step reveal" style="transition-delay:0.2s">
+            <div class="guide-step-num">4</div>
+            <div class="guide-step-content">
+              <h4>Launch</h4>
+              <div class="guide-code">python server.py
+xdg-open http://localhost:9000</div>
+              <p>Click the <strong>power button</strong> to activate HAL. Ensure PulseAudio/PipeWire is running for audio.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Using HAL (shared across platforms) -->
+      <div class="guide-steps" style="margin-top:32px;">
+        <div class="guide-step reveal">
+          <div class="guide-step-num" style="background:var(--red-dim);color:var(--red);">▶</div>
           <div class="guide-step-content">
             <h4>Using HAL</h4>
-            <p>Interact via voice or text. HAL responds with speech and can control your Mac, run shell commands, search the web, manage files, and delegate tasks to Claude Code.</p>
+            <p>Interact via voice or text. HAL responds with speech and can control your system, run commands, search the web, manage files, and delegate tasks to Claude Code.</p>
             <div class="guide-code"><span class="dim"># Voice examples:</span>
 "Hey HAL, what's on my screen?"
-"Open Slack and check my messages"
+"Set volume to 30 and check the battery"
 "Run the tests in the background"
-"Orchestrate: frontend does X, backend does Y"
 
 <span class="dim"># Chat examples:</span>
 "Remember that we decided to use PostgreSQL"
