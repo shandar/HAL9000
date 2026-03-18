@@ -416,14 +416,25 @@ section, footer, nav { position: relative; z-index: 2; }
   position: absolute;
   inset: -30%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,23,68,0.2) 0%, transparent 60%);
-  animation: eyePulse 4s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(255,23,68,0.25) 0%, transparent 60%);
+  animation: heartbeat 0.85s ease-in-out infinite;
   z-index: 1;
 }
 
-@keyframes eyePulse {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.08); }
+/* Human heartbeat: lub-dub + rest (~72 BPM)
+   0%   = rest (relaxed)
+   12%  = lub  (first contraction — systole)
+   24%  = between beats
+   36%  = dub  (second contraction — diastole)
+   48%  = start of rest
+   100% = full rest before next beat */
+@keyframes heartbeat {
+  0%   { opacity: 0.35; transform: scale(1); }
+  12%  { opacity: 1;    transform: scale(1.12); }
+  24%  { opacity: 0.5;  transform: scale(1.02); }
+  36%  { opacity: 0.9;  transform: scale(1.08); }
+  48%  { opacity: 0.4;  transform: scale(1); }
+  100% { opacity: 0.35; transform: scale(1); }
 }
 
 .hero-ring {
