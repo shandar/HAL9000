@@ -120,6 +120,10 @@ def _get_hearing():
 
 from core.memory_store import get_store as _get_store
 
+# ── Cross-platform API ────────────────────────────────────────
+
+from core.platform import platform as _platform
+
 
 # ══════════════════════════════════════════════════════════════
 #  MCP TOOLS
@@ -323,134 +327,66 @@ def hal_get_context(query: str = "") -> str:
 
 @mcp.tool()
 def macos_volume(action: str = "get", level: int = 50) -> str:
-    """Get or set the macOS system volume.
+    """Get or set the system volume.
     action: 'get' to read current volume, 'set' to change it.
     level: volume level 0-100 (only used when action is 'set')."""
     if action == "set":
-        level = max(0, min(100, level))
-        subprocess.run(
-            ["osascript", "-e", f"set volume output volume {level}"],
-            capture_output=True,
-        )
-        return f"Volume set to {level}%"
-    else:
-        result = subprocess.run(
-            ["osascript", "-e", "output volume of (get volume settings)"],
-            capture_output=True, text=True,
-        )
-        return f"Volume: {result.stdout.strip()}%"
+        return _platform.set_volume(level)
+    return _platform.get_volume()
 
 
 @mcp.tool()
 def macos_brightness(action: str = "get", level: float = 0.5) -> str:
-    """Get or set the macOS display brightness.
+    """Get or set the display brightness.
     action: 'get' to read current brightness, 'set' to change it.
     level: brightness 0.0-1.0 (only used when action is 'set')."""
     if action == "set":
-        level = max(0.0, min(1.0, level))
-        subprocess.run(
-            ["osascript", "-e",
-             f'tell application "System Events" to set value of slider 1 of group 1 of window 1 of process "Control Center" to {level}'],
-            capture_output=True,
-        )
-        return f"Brightness set to {int(level * 100)}%"
-    else:
-        result = subprocess.run(
-            ["bash", "-c",
-             "ioreg -c AppleBacklightDisplay | grep brightness | head -1 | awk -F'= ' '{print $NF}'"],
-            capture_output=True, text=True,
-        )
-        dark_result = subprocess.run(
-            ["osascript", "-e",
-             'tell application "System Events" to tell appearance preferences to get dark mode'],
-            capture_output=True, text=True,
-        )
-        brightness = result.stdout.strip() or "unknown"
-        dark = dark_result.stdout.strip() == "true"
-        return f"Brightness: {brightness}, Dark mode: {'on' if dark else 'off'}"
+        return _platform.set_brightness(level)
+    return _platform.get_brightness()
 
 
 @mcp.tool()
 def macos_notify(title: str, message: str) -> str:
-    """Send a macOS notification with a title and message.
-    Shows as a native notification banner on the user's screen."""
-    safe_title = _escape_applescript(title)
-    safe_message = _escape_applescript(message)
-    subprocess.run(
-        ["osascript", "-e",
-         f'display notification "{safe_message}" with title "{safe_title}"'],
-        capture_output=True,
-    )
-    return f"Notification sent: {title}"
+    """Send a desktop notification with a title and message."""
+    return _platform.send_notification(title, message)
 
 
 @mcp.tool()
 def macos_clipboard(action: str = "get", text: str = "") -> str:
-    """Get or set the macOS clipboard contents.
+    """Get or set the clipboard contents.
     action: 'get' to read clipboard, 'set' to copy text to clipboard.
     text: the text to copy (only used when action is 'set')."""
     if action == "set":
-        process = subprocess.Popen(["pbcopy"], stdin=subprocess.PIPE)
-        process.communicate(text.encode("utf-8"))
-        return f"Copied {len(text)} chars to clipboard"
-    else:
-        result = subprocess.run(["pbpaste"], capture_output=True, text=True)
-        content = result.stdout[:3000]
-        return content or "(clipboard is empty)"
+        return _platform.set_clipboard(text)
+    return _platform.get_clipboard()
 
 
 @mcp.tool()
 def macos_apps(action: str = "list", name: str = "") -> str:
-    """Manage macOS applications.
+    """Manage applications.
     action: 'list' to see running apps, 'open' to launch an app, 'quit' to close an app.
     name: application name (required for 'open' and 'quit')."""
     if action == "open":
         if not name:
             return "ERROR: Provide an application name to open."
-        try:
-            subprocess.run(["open", "-a", name], check=True, capture_output=True)
-            return f"Opened {name}"
-        except subprocess.CalledProcessError:
-            return f"Could not open '{name}' — app not found"
+        return _platform.open_application(name)
     elif action == "quit":
         if not name:
             return "ERROR: Provide an application name to quit."
-        safe_name = _escape_applescript(name)
-        result = subprocess.run(
-            ["osascript", "-e", f'tell application "{safe_name}" to quit'],
-            capture_output=True, text=True,
-        )
-        return f"Quit {name}" if result.returncode == 0 else f"Could not quit '{name}'"
-    else:
-        result = subprocess.run(
-            ["osascript", "-e",
-             'tell application "System Events" to get name of every process whose background only is false'],
-            capture_output=True, text=True,
-        )
-        return result.stdout.strip() or "Could not list applications"
+        return _platform.quit_application(name)
+    return _platform.list_running_apps()
 
 
 @mcp.tool()
 def macos_wifi() -> str:
     """Get the current WiFi network name."""
-    result = subprocess.run(
-        ["/usr/sbin/networksetup", "-getairportnetwork", "en0"],
-        capture_output=True, text=True,
-    )
-    output = result.stdout.strip()
-    if "Current Wi-Fi Network:" in output:
-        return output.split(":", 1)[1].strip()
-    return output or "Not connected to WiFi"
+    return _platform.get_wifi()
 
 
 @mcp.tool()
 def macos_battery() -> str:
-    """Get Mac battery level and charging status."""
-    result = subprocess.run(
-        ["pmset", "-g", "batt"],
-        capture_output=True, text=True,
-    )
-    return result.stdout.strip() or "Could not read battery status"
+    """Get battery level and charging status."""
+    return _platform.get_battery()
 
 
 # ── Web ─────────────────────────────────────────────────────

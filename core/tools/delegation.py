@@ -5,6 +5,7 @@ import os
 import subprocess
 import time
 
+from core.platform import platform
 from core.tools import tool, _escape_applescript
 
 # Debounce guard — prevent duplicate Terminal opens
@@ -13,14 +14,26 @@ _OPEN_COOLDOWN = 5  # seconds
 
 
 def _find_claude_bin() -> str:
-    """Locate the claude CLI binary."""
+    """Locate the claude CLI binary (cross-platform)."""
+    import platform as _plat
     home = os.path.expanduser("~")
-    for candidate in [
-        os.path.join(home, ".local/bin/claude"),
-        "/opt/homebrew/bin/claude",
-        "/usr/local/bin/claude",
-        os.path.join(home, ".npm-global/bin/claude"),
-    ]:
+
+    if _plat.system() == "Windows":
+        candidates = [
+            os.path.join(home, ".local", "bin", "claude.exe"),
+            os.path.join(home, "AppData", "Roaming", "npm", "claude.cmd"),
+            os.path.join(home, "AppData", "Roaming", "npm", "claude"),
+            os.path.join(os.environ.get("ProgramFiles", ""), "claude", "claude.exe"),
+        ]
+    else:
+        candidates = [
+            os.path.join(home, ".local/bin/claude"),
+            "/opt/homebrew/bin/claude",
+            "/usr/local/bin/claude",
+            os.path.join(home, ".npm-global/bin/claude"),
+        ]
+
+    for candidate in candidates:
         if os.path.isfile(candidate):
             return candidate
     return "claude"
@@ -55,27 +68,10 @@ def open_claude_code(working_directory: str = "") -> str:
         return f"Directory not found: {cwd}"
 
     claude_bin = _find_claude_bin()
-    safe_cwd = _escape_applescript(cwd)
-    safe_bin = _escape_applescript(claude_bin)
 
-    # Open a new Terminal window, cd to directory, and run claude
-    script = f'''
-    tell application "Terminal"
-        activate
-        do script "cd \\"{safe_cwd}\\" && \\"{safe_bin}\\""
-    end tell
-    '''
-
-    try:
-        subprocess.run(
-            ["osascript", "-e", script],
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        return f"Opened Claude Code CLI in Terminal at {cwd}"
-    except Exception as e:
-        return f"Failed to open Terminal: {e}"
+    # Use platform API to open a terminal with claude command
+    result = platform.open_terminal(f'"{claude_bin}"', cwd)
+    return f"Opened Claude Code CLI at {cwd}" if "Failed" not in result else result
 
 
 @tool(

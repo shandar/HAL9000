@@ -245,7 +245,7 @@ def _save_memories(memories: list[dict]):
 from core.tools import shell      # noqa: E402, F401
 from core.tools import apps       # noqa: E402, F401
 from core.tools import files      # noqa: E402, F401
-from core.tools import macos      # noqa: E402, F401
+from core.tools import system     # noqa: E402, F401  # cross-platform (was macos.py)
 from core.tools import web        # noqa: E402, F401
 from core.tools import memory     # noqa: E402, F401
 from core.tools import delegation  # noqa: E402, F401
