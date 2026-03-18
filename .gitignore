@@ -15,3 +15,4 @@ firebase-debug.log
 docs/
 product-page/
 assets/llms/
+knowledge/*.txt
