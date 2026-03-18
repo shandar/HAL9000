@@ -127,6 +127,46 @@ No `#ifdef`, no separate builds — one `pip install`, one `python server.py`.
 
 ---
 
+## System Requirements
+
+### Minimum (Free Mode — Ollama + faster-whisper)
+
+| Component | Requirement |
+|-----------|-------------|
+| **OS** | macOS 12+, Windows 10+, or Ubuntu 20.04+ (any modern Linux) |
+| **CPU** | 4 cores (Intel i5 / Apple M1 / AMD Ryzen 5 or better) |
+| **RAM** | 8 GB (Ollama loads models into memory — llama3.1 8B needs ~5 GB) |
+| **Disk** | 6 GB free (3 GB for Ollama model + 1 GB for faster-whisper model + HAL) |
+| **Python** | 3.10 or higher |
+| **Browser** | Any modern browser (Chrome, Firefox, Safari, Edge) |
+| **Microphone** | Required for voice input (built-in or USB) |
+| **Webcam** | Optional — required only for vision features |
+| **Network** | Not required (fully offline operation) |
+
+### Recommended (Paid Providers — GPT-4o, Claude, ElevenLabs)
+
+| Component | Requirement |
+|-----------|-------------|
+| **RAM** | 4 GB (no local models loaded) |
+| **Disk** | 500 MB free |
+| **Network** | Required (API calls to OpenAI/Anthropic/Google) |
+| **API Keys** | At least `OPENAI_API_KEY` for GPT-4o + Whisper STT |
+
+### Performance Notes
+
+| Mode | Brain Latency | STT Latency | TTS Latency | RAM Usage |
+|------|--------------|-------------|-------------|-----------|
+| **Free (Ollama llama3.1)** | ~2-5s (CPU), ~1-2s (Apple Silicon) | ~1-3s (faster-whisper base) | ~0.7s (Edge TTS) | ~5-6 GB |
+| **Free (Ollama phi3)** | ~1-2s (CPU) | ~1-3s | ~0.7s | ~3 GB |
+| **Paid (GPT-4o)** | ~1-2s (API) | ~0.5s (Whisper API) | ~0.7s (Edge) | ~200 MB |
+| **Paid (Claude)** | ~1-3s (API) | ~0.5s | ~1.2s (ElevenLabs) | ~200 MB |
+
+> **Apple Silicon users**: Ollama runs significantly faster on M1/M2/M3/M4 chips with Metal acceleration. An M1 MacBook Air can run llama3.1 8B comfortably.
+>
+> **GPU users (Linux/Windows)**: Ollama supports NVIDIA CUDA. With a 6 GB+ VRAM GPU, expect 2-3x faster inference than CPU.
+
+---
+
 ## Quick Start
 
 ```bash
