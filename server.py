@@ -35,6 +35,21 @@ def api_status():
     return jsonify(engine.get_status())
 
 
+@app.route("/api/license")
+def api_license():
+    from core.license import get_license
+    lic = get_license()
+    return jsonify({
+        "tier": lic.tier,
+        "features": sorted(lic.features),
+        "valid": lic.valid,
+        "expires": lic.expires,
+        "max_memories": lic.max_memories,
+        "max_agents": lic.max_agents,
+        "email": lic.email,
+    })
+
+
 @app.route("/api/start", methods=["POST"])
 def api_start():
     if not engine.running:

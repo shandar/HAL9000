@@ -96,6 +96,9 @@ class Config:
     MAX_CONCURRENT_TASKS: int = _safe_int("MAX_CONCURRENT_TASKS", 2)
     MAX_AGENTS: int = _safe_int("MAX_AGENTS", 4)
 
+    # License (Pro/Team/Enterprise features)
+    HAL_LICENSE: str = os.getenv("HAL_LICENSE", "")
+
     # Server
     SERVER_PORT: int = _safe_int("SERVER_PORT", 9000)
 

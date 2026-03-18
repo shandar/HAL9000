@@ -116,6 +116,15 @@ def execute(name: str, args: dict) -> dict:
     if not tool_def:
         return {"error": f"Unknown tool: {name}"}
 
+    # License gate — check if tool requires a paid feature
+    from core.license import get_license, GATED_TOOLS, License
+    if name in GATED_TOOLS:
+        lic = get_license()
+        required = GATED_TOOLS[name]
+        if required not in lic.features:
+            tier = License.tier_needed(required)
+            return {"error": f"'{name}' requires HAL {tier}. Upgrade at hal9000.dev"}
+
     try:
         result = tool_def.fn(**args)
         return {"result": str(result)}

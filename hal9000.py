@@ -181,6 +181,14 @@ class HALEngine:
         self._stop_event.clear()
         self._running = True
 
+        # License info at boot
+        from core.license import get_license
+        lic = get_license()
+        if lic.valid:
+            self._add_log("system", f"License: {lic.tier.upper()} ({lic.email}, expires {lic.expires})")
+        else:
+            self._add_log("system", "License: FREE tier (40 tools, 100 memories)")
+
         # Boot greeting — time-aware, always creative
         self._respond(self._generate_greeting())
 

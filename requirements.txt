@@ -37,6 +37,10 @@ faster-whisper>=1.0.0   # local Whisper STT (CTranslate2)
 # torch>=2.5,<2.6
 # transformers>=4.40,<4.45
 
+# Licensing (JWT verification)
+PyJWT>=2.8.0            # license key decode
+cryptography>=41.0.0    # Ed25519 signature verification
+
 # Utilities
 python-dotenv>=1.0.0
 pillow>=10.2.0          # image encoding

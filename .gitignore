@@ -1,5 +1,6 @@
 .env
 .venv/
+hal_private.pem
 __pycache__/
 *.pyc
 *.pyo
