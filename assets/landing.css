@@ -473,13 +473,39 @@ section, footer, nav { position: relative; z-index: 2; }
   color: var(--red);
 }
 
+.hero-tagline-wrap {
+  position: relative;
+  height: 32px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-waveform {
+  position: absolute;
+  width: clamp(200px, 40vw, 400px);
+  height: 32px;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+.hero-waveform.done {
+  opacity: 0;
+}
+
 .hero-tagline {
   font-family: var(--mono);
   font-size: clamp(0.75rem, 1.8vw, 1rem);
   color: var(--text-dim);
   font-style: italic;
-  margin-bottom: 16px;
   letter-spacing: 0.02em;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+}
+.hero-tagline.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .hero-subtitle {

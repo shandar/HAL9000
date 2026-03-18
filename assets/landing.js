@@ -79,6 +79,79 @@ const fabTop = document.getElementById('fab-top');
 // Initial state
 updateNav();
 
+// ══════════════════════════════════════════
+//  HERO: Waveform → text animation
+// ══════════════════════════════════════════
+
+(function() {
+  const canvas = document.getElementById('hero-waveform');
+  const tagline = document.getElementById('hero-tagline');
+  if (!canvas || !tagline) return;
+
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.offsetWidth;
+  const h = canvas.offsetHeight;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+
+  const bars = 48;
+  const barW = Math.max(2, (w / bars) * 0.5);
+  const gap = w / bars;
+  const startTime = performance.now();
+  const duration = 2400; // ms of waveform animation
+  let animId;
+
+  function draw(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Envelope: ramp up, sustain, ramp down
+    let envelope;
+    if (progress < 0.15) {
+      envelope = progress / 0.15; // ramp up
+    } else if (progress > 0.75) {
+      envelope = (1 - progress) / 0.25; // ramp down
+    } else {
+      envelope = 1; // sustain
+    }
+
+    for (let i = 0; i < bars; i++) {
+      const x = i * gap + gap / 2 - barW / 2;
+
+      // Multiple sine waves for organic speech-like pattern
+      const t = elapsed * 0.004;
+      const wave1 = Math.sin(i * 0.4 + t * 3.1) * 0.5;
+      const wave2 = Math.sin(i * 0.7 + t * 5.3) * 0.3;
+      const wave3 = Math.sin(i * 1.1 + t * 1.7) * 0.2;
+      const combined = (wave1 + wave2 + wave3) * envelope;
+
+      const barH = Math.max(2, Math.abs(combined) * h * 0.8);
+      const y = (h - barH) / 2;
+
+      // Red glow color with varying opacity
+      const alpha = 0.3 + Math.abs(combined) * 0.7;
+      ctx.fillStyle = `rgba(255, 23, 68, ${alpha})`;
+      ctx.beginPath();
+      ctx.roundRect(x, y, barW, barH, barW / 2);
+      ctx.fill();
+    }
+
+    if (progress < 1) {
+      animId = requestAnimationFrame(draw);
+    } else {
+      // Waveform done → crossfade to text
+      canvas.classList.add('done');
+      setTimeout(() => tagline.classList.add('visible'), 200);
+    }
+  }
+
+  animId = requestAnimationFrame(draw);
+})();
+
 // ── Scroll reveal (IntersectionObserver) ──
 const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-stagger');
 const revealObserver = new IntersectionObserver((entries) => {
