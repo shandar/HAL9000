@@ -154,6 +154,8 @@ class TaskRunner:
             + "/opt/homebrew/bin:/usr/local/bin:"
             + env.get("PATH", "")
         )
+        # Remove API key so Claude Code uses OAuth (Max plan) instead of API credits
+        env.pop("ANTHROPIC_API_KEY", None)
 
         timeout = getattr(cfg, "TASK_TIMEOUT", 600)
 

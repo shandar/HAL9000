@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="HAL 9000">
   <meta name="theme-color" content="#050507">
@@ -44,7 +44,7 @@
     /* ── Full viewport grid ──────────────────────── */
     .dashboard {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 2fr;
       grid-template-rows: auto 1fr auto;
       gap: 0;
       height: 100vh;
@@ -57,7 +57,7 @@
       grid-column: 1 / -1;
       display: flex;
       align-items: center;
-      padding: 6px 12px;
+      padding: 8px 14px;
       background:
         linear-gradient(180deg, #16161c 0%, #0e0e14 40%, #0a0a10 100%);
       border: 1px solid #2a2a36;
@@ -67,11 +67,11 @@
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.04),
         0 1px 3px rgba(0,0,0,0.5);
-      font-size: 0.5rem;
-      letter-spacing: 0.2em;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--text-dim);
-      gap: 6px;
+      gap: 10px;
     }
 
     .top-bar-left {
@@ -84,7 +84,7 @@
     .top-bar-title {
       color: var(--red);
       font-weight: 700;
-      font-size: 0.55rem;
+      font-size: 0.85rem;
       text-shadow: 0 0 8px var(--red-glow), 0 0 20px rgba(255,23,68,0.15);
     }
 
@@ -95,8 +95,8 @@
     }
 
     .status-dot {
-      width: 7px;
-      height: 7px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: var(--text-dim);
       border: 1px solid rgba(0,0,0,0.4);
@@ -122,7 +122,7 @@
     /* ── Toolbar divider ───────────────────────── */
     .tb-divider {
       width: 1px;
-      height: 20px;
+      height: 26px;
       background: linear-gradient(180deg, transparent 0%, #2a2a36 30%, #2a2a36 70%, transparent 100%);
       flex-shrink: 0;
     }
@@ -146,20 +146,20 @@
     }
 
     .tb-voice-label {
-      font-size: 0.38rem;
+      font-size: 0.6rem;
       font-weight: 600;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.15em;
       color: #444455;
-      padding: 0 6px;
+      padding: 0 8px;
       white-space: nowrap;
       border-right: 1px solid #1a1a24;
       margin-right: 2px;
     }
 
     .tb-voice-opt {
-      padding: 3px 7px;
+      padding: 4px 10px;
       font-family: var(--mono);
-      font-size: 0.38rem;
+      font-size: 0.6rem;
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -209,7 +209,7 @@
       border-top-color: #333340;
       border-bottom-color: #0a0a10;
       border-radius: 6px;
-      overflow: hidden;
+      overflow: visible;
       flex: 1 1 0;
       min-height: 0;
       box-shadow:
@@ -226,6 +226,9 @@
       transition: filter 0.8s ease;
     }
 
+    .hal-image {
+      border-radius: 6px;  /* clip image corners since panel is overflow:visible */
+    }
     .hal-image.off { filter: brightness(0.3) saturate(0.2); }
     .hal-image.active { filter: brightness(1.1) saturate(1.2); }
 
@@ -265,70 +268,45 @@
     }
 
     .hal-ctrl-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 4px;
-      background:
-        linear-gradient(180deg, #2a2a32 0%, #1a1a22 40%, #141418 100%);
-      border: 1px solid #3a3a44;
-      border-top-color: #4a4a54;
-      border-bottom-color: #111118;
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      background: rgba(20, 20, 26, 0.85);
+      border: 1px solid #2a2a36;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.25s;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.08),
-        0 2px 4px rgba(0,0,0,0.6),
-        0 1px 0 rgba(0,0,0,0.3);
+      transition: all 0.2s;
       position: relative;
-    }
-
-    .hal-ctrl-btn::before {
-      content: '';
-      position: absolute;
-      inset: 1px;
-      border-radius: 3px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 40%);
-      pointer-events: none;
+      backdrop-filter: blur(4px);
     }
 
     .hal-ctrl-btn svg {
-      width: 16px;
-      height: 16px;
+      width: 20px;
+      height: 20px;
       color: #666672;
-      transition: all 0.25s;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+      transition: all 0.2s;
     }
 
     .hal-ctrl-btn:hover {
-      border-color: #4a4a58;
-      background:
-        linear-gradient(180deg, #32323c 0%, #222230 40%, #1a1a22 100%);
+      background: rgba(30, 30, 40, 0.95);
+      border-color: #444455;
     }
 
     .hal-ctrl-btn:hover svg {
-      color: #888894;
+      color: #999;
     }
 
     .hal-ctrl-btn:active {
-      box-shadow:
-        inset 0 2px 4px rgba(0,0,0,0.6),
-        0 0 1px rgba(0,0,0,0.4);
+      background: rgba(10, 10, 14, 0.95);
+      border-color: #222230;
     }
 
-    .hal-ctrl-btn:active::before { opacity: 0; }
-
-    /* ON state — green glow */
+    /* ON state */
     .hal-ctrl-btn.on {
-      border-color: rgba(0,230,118,0.3);
-      background:
-        linear-gradient(180deg, #1a2a20 0%, #0e1a14 40%, #0a1410 100%);
-      box-shadow:
-        inset 0 1px 0 rgba(0,230,118,0.08),
-        0 2px 4px rgba(0,0,0,0.6),
-        0 0 8px rgba(0,230,118,0.12);
+      border-color: rgba(0,230,118,0.4);
+      background: rgba(0,230,118,0.08);
     }
 
     .hal-ctrl-btn.on svg {
@@ -337,11 +315,8 @@
     }
 
     .hal-ctrl-btn.on:hover {
-      border-color: rgba(0,230,118,0.4);
-      box-shadow:
-        inset 0 1px 0 rgba(0,230,118,0.08),
-        0 2px 4px rgba(0,0,0,0.6),
-        0 0 12px rgba(0,230,118,0.2);
+      border-color: rgba(0,230,118,0.5);
+      background: rgba(0,230,118,0.12);
     }
 
     /* Disabled state */
@@ -371,6 +346,53 @@
       pointer-events: none;
     }
 
+    /* Tooltip for HAL image buttons */
+    .hal-ctrl-btn::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: rgba(10,10,14,0.95);
+      border: 1px solid #2a2a36;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      z-index: 100;
+    }
+    .hal-ctrl-btn:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .hal-ctrl-btn.disabled::after { display: none; }
+
+    /* Power button on HAL image — always clickable */
+    .hal-ctrl-btn.power-img-btn {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+    .hal-ctrl-btn.power-img-btn svg {
+      color: #555566;
+      transition: all 0.3s;
+    }
+    .hal-ctrl-btn.power-img-btn.on svg {
+      color: var(--green);
+      filter: drop-shadow(0 0 6px rgba(0,230,118,0.5));
+    }
+    .hal-ctrl-btn.power-img-btn:not(.on) svg {
+      color: var(--red);
+      filter: drop-shadow(0 0 4px rgba(255,23,68,0.3));
+    }
+
     /* Waveform — overlays the red block in the HAL image */
     .waveform-overlay {
       position: absolute;
@@ -390,79 +412,6 @@
 
     .waveform-overlay.active .waveform-canvas {
       opacity: 1;
-    }
-
-    /* ── Power button — circular in top bar ───── */
-    .power-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background:
-        linear-gradient(180deg, #1a1a22 0%, #111118 50%, #0d0d14 100%);
-      border: 2px solid #2a2a36;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.05),
-        0 2px 4px rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      padding: 0;
-      position: relative;
-    }
-
-    .power-btn svg {
-      width: 14px;
-      height: 14px;
-      color: #555566;
-      transition: all 0.3s;
-    }
-
-    .power-btn:hover {
-      border-color: var(--green);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.05),
-        0 0 10px rgba(0,230,118,0.2),
-        0 2px 4px rgba(0,0,0,0.6);
-    }
-
-    .power-btn:hover svg {
-      color: var(--green);
-      filter: drop-shadow(0 0 4px rgba(0,230,118,0.4));
-    }
-
-    .power-btn:active {
-      transform: scale(0.92);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-    }
-
-    .power-btn.running {
-      border-color: var(--red);
-      background:
-        linear-gradient(180deg, #1c0a10 0%, #140810 50%, #100610 100%);
-      box-shadow:
-        inset 0 1px 0 rgba(255,23,68,0.06),
-        0 0 10px rgba(255,23,68,0.15),
-        0 2px 4px rgba(0,0,0,0.6);
-    }
-
-    .power-btn.running svg {
-      color: var(--red);
-      filter: drop-shadow(0 0 4px var(--red-glow));
-    }
-
-    .power-btn.running:hover {
-      border-color: var(--text-dim);
-      box-shadow:
-        0 0 8px rgba(0,0,0,0.4),
-        0 2px 4px rgba(0,0,0,0.6);
-    }
-
-    .power-btn.running:hover svg {
-      color: var(--text-dim);
-      filter: none;
     }
 
     /* Camera HUD */
@@ -625,6 +574,7 @@
       flex-direction: column;
       gap: 8px;
       min-height: 0;
+      overflow: hidden;
     }
 
     /* (Subsystem toggles + voice selector moved to top bar) */
@@ -634,12 +584,9 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      background:
-        linear-gradient(180deg, #0c0c12 0%, #08080e 100%);
-      border: 1px solid #2a2a36;
-      border-top-color: #333340;
-      border-bottom-color: #0a0a10;
-      border-radius: 6px;
+      background: #080810;
+      border: 1px solid #1a1a24;
+      border-radius: 4px;
       min-height: 0;
       overflow: hidden;
       box-shadow:
@@ -648,75 +595,76 @@
     }
 
     .panel-header {
-      font-size: 0.46rem;
+      font-size: 0.62rem;
       font-weight: 600;
       letter-spacing: 0.3em;
       text-transform: uppercase;
-      color: #444455;
-      padding: 8px 12px 7px;
+      color: #555566;
+      padding: 6px 14px;
       border-bottom: 1px solid #1a1a24;
       flex-shrink: 0;
-      background:
-        linear-gradient(180deg, #131318 0%, #0e0e14 100%);
-      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-      box-shadow: 0 1px 0 rgba(255,255,255,0.02);
+      background: #0c0c14;
     }
 
     .chat-messages {
       flex: 1;
       overflow-y: auto;
-      padding: 10px 8px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 2px;
+      font-family: var(--mono);
     }
 
-    /* Message bubbles */
+    /* Terminal-style messages */
     .msg {
-      max-width: 85%;
-      padding: 7px 10px;
-      border-radius: 8px;
-      font-size: 0.62rem;
-      line-height: 1.55;
-      animation: msgIn 0.3s ease;
+      max-width: 100%;
+      padding: 4px 0;
+      border-radius: 0;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      animation: msgIn 0.2s ease;
       position: relative;
+      background: none;
+      border: none;
     }
 
     @keyframes msgIn {
-      from { opacity: 0; transform: translateY(6px) scale(0.97); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .msg-label {
-      font-size: 0.4rem;
+      font-size: 0.62rem;
       font-weight: 700;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      margin-bottom: 3px;
-      display: block;
+      margin-right: 8px;
+      display: inline;
+      user-select: none;
     }
 
-    /* HAL messages — left aligned */
+    /* HAL messages — red prompt */
     .msg.hal {
-      align-self: flex-start;
-      background:
-        linear-gradient(135deg, rgba(255,23,68,0.08) 0%, rgba(255,23,68,0.03) 100%);
-      border: 1px solid rgba(255,23,68,0.12);
-      border-radius: 2px 8px 8px 8px;
-      color: #d0d0d8;
+      align-self: stretch;
+      color: #d4d4dc;
+      border-left: 2px solid var(--red-dim);
+      padding-left: 10px;
+      margin-left: 0;
     }
     .msg.hal .msg-label { color: var(--red); }
+    .msg.hal .msg-label::before { content: '> '; color: var(--red-dim); }
 
-    /* User messages — right aligned */
+    /* User messages — green prompt, right-aligned */
     .msg.user {
-      align-self: flex-end;
-      background:
-        linear-gradient(135deg, rgba(0,230,118,0.08) 0%, rgba(0,230,118,0.03) 100%);
-      border: 1px solid rgba(0,230,118,0.12);
-      border-radius: 8px 2px 8px 8px;
-      color: #d0d0d8;
+      align-self: stretch;
+      color: #c8e6c9;
+      border-left: 2px solid rgba(0,230,118,0.25);
+      padding-left: 10px;
+      text-align: left;
     }
     .msg.user .msg-label { color: var(--green); }
+    .msg.user .msg-label::before { content: '$ '; color: rgba(0,230,118,0.4); }
 
     /* System + tool styles defined below terminal removal block */
 
@@ -745,6 +693,7 @@
       display: flex;
       gap: 6px;
       align-items: flex-end;
+      overflow: visible;
     }
 
     .chat-input {
@@ -755,7 +704,7 @@
       border-radius: 4px;
       padding: 8px 10px;
       font-family: var(--mono);
-      font-size: 0.62rem;
+      font-size: 0.85rem;
       color: var(--text);
       resize: none;
       outline: none;
@@ -766,10 +715,171 @@
       transition: border-color 0.3s;
     }
 
+    /* Terminal-style list items */
+    .msg-list {
+      margin: 4px 0 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding-left: 4px;
+    }
+
+    .msg-list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 3px 0;
+      color: #b0b0bc;
+    }
+
+    .msg-list-num {
+      flex-shrink: 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--red);
+      min-width: 18px;
+      text-align: right;
+    }
+    .msg-list-num::after { content: '.'; }
+
+    .msg-list-bullet {
+      flex-shrink: 0;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+    .msg-list-bullet::before { content: '—'; }
+
     .chat-input::placeholder {
-      color: #333344;
+      color: #666677;
       letter-spacing: 0.05em;
     }
+
+    /* ── Slash command menu ──────────────────────── */
+    .cmd-menu {
+      display: none;
+      position: absolute;
+      bottom: 100%;
+      left: 6px;
+      right: 6px;
+      background: linear-gradient(180deg, #16161c 0%, #0e0e14 100%);
+      border: 1px solid #2a2a36;
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      max-height: 320px;
+      overflow-y: auto;
+      z-index: 50;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+    }
+
+    .cmd-menu.active { display: block; }
+
+    .cmd-menu-header {
+      padding: 8px 12px 4px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      border-bottom: 1px solid #1a1a24;
+    }
+
+    .cmd-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+      border-bottom: 1px solid rgba(26,26,36,0.5);
+    }
+
+    .cmd-item:last-child { border-bottom: none; }
+
+    .cmd-item:hover, .cmd-item.selected {
+      background: rgba(255,23,68,0.08);
+    }
+
+    .cmd-item-icon {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid #2a2a36;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+
+    .cmd-item-icon svg {
+      width: 16px;
+      height: 16px;
+      color: var(--text-dim);
+      transition: color 0.15s;
+    }
+
+    .cmd-item:hover .cmd-item-icon,
+    .cmd-item.selected .cmd-item-icon {
+      border-color: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .cmd-item:hover .cmd-item-icon svg,
+    .cmd-item.selected .cmd-item-icon svg {
+      color: #fff;
+    }
+
+    .cmd-item-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cmd-item-name {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+      transition: color 0.15s;
+    }
+
+    .cmd-item:hover .cmd-item-name,
+    .cmd-item.selected .cmd-item-name {
+      color: #fff;
+    }
+
+    .cmd-item-name span {
+      color: var(--red);
+    }
+
+    .cmd-item-desc {
+      font-size: 0.72rem;
+      color: #777788;
+      margin-top: 2px;
+      line-height: 1.3;
+      transition: color 0.15s;
+    }
+
+    .cmd-item:hover .cmd-item-desc,
+    .cmd-item.selected .cmd-item-desc {
+      color: #bbb;
+    }
+
+    .cmd-item-shortcut {
+      font-size: 0.55rem;
+      color: #444;
+      font-family: var(--mono);
+      padding: 2px 6px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid #2a2a36;
+      border-radius: 3px;
+      align-self: center;
+      white-space: nowrap;
+    }
+
+    .cmd-menu::-webkit-scrollbar { width: 3px; }
+    .cmd-menu::-webkit-scrollbar-track { background: transparent; }
+    .cmd-menu::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
 
     .chat-input:focus {
       border-color: var(--red-dim);
@@ -777,6 +887,15 @@
         inset 0 2px 4px rgba(0,0,0,0.4),
         0 0 8px rgba(255,23,68,0.08);
     }
+
+    .chat-input:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .chat-input::-webkit-scrollbar { width: 3px; }
+    .chat-input::-webkit-scrollbar-track { background: transparent; }
+    .chat-input::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
 
     .chat-send-btn {
       width: 34px;
@@ -870,7 +989,7 @@
         inset 0 1px 0 rgba(255,255,255,0.04),
         0 0 8px var(--red-glow),
         0 0 20px rgba(255,23,68,0.15);
-      animation: micPulse 1.5s ease-in-out infinite;
+      animation: micPulse 1s ease-in-out infinite;
     }
 
     .chat-mic-btn.listening svg {
@@ -878,9 +997,62 @@
       filter: drop-shadow(0 0 6px var(--red-glow));
     }
 
+    .chat-mic-btn.transcribing {
+      border-color: var(--amber);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 0 8px rgba(255,193,7,0.3),
+        0 0 20px rgba(255,193,7,0.15);
+      animation: micPulse 0.6s ease-in-out infinite;
+    }
+
+    .chat-mic-btn.transcribing svg {
+      color: var(--amber);
+      filter: drop-shadow(0 0 6px rgba(255,193,7,0.3));
+    }
+
     @keyframes micPulse {
       0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 0 8px var(--red-glow), 0 0 20px rgba(255,23,68,0.15); }
       50% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 0 14px var(--red-glow), 0 0 30px rgba(255,23,68,0.25); }
+    }
+
+    /* Status pill — shows mic/processing state above input */
+    .chat-status-pill {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: linear-gradient(180deg, #1a1a22 0%, #111118 100%);
+      border: 1px solid #2a2a36;
+      border-radius: 14px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      margin: 0 auto 6px;
+    }
+
+    .chat-status-pill.active { display: flex; }
+
+    .chat-status-pill .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--amber);
+      animation: pillDotPulse 0.8s ease-in-out infinite;
+    }
+
+    .chat-status-pill.recording .pill-dot { background: var(--red); }
+    .chat-status-pill.transcribing .pill-dot { background: var(--amber); }
+    .chat-status-pill.thinking .pill-dot { background: var(--cyan); }
+    .chat-status-pill.speaking .pill-dot { background: var(--green); }
+
+    @keyframes pillDotPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
     /* Typing indicator */
@@ -908,37 +1080,38 @@
       30% { transform: translateY(-4px); opacity: 1; }
     }
 
-    /* Inline system/tool entries in chat (compact, no bubble chrome) */
+    /* System/tool entries — dimmer, inline */
     .msg.system, .msg.tool {
       max-width: 100%;
-      padding: 2px 10px;
+      padding: 2px 0 2px 10px;
       border: none;
-      border-radius: 0;
       border-left: 2px solid;
-      background: transparent;
-      font-size: 0.48rem;
+      background: none;
+      font-size: 0.72rem;
       line-height: 1.5;
-      opacity: 0.7;
       animation: none;
+      white-space: pre-wrap;
+      opacity: 0.7;
     }
     .msg.system {
       align-self: stretch;
       border-left-color: rgba(255,193,7,0.3);
-      color: #666674;
+      color: #999aa8;
     }
     .msg.tool {
       align-self: stretch;
       border-left-color: rgba(0,188,255,0.25);
-      color: #606070;
+      color: #8090a0;
     }
     .msg.system .msg-label, .msg.tool .msg-label {
       display: inline;
-      margin-right: 6px;
-      margin-bottom: 0;
-      font-size: 0.38rem;
+      margin-right: 8px;
+      font-size: 0.58rem;
     }
     .msg.system .msg-label { color: var(--amber); }
+    .msg.system .msg-label::before { content: '# '; color: rgba(255,193,7,0.4); }
     .msg.tool .msg-label { color: var(--cyan); }
+    .msg.tool .msg-label::before { content: '~ '; color: rgba(0,188,255,0.3); }
 
     /* ── Bottom bar — spans full width ──────────── */
     .bottom-bar {
@@ -947,7 +1120,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 5px 16px;
-      font-size: 0.44rem;
+      font-size: 0.6rem;
       font-weight: 600;
       letter-spacing: 0.25em;
       text-transform: uppercase;
@@ -958,17 +1131,17 @@
     /* ── Scrollbar ──────────────────────────────── */
     .chat-messages::-webkit-scrollbar { width: 3px; }
     .chat-messages::-webkit-scrollbar-track { background: transparent; }
-    .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
     .task-panel::-webkit-scrollbar { width: 3px; }
     .task-panel::-webkit-scrollbar-track { background: transparent; }
-    .task-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .task-panel::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
     .workspace-content::-webkit-scrollbar { width: 3px; }
     .workspace-content::-webkit-scrollbar-track { background: transparent; }
-    .workspace-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .workspace-content::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
 
     /* ── 3-column layout when artifacts exist ── */
     .dashboard.has-artifacts {
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 2fr;
     }
 
     /* ── Task Queue Panel ──────────────────────── */
@@ -996,7 +1169,7 @@
     .task-badge {
       background: var(--red-dim);
       color: var(--red);
-      font-size: 0.36rem;
+      font-size: 0.55rem;
       padding: 1px 5px;
       border-radius: 8px;
       min-width: 16px;
@@ -1011,7 +1184,7 @@
       gap: 6px;
       padding: 4px 6px;
       border-radius: 3px;
-      font-size: 0.42rem;
+      font-size: 0.58rem;
       color: var(--text-dim);
       background: rgba(255,255,255,0.01);
       margin-bottom: 3px;
@@ -1045,7 +1218,7 @@
     }
 
     .task-time {
-      font-size: 0.36rem;
+      font-size: 0.55rem;
       color: #333344;
       flex-shrink: 0;
     }
@@ -1054,7 +1227,7 @@
       background: none;
       border: 1px solid #2a2a36;
       color: var(--text-dim);
-      font-size: 0.36rem;
+      font-size: 0.55rem;
       padding: 1px 4px;
       border-radius: 2px;
       cursor: pointer;
@@ -1087,7 +1260,7 @@
 
     .workspace-tab {
       padding: 6px 12px;
-      font-size: 0.4rem;
+      font-size: 0.65rem;
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -1126,7 +1299,7 @@
       margin: 0;
       white-space: pre-wrap;
       word-break: break-word;
-      font-size: 0.44rem;
+      font-size: 0.8rem;
       line-height: 1.5;
       color: var(--text);
     }
@@ -1139,19 +1312,168 @@
       min-height: 300px;
     }
 
-    .workspace-copy-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(0,0,0,0.5);
+    .workspace-actions {
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      background: linear-gradient(180deg, #101016 0%, #0c0c12 100%);
+      border-bottom: 1px solid #1a1a24;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .workspace-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(180deg, #1a1a22 0%, #141418 100%);
       border: 1px solid #2a2a36;
       color: var(--text-dim);
-      font-size: 0.38rem;
-      padding: 3px 8px;
-      border-radius: 3px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 4px;
       cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
     }
-    .workspace-copy-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    .workspace-action-btn:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: linear-gradient(180deg, #1e1e2a 0%, #16161e 100%);
+    }
+
+    .workspace-action-btn.accent-red:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .workspace-action-btn.accent-green:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .workspace-action-btn svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    .workspace-action-btn.active {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: linear-gradient(180deg, #1e1e2a 0%, #16161e 100%);
+    }
+
+    /* Edit mode — content area becomes a flex column for the textarea */
+    .workspace-content.editing {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+    }
+
+    .workspace-editor {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      background: #08080e;
+      border: none;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      padding: 10px;
+      resize: none;
+      outline: none;
+      min-height: 0;
+      tab-size: 2;
+    }
+
+    /* Mini terminal output panel */
+    .workspace-output {
+      border-top: 1px solid #1a1a24;
+      background: #0c0c0e;
+      max-height: 40%;
+      overflow-y: auto;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .workspace-output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 10px;
+      background: linear-gradient(180deg, #1a1a22 0%, #141418 100%);
+      border-bottom: 1px solid #1a1a24;
+      flex-shrink: 0;
+    }
+
+    .workspace-output-header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .workspace-output-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+    .workspace-output-dot.error { background: var(--red); }
+    .workspace-output-dot.running { background: var(--amber); animation: termBlink 1s infinite; }
+
+    @keyframes termBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .workspace-output-title {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .workspace-output-close {
+      cursor: pointer;
+      color: #444;
+      font-size: 0.7rem;
+      padding: 2px 4px;
+    }
+    .workspace-output-close:hover { color: var(--red); }
+
+    .workspace-output-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 10px;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: var(--green);
+    }
+
+    .workspace-output-body.error { color: var(--red); }
+    .workspace-output-body.running { color: var(--amber); }
+
+    .workspace-output-prompt {
+      color: var(--cyan);
+      user-select: none;
+    }
+
+    .workspace-output-line {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .workspace-output-body::-webkit-scrollbar { width: 3px; }
+    .workspace-output-body::-webkit-scrollbar-track { background: transparent; }
+    .workspace-output-body::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
 
     /* ── Agent cards (in task panel) ──────────── */
     .agent-section { margin-top: 4px; }
@@ -1162,7 +1484,7 @@
       gap: 6px;
       padding: 4px 6px;
       border-radius: 3px;
-      font-size: 0.42rem;
+      font-size: 0.58rem;
       color: var(--text-dim);
       background: rgba(0,188,255,0.03);
       border-left: 2px solid var(--cyan);
@@ -1272,15 +1594,14 @@
       to { opacity: 0; transform: translateX(40px); }
     }
 
-    /* ── Choice Sheet — slides up from bottom of chat ── */
+    /* ── Choice Sheet — terminal-style selection ── */
     .choice-sheet-backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(5, 5, 7, 0.7);
-      backdrop-filter: blur(4px);
+      background: rgba(5, 5, 7, 0.5);
       z-index: 50;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.2s ease;
       pointer-events: none;
     }
 
@@ -1295,19 +1616,12 @@
       left: 0;
       right: 0;
       z-index: 51;
-      background:
-        linear-gradient(180deg, #141418 0%, #0e0e14 40%, #0a0a10 100%);
-      border: 1px solid #2a2a36;
-      border-bottom: none;
-      border-top-color: #3a3a48;
-      border-radius: 10px 10px 0 0;
+      background: #0a0a10;
+      border-top: 1px solid #2a2a36;
       padding: 0;
       transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-      box-shadow:
-        0 -4px 24px rgba(0,0,0,0.6),
-        inset 0 1px 0 rgba(255,255,255,0.05);
-      max-height: 70%;
+      transition: transform 0.25s ease;
+      max-height: 60%;
       overflow-y: auto;
     }
 
@@ -1317,20 +1631,20 @@
 
     .choice-sheet-handle {
       width: 36px;
-      height: 4px;
-      background: #333344;
+      height: 3px;
+      background: #2a2a36;
       border-radius: 2px;
-      margin: 10px auto 0;
+      margin: 8px auto 0;
     }
 
     .choice-sheet-title {
       font-family: var(--mono);
-      font-size: 0.52rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--text);
-      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+      color: var(--amber);
+      text-shadow: none;
       padding: 14px 16px 8px;
       text-align: center;
     }
@@ -1346,78 +1660,62 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 14px;
-      background:
-        linear-gradient(180deg, #16161c 0%, #101016 100%);
-      border: 1px solid #222230;
-      border-top-color: #2a2a36;
-      border-bottom-color: #18181e;
-      border-radius: 6px;
+      padding: 8px 14px;
+      background: none;
+      border: none;
+      border-left: 2px solid transparent;
       cursor: pointer;
-      transition: all 0.2s;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.03),
-        0 2px 4px rgba(0,0,0,0.4);
+      transition: all 0.15s;
       user-select: none;
     }
 
     .choice-item:hover {
-      border-color: var(--red-dim);
-      background:
-        linear-gradient(180deg, #1c0a10 0%, #150810 100%);
-      box-shadow:
-        inset 0 1px 0 rgba(255,23,68,0.05),
-        0 2px 8px rgba(0,0,0,0.5),
-        0 0 12px rgba(255,23,68,0.08);
+      background: rgba(255,23,68,0.06);
+      border-left-color: var(--red);
     }
 
+    .choice-item:hover .choice-item-num { color: var(--red); }
+    .choice-item:hover .choice-item-text { color: #fff; }
+
     .choice-item:active {
-      transform: translateY(1px);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      background: rgba(255,23,68,0.1);
     }
 
     .choice-item-num {
-      width: 24px;
-      height: 24px;
       flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background:
-        linear-gradient(180deg, #1e1e28 0%, #141418 100%);
-      border: 1px solid #2a2a36;
-      border-radius: 50%;
       font-family: var(--mono);
-      font-size: 0.55rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      color: var(--text);
+      color: var(--text-dim);
+      min-width: 20px;
+      text-align: right;
     }
 
     .choice-item-text {
       font-family: var(--mono);
-      font-size: 0.6rem;
+      font-size: 0.82rem;
       color: var(--text);
-      letter-spacing: 0.04em;
+      letter-spacing: 0.02em;
       line-height: 1.4;
+      transition: color 0.15s;
     }
 
     .choice-item-desc {
-      font-size: 0.48rem;
+      font-size: 0.68rem;
       color: var(--text-dim);
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     .choice-sheet-dismiss {
       display: block;
-      width: calc(100% - 20px);
-      margin: 0 10px 12px;
-      padding: 8px;
-      background:
-        linear-gradient(180deg, #141418 0%, #0e0e14 100%);
-      border: 1px solid #222230;
-      border-radius: 6px;
+      width: calc(100% - 28px);
+      margin: 4px 14px 10px;
+      padding: 6px;
+      background: none;
+      border: 1px solid #2a2a36;
+      border-radius: 3px;
       font-family: var(--mono);
-      font-size: 0.48rem;
+      font-size: 0.65rem;
       font-weight: 600;
       letter-spacing: 0.15em;
       text-transform: uppercase;
@@ -1453,9 +1751,6 @@
     <!-- Top bar -->
     <div class="top-bar">
       <div class="top-bar-left">
-        <button class="power-btn" id="power-btn" onclick="togglePower()" title="Activate HAL">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v6"/><path d="M16.24 7.76a6 6 0 1 1-8.49 0"/></svg>
-        </button>
         <span class="top-bar-title">HAL 9000</span>
         <span id="hal-status-label">Offline</span>
       </div>
@@ -1484,16 +1779,16 @@
       <div class="hal-panel" id="hal-panel">
         <img src="/assets/HAL.png" alt="HAL 9000" class="hal-image off" id="hal-image" />
         <div class="hal-controls" id="hal-controls">
-          <button class="hal-ctrl-btn disabled" data-sub="vision" onclick="toggleSub('vision')" title="Vision">
+          <button class="hal-ctrl-btn power-img-btn" id="power-img-btn" onclick="togglePower()" data-tip="Power">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v6"/><path d="M16.24 7.76a6 6 0 1 1-8.49 0"/></svg>
+          </button>
+          <button class="hal-ctrl-btn disabled" data-sub="vision" onclick="toggleSub('vision')" data-tip="Vision">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
           </button>
-          <button class="hal-ctrl-btn disabled" data-sub="hearing" onclick="toggleSub('hearing')" title="Hearing">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/></svg>
-          </button>
-          <button class="hal-ctrl-btn disabled" data-sub="voice" onclick="toggleSub('voice')" title="Voice">
+          <button class="hal-ctrl-btn disabled" data-sub="voice" onclick="toggleSub('voice')" data-tip="Voice">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
           </button>
-          <button class="hal-ctrl-btn claude-btn" onclick="openClaudeCode()" title="Open Claude Code CLI">
+          <button class="hal-ctrl-btn claude-btn" onclick="openClaudeCode()" data-tip="Claude Code">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.709 15.955l4.72-2.647.08-.23-.08-.128H9.2l-.79-.048-2.698-.073-2.339-.097-2.266-.122-.571-.121L0 11.784l.055-.352.48-.321.686.06 1.52.103 2.278.158 1.652.097 2.449.255h.389l.055-.157-.134-.098-.103-.097-2.358-1.596-2.552-1.688-1.336-.972-.724-.491-.364-.462-.158-1.008.656-.722.881.06.225.061.893.686 1.908 1.476 2.491 1.833.365.304.145-.103.019-.073-.164-.274-1.355-2.446-1.446-2.49-.644-1.032-.17-.619a2.97 2.97 0 01-.104-.729L6.283.134 6.696 0l.996.134.42.364.62 1.414 1.002 2.229 1.555 3.03.456.898.243.832.091.255h.158V9.01l.128-1.706.237-2.095.23-2.695.08-.76.376-.91.747-.492.584.28.48.685-.067.444-.286 1.851-.559 2.903-.364 1.942h.212l.243-.242.985-1.306 1.652-2.064.73-.82.85-.904.547-.431h1.033l.76 1.129-.34 1.166-1.064 1.347-.881 1.142-1.264 1.7-.79 1.36.073.11.188-.02 2.856-.606 1.543-.28 1.841-.315.833.388.091.395-.328.807-1.969.486-2.309.462-3.439.813-.042.03.049.061 1.549.146.662.036h1.622l3.02.225.79.522.474.638-.079.485-1.215.62-1.64-.389-3.829-.91-1.312-.329h-.182v.11l1.093 1.068 2.006 1.81 2.509 2.33.127.578-.322.455-.34-.049-2.205-1.657-.851-.747-1.926-1.62h-.128v.17l.444.649 2.345 3.521.122 1.08-.17.353-.608.213-.668-.122-1.374-1.925-1.415-2.167-1.143-1.943-.14.08-.674 7.254-.316.37-.729.28-.607-.461-.322-.747.322-1.476.389-1.924.315-1.53.286-1.9.17-.632-.012-.042-.14.018-1.434 1.967-2.18 2.945-1.726 1.845-.414.164-.717-.37.067-.662.401-.589 2.388-3.036 1.44-1.882.93-1.086-.006-.158h-.055L4.132 18.56l-1.13.146-.487-.456.061-.746.231-.243 1.908-1.312-.006.006z" fill-rule="nonzero"/></svg>
           </button>
         </div>
@@ -1543,7 +1838,8 @@
     <!-- Workspace / Artifacts (hidden until artifacts exist) -->
     <div class="workspace-panel" id="workspace-panel">
       <div class="workspace-tabs" id="workspace-tabs"></div>
-      <div class="workspace-content" id="workspace-content" style="position:relative;"></div>
+      <div class="workspace-actions" id="workspace-actions"></div>
+      <div class="workspace-content" id="workspace-content"></div>
     </div>
 
     <!-- Right column -->
@@ -1570,7 +1866,12 @@
           <div class="typing-dot"></div>
           <div class="typing-dot"></div>
         </div>
-        <div class="chat-input-wrap">
+        <div class="chat-status-pill" id="chat-status-pill">
+          <div class="pill-dot"></div>
+          <span id="chat-status-text">Listening</span>
+        </div>
+        <div class="chat-input-wrap" style="position:relative;">
+          <div class="cmd-menu" id="cmd-menu"></div>
           <textarea class="chat-input" id="chat-input" placeholder="Message HAL..." rows="1"></textarea>
           <button class="chat-mic-btn" id="chat-mic-btn" onclick="voiceInput()" title="Click to speak">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
@@ -1602,7 +1903,7 @@
     const halPanel = document.getElementById('hal-panel');
     const halImage = document.getElementById('hal-image');
     const halStatusLabel = document.getElementById('hal-status-label');
-    const powerBtn = document.getElementById('power-btn');
+    const powerBtn = document.getElementById('power-img-btn');
     // subsystems now live on HAL image (halControls)
     const chatMessages = document.getElementById('chat-messages');
     const chatInput = document.getElementById('chat-input');
@@ -1689,12 +1990,19 @@
 
     // ── Power / subsystem controls ─────────────────
     async function togglePower() {
-      powerBtn.disabled = true;
-      powerBtn.style.opacity = '0.4';
-      const status = await api(isRunning ? 'stop' : 'start', 'POST');
+      if (powerBtn) {
+        powerBtn.style.opacity = '0.4';
+        powerBtn.style.pointerEvents = 'none';
+      }
+      const action = isRunning ? 'stop' : 'start';
+      showToast('info', action === 'start' ? 'Booting' : 'Shutting Down',
+        action === 'start' ? 'Initializing subsystems...' : 'Saving session...', 3000);
+      const status = await api(action, 'POST');
       applyStatus(status);
-      powerBtn.disabled = false;
-      powerBtn.style.opacity = '';
+      if (powerBtn) {
+        powerBtn.style.opacity = '';
+        powerBtn.style.pointerEvents = '';
+      }
     }
 
     async function toggleSub(name) {
@@ -1713,15 +2021,20 @@
       });
     }
 
-    // ── Claude Code — open CLI in Terminal ─────────
+    // ── Claude Code — open CLI in Terminal (direct tool call, no brain) ─────────
     async function openClaudeCode() {
       if (!isRunning) return;
       const claudeBtn = document.querySelector('.claude-btn');
       claudeBtn.style.opacity = '0.4';
       claudeBtn.style.pointerEvents = 'none';
       try {
-        const result = await api('chat', 'POST', { text: 'open claude code terminal CLI' });
-        if (result.error) showToast('error', 'Claude Code', result.error);
+        const result = await fetch('/api/open_claude', { method: 'POST' });
+        const data = await result.json();
+        if (data.error) {
+          showToast('error', 'Claude Code', data.error);
+        } else {
+          showToast('info', 'Claude Code', 'Terminal opened', 2000);
+        }
       } catch (err) {
         showToast('error', 'Claude Code', err.message);
       } finally {
@@ -1732,7 +2045,7 @@
       }
     }
 
-    // ── Chat — send typed message ──────────────────
+    // ── Chat — send typed message with token streaming ──
     async function sendChat() {
       const text = chatInput.value.trim();
       if (!text || chatSending) return;
@@ -1744,66 +2057,614 @@
       chatInput.value = '';
       chatInput.style.height = 'auto';
       chatSending = true;
-      chatSendBtn.classList.add('sending');
-      typingIndicator.classList.add('active');
+      setStatus('thinking', 'HAL is thinking...');
+
+      // Block SSE from rendering duplicates during streaming
+      streamingUntil = (Date.now() / 1000) + 300; // 5 min — refined in finally block
+
+      // Add user message immediately
+      addChatMsg('user', text);
+
+      // Create streaming HAL message bubble
+      const halDiv = document.createElement('div');
+      halDiv.className = 'msg hal';
+      halDiv.innerHTML = '<span class="msg-label">HAL</span><span class="msg-stream-text"></span>';
+      chatMessages.appendChild(halDiv);
+      const streamSpan = halDiv.querySelector('.msg-stream-text');
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
 
       try {
-        const result = await api('chat', 'POST', { text });
-        if (result.error) {
-          showToast('error', 'Chat Error', result.error);
+        const resp = await fetch('/api/chat/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let fullText = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // keep incomplete line
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            try {
+              const event = JSON.parse(line.slice(6));
+
+              if (event.type === 'token') {
+                fullText += event.text;
+                streamSpan.textContent = fullText;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                setStatus('speaking', 'HAL is responding...');
+
+              } else if (event.type === 'tool') {
+                const name = event.name;
+                const summary = (event.result?.result || event.result?.error || '').substring(0, 150);
+                addChatMsg('tool', `[${name}] ${summary}`);
+                setStatus('thinking', `Running ${name}...`);
+              } else if (event.type === 'done') {
+                // Final — replace stream content with final text
+                const finalText = fullText || event.text || '';
+                if (event.text && !fullText) {
+                  streamSpan.textContent = event.text;
+                }
+                // Check for choices in the final text
+                const parsed = parseChoices(finalText);
+                if (parsed && parsed.choices.length >= 2 && parsed.choices.length <= 10) {
+                  showChoiceSheet(parsed.title, parsed.choices);
+                  streamSpan.textContent = parsed.title || finalText.split(/\n/)[0] || '';
+                }
+              }
+            } catch (e) { /* skip malformed events */ }
+          }
         }
+
       } catch (err) {
         showToast('error', 'Connection Error', err.message);
       } finally {
+        // Mark: skip SSE entries up to 2 seconds from now (covers server log delay)
+        streamingUntil = (Date.now() / 1000) + 2;
         chatSending = false;
-        chatSendBtn.classList.remove('sending');
-        typingIndicator.classList.remove('active');
+        setStatus(null);
         chatInput.focus();
       }
     }
 
-    // ── Voice input — click mic, speak, HAL listens ──
-    let micListening = false;
+    // ── Status pill — unified feedback for all actions ──
+    const statusPill = document.getElementById('chat-status-pill');
+    const statusPillText = document.getElementById('chat-status-text');
+
+    function setStatus(phase, text) {
+      // phase: null (hide), 'recording', 'transcribing', 'thinking', 'speaking', 'sending'
+      if (!phase) {
+        statusPill.classList.remove('active', 'recording', 'transcribing', 'thinking', 'speaking');
+        chatInput.placeholder = 'Message HAL...';
+        chatInput.disabled = false;
+        chatSendBtn.disabled = false;
+        chatMicBtn.disabled = false;
+        chatMicBtn.style.opacity = '';
+        chatMicBtn.style.pointerEvents = '';
+        chatMicBtn.classList.remove('listening', 'transcribing');
+        return;
+      }
+
+      statusPill.className = 'chat-status-pill active ' + phase;
+      statusPillText.textContent = text || phase;
+      chatInput.placeholder = text || phase;
+      chatInput.disabled = true;
+      chatSendBtn.disabled = true;
+      chatMicBtn.disabled = true;
+      chatMicBtn.style.opacity = phase === 'recording' ? '' : '0.3';
+      chatMicBtn.style.pointerEvents = 'none';
+    }
+
+    // ── Browser-side mic recording ─────────────────
+    let micRecording = false;
+    let micStream = null;
+    let micProcessor = null;
+    let micSource = null;
+    let micAnalyser = null;
+    let micChunks = [];
+    let micSilenceStart = 0;
+    let micSampleRate = 16000;
+    let wfMicActive = false;
+    const MIC_SILENCE_THRESHOLD = 0.015;  // normalized RMS
+    const MIC_SILENCE_DURATION = 1500;    // ms before auto-stop
+    const MIC_MAX_DURATION = 30000;       // 30s max recording
+    let micTimeout = null;
 
     async function voiceInput() {
-      if (micListening || chatSending) return;
+      if (chatSending) return;
       if (!isRunning) {
         addChatMsg('system', 'Activate HAL first');
         return;
       }
 
-      micListening = true;
-      chatMicBtn.classList.add('listening');
-      typingIndicator.classList.add('active');
+      // Stop HAL speaking if currently playing audio
+      if (currentSource || wfSpeaking) {
+        if (currentSource) { try { currentSource.stop(); } catch(e) {} currentSource = null; }
+        wfSpeaking = false;
+        waveformWrap.classList.remove('active');
+        fetch('/api/speech_done', { method: 'POST' }).catch(() => {});
+      }
+
+      // Toggle: if already recording, stop
+      if (micRecording) {
+        stopMicRecording();
+        return;
+      }
+
+      // Start recording
       try {
-        // Single call: record → transcribe → think → respond (no round-trip)
-        const result = await api('voice_chat', 'POST', {});
-        if (result.error && !result.heard) {
-          // Silence / no speech detected — no action needed
-        } else if (result.error) {
-          showToast('error', 'Voice Error', result.error);
-        }
-        // Heard text + HAL reply arrive via SSE log stream
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: { channelCount: 1, sampleRate: 16000 }
+        });
       } catch (err) {
-        showToast('error', 'Mic Error', err.message);
-      } finally {
-        micListening = false;
-        chatMicBtn.classList.remove('listening');
-        typingIndicator.classList.remove('active');
+        if (err.name === 'NotAllowedError') {
+          showToast('error', 'Mic Denied', 'Please allow microphone access in your browser settings', 4000);
+        } else if (err.name === 'NotFoundError') {
+          showToast('error', 'No Mic', 'No microphone found on this device', 3000);
+        } else {
+          showToast('error', 'Mic Error', err.message, 3000);
+        }
+        return;
+      }
+
+      micRecording = true;
+      micChunks = [];
+      micSilenceStart = 0;
+
+      // Create audio context for recording
+      ensureAudioCtx();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+      micSampleRate = audioCtx.sampleRate;
+
+      micSource = audioCtx.createMediaStreamSource(micStream);
+      micAnalyser = audioCtx.createAnalyser();
+      micAnalyser.fftSize = 128;
+      micAnalyser.smoothingTimeConstant = 0.75;
+
+      // Use ScriptProcessorNode for PCM capture
+      micProcessor = audioCtx.createScriptProcessor(4096, 1, 1);
+      micProcessor.onaudioprocess = (e) => {
+        const input = e.inputBuffer.getChannelData(0);
+        micChunks.push(new Float32Array(input));
+
+        // Silence detection
+        let sum = 0;
+        for (let i = 0; i < input.length; i++) sum += input[i] * input[i];
+        const rms = Math.sqrt(sum / input.length);
+
+        if (rms < MIC_SILENCE_THRESHOLD) {
+          if (!micSilenceStart) micSilenceStart = Date.now();
+          else if (Date.now() - micSilenceStart > MIC_SILENCE_DURATION && micChunks.length > 3) {
+            stopMicRecording(); // auto-stop after 1.5s silence
+          }
+        } else {
+          micSilenceStart = 0;
+        }
+      };
+
+      micSource.connect(micAnalyser);
+      micSource.connect(micProcessor);
+      micProcessor.connect(audioCtx.destination);
+
+      // Drive waveform from mic input
+      wfMicActive = true;
+      waveformWrap.classList.add('active');
+
+      // UI feedback
+      chatMicBtn.classList.add('listening');
+      setStatus('recording', 'Recording... click mic to stop');
+
+      // Safety timeout
+      micTimeout = setTimeout(() => {
+        if (micRecording) stopMicRecording();
+      }, MIC_MAX_DURATION);
+    }
+
+    async function stopMicRecording() {
+      if (!micRecording) return;
+      micRecording = false;
+      clearTimeout(micTimeout);
+
+      // Disconnect audio nodes
+      if (micProcessor) { micProcessor.disconnect(); micProcessor = null; }
+      if (micSource) { micSource.disconnect(); micSource = null; }
+      if (micStream) {
+        micStream.getTracks().forEach(t => t.stop());
+        micStream = null;
+      }
+
+      // Stop waveform
+      wfMicActive = false;
+      micAnalyser = null;
+      chatMicBtn.classList.remove('listening');
+
+      if (micChunks.length < 2) {
+        setStatus(null);
+        showToast('info', 'Too Short', 'Recording was too short — try again', 2000);
+        return;
+      }
+
+      // Encode to WAV
+      setStatus('transcribing', 'Transcribing...');
+      chatMicBtn.classList.add('transcribing');
+
+      const wavBlob = encodeWAV(micChunks, micSampleRate);
+      micChunks = [];
+
+      // Send to server for transcription
+      try {
+        const formData = new FormData();
+        formData.append('audio', wavBlob, 'recording.wav');
+
+        const resp = await fetch('/api/transcribe', { method: 'POST', body: formData });
+        const data = await resp.json();
+
+        chatMicBtn.classList.remove('transcribing');
+
+        if (!data.text) {
+          setStatus(null);
+          showToast('info', 'No Speech', 'Nothing heard — try speaking more clearly', 3000);
+          return;
+        }
+
+        // Show what was heard
+        setStatus('thinking', 'Heard: ' + data.text.substring(0, 50));
+
+        // Send transcription as chat text
+        chatInput.value = data.text;
+        setStatus(null);
+        await sendChat();
+
+      } catch (err) {
+        chatMicBtn.classList.remove('transcribing');
+        setStatus(null);
+        showToast('error', 'Transcription Failed', err.message, 3000);
       }
     }
 
-    // Chat input: Enter to send, Shift+Enter for newline, auto-resize
+    // ── WAV encoder (pure JS, no dependencies) ──────
+    function encodeWAV(chunks, sampleRate) {
+      // Concatenate all Float32 chunks
+      let totalLength = 0;
+      for (const c of chunks) totalLength += c.length;
+      const merged = new Float32Array(totalLength);
+      let offset = 0;
+      for (const c of chunks) { merged.set(c, offset); offset += c.length; }
+
+      // Convert Float32 [-1,1] to Int16
+      const numSamples = merged.length;
+      const buffer = new ArrayBuffer(44 + numSamples * 2);
+      const view = new DataView(buffer);
+
+      // WAV header
+      const writeStr = (o, s) => { for (let i = 0; i < s.length; i++) view.setUint8(o + i, s.charCodeAt(i)); };
+      writeStr(0, 'RIFF');
+      view.setUint32(4, 36 + numSamples * 2, true);
+      writeStr(8, 'WAVE');
+      writeStr(12, 'fmt ');
+      view.setUint32(16, 16, true);          // chunk size
+      view.setUint16(20, 1, true);           // PCM format
+      view.setUint16(22, 1, true);           // mono
+      view.setUint32(24, sampleRate, true);   // sample rate
+      view.setUint32(28, sampleRate * 2, true); // byte rate
+      view.setUint16(32, 2, true);           // block align
+      view.setUint16(34, 16, true);          // bits per sample
+      writeStr(36, 'data');
+      view.setUint32(40, numSamples * 2, true);
+
+      // PCM data
+      let p = 44;
+      for (let i = 0; i < numSamples; i++) {
+        const s = Math.max(-1, Math.min(1, merged[i]));
+        view.setInt16(p, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        p += 2;
+      }
+
+      return new Blob([buffer], { type: 'audio/wav' });
+    }
+
+    // ── Slash Commands ──────────────────────────────
+    const cmdMenu = document.getElementById('cmd-menu');
+    let cmdSelectedIdx = -1;
+    let cmdVisible = false;
+
+    const COMMANDS = [
+      // System
+      { cmd: '/help',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>', desc: 'Show all available commands', cat: 'System' },
+      { cmd: '/status',     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>', desc: 'Show system status (vision, voice, provider)', cat: 'System' },
+      { cmd: '/reset',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>', desc: 'Clear conversation history', cat: 'System' },
+      { cmd: '/clear',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>', desc: 'Clear chat display (keeps memory)', cat: 'System' },
+      { cmd: '/tools',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>', desc: 'List all 40 available tools', cat: 'System' },
+      // Memory
+      { cmd: '/memory',     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>', desc: 'Show all stored memories', cat: 'Memory' },
+      { cmd: '/remember',   icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>', desc: 'Remember something: /remember [fact]', cat: 'Memory' },
+      { cmd: '/forget',     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>', desc: 'Forget a memory: /forget [keyword]', cat: 'Memory' },
+      { cmd: '/save',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>', desc: 'Save current session context', cat: 'Memory' },
+      // Voice & Vision
+      { cmd: '/voice',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14"/></svg>', desc: 'Switch voice: /voice edge | elevenlabs | local', cat: 'Voice' },
+      { cmd: '/mute',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>', desc: 'Mute HAL voice output', cat: 'Voice' },
+      { cmd: '/unmute',     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>', desc: 'Unmute HAL voice output', cat: 'Voice' },
+      { cmd: '/vision',     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>', desc: 'Toggle camera on/off', cat: 'Vision' },
+      { cmd: '/screenshot',icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="13" r="3"/><path d="M12 7v.01"/></svg>', desc: 'Take a screenshot of your screen', cat: 'Vision' },
+      // Apps & System Control
+      { cmd: '/open',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>', desc: 'Open an app: /open Safari', cat: 'Apps' },
+      { cmd: '/quit',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>', desc: 'Quit an app: /quit Safari', cat: 'Apps' },
+      { cmd: '/apps',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>', desc: 'List running applications', cat: 'Apps' },
+      { cmd: '/volume',     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>', desc: 'Get or set volume: /volume 50', cat: 'Control' },
+      { cmd: '/brightness', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg>', desc: 'Get or set brightness: /brightness 80', cat: 'Control' },
+      { cmd: '/battery',    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>', desc: 'Show battery status', cat: 'Control' },
+      { cmd: '/wifi',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>', desc: 'Show current WiFi network', cat: 'Control' },
+      { cmd: '/time',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', desc: 'Show current date and time', cat: 'Control' },
+      { cmd: '/notify',     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>', desc: 'Send notification: /notify [message]', cat: 'Control' },
+      { cmd: '/clipboard',  icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>', desc: 'Read clipboard contents', cat: 'Control' },
+      // Claude Code & Tasks
+      { cmd: '/claude',     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>', desc: 'Open Claude Code terminal', cat: 'Claude' },
+      { cmd: '/delegate',   icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>', desc: 'Delegate task: /delegate [task description]', cat: 'Claude' },
+      { cmd: '/task',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>', desc: 'Run background task: /task [description]', cat: 'Claude' },
+      { cmd: '/tasks',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>', desc: 'Show background tasks status', cat: 'Claude' },
+      // Files & Web
+      { cmd: '/files',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>', desc: 'List files: /files [path]', cat: 'Files' },
+      { cmd: '/read',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>', desc: 'Read a file: /read [path]', cat: 'Files' },
+      { cmd: '/search',     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>', desc: 'Web search: /search [query]', cat: 'Web' },
+      { cmd: '/fetch',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>', desc: 'Fetch webpage: /fetch [url]', cat: 'Web' },
+      // Workspace
+      { cmd: '/artifact',   icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', desc: 'Create artifact: /artifact [code|html|mermaid] [title]', cat: 'Workspace' },
+      { cmd: '/agents',     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>', desc: 'Show orchestrated agents and conflicts', cat: 'Workspace' },
+    ];
+
+    function showCmdMenu(filter) {
+      const q = (filter || '').toLowerCase();
+      const filtered = q === '/'
+        ? COMMANDS
+        : COMMANDS.filter(c => c.cmd.includes(q) || c.desc.toLowerCase().includes(q.replace('/', '')));
+
+      if (filtered.length === 0) { hideCmdMenu(); return; }
+
+      cmdSelectedIdx = 0;
+      cmdVisible = true;
+
+      // Group by category
+      let html = '<div class="cmd-menu-header">Commands — type to filter</div>';
+      let lastCat = '';
+      let idx = 0;
+      filtered.forEach((c) => {
+        if (c.cat !== lastCat) {
+          html += '<div style="padding:4px 12px 2px;font-size:0.55rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#555;border-top:1px solid #1a1a24;margin-top:2px;">' + (c.cat || '') + '</div>';
+          lastCat = c.cat;
+        }
+        html += '<div class="cmd-item ' + (idx === 0 ? 'selected' : '') + '" data-idx="' + idx + '" onclick="execCmd(\'' + c.cmd + '\')" onmouseenter="cmdSelect(' + idx + ')">' +
+          '<div class="cmd-item-icon">' + c.icon + '</div>' +
+          '<div class="cmd-item-text">' +
+            '<div class="cmd-item-name"><span>/</span>' + c.cmd.slice(1) + '</div>' +
+            '<div class="cmd-item-desc">' + c.desc + '</div>' +
+          '</div>' +
+        '</div>';
+        idx++;
+      });
+      cmdMenu.innerHTML = html;
+
+      cmdMenu.classList.add('active');
+    }
+
+    function hideCmdMenu() {
+      cmdMenu.classList.remove('active');
+      cmdVisible = false;
+      cmdSelectedIdx = -1;
+    }
+
+    function cmdSelect(idx) {
+      cmdSelectedIdx = idx;
+      cmdMenu.querySelectorAll('.cmd-item').forEach((el, i) => {
+        el.classList.toggle('selected', i === idx);
+      });
+    }
+
+    async function execCmd(cmd) {
+      hideCmdMenu();
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+
+      const parts = cmd.trim().split(/\s+/);
+      const base = parts[0].toLowerCase();
+      const arg = parts.slice(1).join(' ');
+
+      // Route to chat for commands that need HAL's brain
+      const chatCmds = {
+        '/memory':    'list all my memories',
+        '/save':      'save session',
+        '/tools':     'list all your tools with their names',
+        '/screenshot':'take a screenshot',
+        '/battery':   'what is my battery status',
+        '/wifi':      'what wifi am I connected to',
+        '/time':      'what time is it',
+        '/clipboard': 'read my clipboard',
+        '/apps':      'list running applications',
+        '/agents':    'list agents and check conflicts',
+      };
+
+      // Commands with arguments → send to chat
+      const argChatCmds = {
+        '/remember':  'remember that ',
+        '/forget':    'forget ',
+        '/open':      'open application ',
+        '/quit':      'quit application ',
+        '/delegate':  'delegate to claude code: ',
+        '/task':      'run this in the background: ',
+        '/files':     'list files in ',
+        '/read':      'read file ',
+        '/search':    'search the web for ',
+        '/fetch':     'fetch the webpage ',
+        '/notify':    'send a notification saying ',
+        '/artifact':  'create a code artifact titled ',
+      };
+
+      if (chatCmds[base]) {
+        chatInput.value = chatCmds[base];
+        await sendChat();
+      } else if (argChatCmds[base]) {
+        if (arg) {
+          chatInput.value = argChatCmds[base] + arg;
+          await sendChat();
+        } else {
+          addChatMsg('system', 'Usage: ' + base + ' [argument]. Example: ' + base + ' test');
+        }
+      } else {
+        // Direct commands (no brain needed)
+        switch (base) {
+          case '/help': {
+            let cats = {};
+            COMMANDS.forEach(c => { (cats[c.cat] = cats[c.cat] || []).push(c); });
+            let helpText = '';
+            for (const [cat, cmds] of Object.entries(cats)) {
+              helpText += '\n' + cat + ':\n';
+              cmds.forEach(c => { helpText += '  ' + c.cmd + ' — ' + c.desc + '\n'; });
+            }
+            addChatMsg('system', helpText);
+            break;
+          }
+          case '/status': {
+            const st = await api('status');
+            addChatMsg('system',
+              'Running: ' + st.running + ' | Vision: ' + st.vision + ' | Voice: ' + st.voice + ' (' + st.voice_provider + ') | Processing: ' + st.processing
+            );
+            break;
+          }
+          case '/reset':
+            await api('chat', 'POST', { text: 'reset' });
+            chatMessages.innerHTML = '';
+            chatInitialized = false;
+            lastLogTime = 0;
+            addChatMsg('system', 'Conversation cleared.');
+            break;
+          case '/clear':
+            chatMessages.innerHTML = '';
+            chatInitialized = false;
+            addChatMsg('system', 'Chat display cleared.');
+            break;
+          case '/claude':
+            openClaudeCode();
+            break;
+          case '/tasks': {
+            const tasks = await api('tasks');
+            if (!tasks || tasks.length === 0) {
+              addChatMsg('system', 'No background tasks.');
+            } else {
+              let taskText = tasks.length + ' task(s):\n';
+              tasks.forEach(t => { taskText += '  [' + t.status + '] ' + t.id + ': ' + t.description.substring(0, 60) + '\n'; });
+              addChatMsg('system', taskText);
+            }
+            break;
+          }
+          case '/voice':
+            if (arg && ['edge', 'elevenlabs', 'local'].includes(arg)) {
+              await switchVoice(arg);
+              addChatMsg('system', 'Voice switched to ' + arg);
+            } else {
+              addChatMsg('system', 'Usage: /voice edge | /voice elevenlabs | /voice local');
+            }
+            break;
+          case '/mute':
+            if (isRunning) { await toggleSub('voice'); addChatMsg('system', 'Voice muted.'); }
+            break;
+          case '/unmute':
+            if (isRunning) { await toggleSub('voice'); addChatMsg('system', 'Voice unmuted.'); }
+            break;
+          case '/vision':
+            await toggleSub('vision');
+            break;
+          case '/volume':
+            if (arg) {
+              chatInput.value = 'set volume to ' + arg;
+              await sendChat();
+            } else {
+              chatInput.value = 'what is my current volume';
+              await sendChat();
+            }
+            break;
+          case '/brightness':
+            if (arg) {
+              chatInput.value = 'set brightness to ' + arg;
+              await sendChat();
+            } else {
+              chatInput.value = 'what is my current brightness';
+              await sendChat();
+            }
+            break;
+          default:
+            addChatMsg('system', 'Unknown command: ' + base + '. Type /help for available commands.');
+        }
+      }
+    }
+
+    // Chat input: Enter to send, Shift+Enter for newline, / for commands
     chatInput.addEventListener('keydown', (e) => {
+      // Command menu navigation
+      if (cmdVisible) {
+        const items = cmdMenu.querySelectorAll('.cmd-item');
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          cmdSelect(Math.min(cmdSelectedIdx + 1, items.length - 1));
+          items[cmdSelectedIdx]?.scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          cmdSelect(Math.max(cmdSelectedIdx - 1, 0));
+          items[cmdSelectedIdx]?.scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          if (items[cmdSelectedIdx]) {
+            let name = items[cmdSelectedIdx].querySelector('.cmd-item-name').textContent.trim();
+            if (name.startsWith('/')) name = name.slice(1);
+            execCmd('/' + name + (chatInput.value.includes(' ') ? ' ' + chatInput.value.split(' ').slice(1).join(' ') : ''));
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          hideCmdMenu();
+        } else if (e.key === 'Tab') {
+          e.preventDefault();
+          if (items[cmdSelectedIdx]) {
+            let tname = items[cmdSelectedIdx].querySelector('.cmd-item-name').textContent.trim();
+            if (tname.startsWith('/')) tname = tname.slice(1);
+            chatInput.value = '/' + tname + ' ';
+            chatInput.dispatchEvent(new Event('input'));
+          }
+        }
+        return;
+      }
+
+      // Normal chat
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        sendChat();
+        const val = chatInput.value.trim();
+        if (val.startsWith('/')) {
+          execCmd(val);
+        } else {
+          sendChat();
+        }
       }
     });
 
     chatInput.addEventListener('input', () => {
       chatInput.style.height = 'auto';
       chatInput.style.height = Math.min(chatInput.scrollHeight, 80) + 'px';
+
+      // Show/hide command menu
+      const val = chatInput.value;
+      if (val.startsWith('/') && val.length <= 25) {
+        showCmdMenu(val);
+      } else {
+        hideCmdMenu();
+      }
     });
 
     // ── Choice Sheet ─────────────────────────────────
@@ -1839,6 +2700,9 @@
       choiceSheet.classList.remove('active');
       choiceBackdrop.classList.remove('active');
     }
+
+    // Auto-dismiss on page load (in case stale from previous session)
+    dismissChoiceSheet();
 
     function selectChoice(label, num) {
       dismissChoiceSheet();
@@ -1920,10 +2784,12 @@
     function addChatMsg(role, text) {
       if (!chatInitialized) { chatMessages.innerHTML = ''; chatInitialized = true; }
 
+
       let displayText = text;
 
       // Check if HAL's message contains choices → show choice sheet + strip from bubble
-      if (role === 'hal') {
+      // Only for new messages, not initial page load replay
+      if (role === 'hal' && lastLogTime > 0) {
         const parsed = parseChoices(text);
         if (parsed && parsed.choices.length >= 2 && parsed.choices.length <= 10) {
           showChoiceSheet(parsed.title, parsed.choices);
@@ -1942,10 +2808,9 @@
         : 'SYS';
 
       if (role === 'tool' || role === 'system') {
-        // Compact inline — label + text on one line, no bubble
         div.innerHTML = '<span class="msg-label">' + roleLabel + '</span>' + escapeHtml(displayText);
       } else {
-        div.innerHTML = '<span class="msg-label">' + roleLabel + '</span>' + escapeHtml(displayText);
+        div.innerHTML = '<span class="msg-label">' + roleLabel + '</span>' + formatMessage(displayText);
       }
       chatMessages.appendChild(div);
 
@@ -1956,17 +2821,71 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    let lastLogTime = 0;
+    let streamingUntil = 0; // timestamp — skip SSE user/hal/tool entries until this time
+
     function appendLogEntries(entries) {
       if (!entries.length) return;
+      const now = Date.now() / 1000;
       entries.forEach(entry => {
+        // Skip entries already rendered (dedup by timestamp)
+        if (entry.time && entry.time <= lastLogTime) return;
+        // During/after streaming, skip user+hal+tool entries (they were rendered by sendChat)
+        if (entry.time && entry.time <= streamingUntil && (entry.role === 'user' || entry.role === 'hal' || entry.role === 'tool')) {
+          if (entry.time) lastLogTime = entry.time; // advance time but don't render
+          return;
+        }
         addChatMsg(entry.role, entry.text);
       });
+      const latest = entries[entries.length - 1];
+      if (latest && latest.time) lastLogTime = latest.time;
     }
 
+    const _escDiv = document.createElement('div');
     function escapeHtml(str) {
-      const d = document.createElement('div');
-      d.textContent = str;
-      return d.innerHTML;
+      _escDiv.textContent = str;
+      return _escDiv.innerHTML;
+    }
+
+    function formatMessage(text) {
+      // Pre-process: split inline numbered lists into separate lines
+      // Matches patterns like ". 2. " or ". 3) " mid-sentence
+      text = text.replace(/\.\s+(\d+)[.):\-]\s+/g, '.\n$1. ');
+      // Also handle start of text: "1. Item 2. Item"
+      text = text.replace(/^(\d+)[.):\-]\s+/gm, '\n$1. ');
+
+      const lines = text.split('\n');
+      let html = '';
+      let inList = false;
+
+      for (let i = 0; i < lines.length; i++) {
+        const trimmed = lines[i].trim();
+        if (!trimmed) {
+          if (inList) { html += '</div>'; inList = false; }
+          if (i > 0 && i < lines.length - 1) html += '<div style="height:6px"></div>';
+          continue;
+        }
+
+        // Numbered list: "1. Item" or "1) Item"
+        const numMatch = trimmed.match(/^(\d+)[.):\-]\s+(.+)/);
+        // Bullet list: "- Item" or "* Item" or "• Item"
+        const bulletMatch = trimmed.match(/^[-*•]\s+(.+)/);
+
+        if (numMatch || bulletMatch) {
+          if (!inList) { html += '<div class="msg-list">'; inList = true; }
+          const itemText = numMatch ? numMatch[2] : bulletMatch[1];
+          const num = numMatch ? numMatch[1] : '';
+          html += '<div class="msg-list-item">';
+          if (num) html += '<span class="msg-list-num">' + escapeHtml(num) + '</span>';
+          else html += '<span class="msg-list-bullet"></span>';
+          html += '<span>' + escapeHtml(itemText) + '</span></div>';
+        } else {
+          if (inList) { html += '</div>'; inList = false; }
+          html += '<div>' + escapeHtml(trimmed) + '</div>';
+        }
+      }
+      if (inList) html += '</div>';
+      return html;
     }
 
     // ── Status application ─────────────────────────
@@ -1978,8 +2897,7 @@
       halPanel.classList.toggle('active', s.running);
       halStatusLabel.textContent = s.running ? 'Online' : 'Offline';
 
-      powerBtn.classList.toggle('running', s.running);
-      powerBtn.title = s.running ? 'Deactivate HAL' : 'Activate HAL';
+      // Power button state is managed by the HAL image button handler below
 
       // Camera
       const shouldShowVideo = s.running && s.vision && s.has_camera;
@@ -1990,6 +2908,7 @@
         camOfflineLabel.style.display = 'none';
         camPanel.classList.remove('inactive');
         videoActive = true;
+        wfResize();
       } else if (!shouldShowVideo && videoActive) {
         camVideo.src = '';
         camVideo.style.display = 'none';
@@ -1997,6 +2916,7 @@
         camOfflineLabel.style.display = '';
         camPanel.classList.add('inactive');
         videoActive = false;
+        wfResize();
       }
 
       camSpeaking.classList.toggle('active', !!s.speaking);
@@ -2015,17 +2935,32 @@
       }
 
       // Subsystem buttons (HAL image)
+      const isBusy = !!s.processing;
       halControls.querySelectorAll('.hal-ctrl-btn').forEach(btn => {
-        if (btn.classList.contains('claude-btn')) {
-          // Claude button: enabled when running, no on/off toggle
-          btn.classList.toggle('disabled', !s.running);
+        // Power button — always enabled, toggle on/off state
+        if (btn.classList.contains('power-img-btn')) {
+          btn.classList.toggle('on', s.running);
+          btn.title = s.running ? 'Deactivate HAL' : 'Activate HAL';
           return;
         }
+        // Claude button: disabled when not running OR when processing
+        if (btn.classList.contains('claude-btn')) {
+          btn.classList.toggle('disabled', !s.running || isBusy);
+          return;
+        }
+        // Subsystem toggles: disabled when not running
         const sub = btn.dataset.sub;
         const enabled = s[sub];
         btn.classList.toggle('disabled', !s.running);
         btn.classList.toggle('on', enabled && s.running);
       });
+
+      // Show processing state via unified status pill
+      if (isBusy && !micRecording && !chatSending) {
+        setStatus('thinking', 'HAL is processing...');
+      } else if (!isBusy && !micRecording && !chatSending) {
+        setStatus(null);
+      }
 
     }
 
@@ -2052,8 +2987,21 @@
         statusText.textContent = 'Connected';
       };
 
+      // On first SSE message, skip audio playback for existing speech
+      let sseFirstMessage = true;
+
       eventSource.onmessage = (event) => {
-        const data = JSON.parse(event.data);
+        let data;
+        try {
+          data = JSON.parse(event.data);
+        } catch (e) { return; } // skip malformed SSE
+
+        // On first message, sync lastSpeechId to avoid replaying old audio
+        if (sseFirstMessage) {
+          sseFirstMessage = false;
+          lastSpeechId = data.status.speech_id || 0;
+        }
+
         applyStatus(data.status);
         appendLogEntries(data.log);
         checkForErrors(data.log);
@@ -2098,7 +3046,7 @@
           : '';
         return `<div class="task-card">
           <span class="task-dot ${t.status}"></span>
-          <span class="task-desc" title="${t.description}">${t.description.substring(0, 50)}</span>
+          <span class="task-desc" title="${escapeHtml(t.description)}">${escapeHtml(t.description.substring(0, 50))}</span>
           <span class="task-time">${elapsed}</span>
           ${cancelBtn}
         </div>`;
@@ -2131,8 +3079,8 @@
           : '';
         return `<div class="agent-card">
           <span class="task-dot ${a.status === 'working' ? 'running' : a.status}"></span>
-          <span class="agent-name">${a.name}</span>
-          <span class="task-desc" title="${a.task}">${a.task.substring(0, 40)}</span>
+          <span class="agent-name">${escapeHtml(a.name)}</span>
+          <span class="task-desc" title="${escapeHtml(a.task)}">${escapeHtml(a.task.substring(0, 40))}</span>
           ${files}
           <span class="task-time">${elapsed}</span>
           ${cancelBtn}
@@ -2151,6 +3099,7 @@
     const dashboard = document.querySelector('.dashboard');
     const workspacePanel = document.getElementById('workspace-panel');
     const workspaceTabs = document.getElementById('workspace-tabs');
+    const workspaceActions = document.getElementById('workspace-actions');
     const workspaceContent = document.getElementById('workspace-content');
     let currentArtifacts = [];
     let activeArtifactId = null;
@@ -2158,12 +3107,15 @@
 
     function checkArtifacts(version) {
       if (version === lastArtifactVersion) return;
+      const prevCount = currentArtifacts.length;
       lastArtifactVersion = version;
       fetch('/api/artifacts').then(r => r.json()).then(artifacts => {
         currentArtifacts = artifacts;
         if (artifacts.length > 0) {
           dashboard.classList.add('has-artifacts');
-          if (!activeArtifactId || !artifacts.find(a => a.id === activeArtifactId)) {
+          // Always activate the newest artifact when a new one is added
+          const isNew = artifacts.length > prevCount;
+          if (isNew || !activeArtifactId || !artifacts.find(a => a.id === activeArtifactId)) {
             activeArtifactId = artifacts[artifacts.length - 1].id;
           }
           renderWorkspaceTabs();
@@ -2192,15 +3144,21 @@
     }
 
     function renderArtifact() {
+      editingArtifact = false;
+      workspaceContent.classList.remove('editing');
+      closeRunOutput();
+
       const a = currentArtifacts.find(x => x.id === activeArtifactId);
       if (!a) {
-        workspaceContent.innerHTML = '';
+        if (workspaceContent) workspaceContent.innerHTML = '';
+        if (workspaceActions) workspaceActions.innerHTML = '';
         return;
       }
 
-      let content = '';
-      const copyBtn = `<button class="workspace-copy-btn" onclick="copyArtifact()">Copy</button>`;
+      renderArtifactActions(a);
 
+      // Content
+      let content = '';
       if (a.type === 'html') {
         content = `<iframe class="artifact-html" sandbox="allow-scripts" srcdoc="${a.content.replace(/"/g, '&quot;')}"></iframe>`;
       } else if (a.type === 'mermaid') {
@@ -2209,11 +3167,33 @@
         content = `<pre><code>${escapeHtml(a.content)}</code></pre>`;
       }
 
-      workspaceContent.innerHTML = copyBtn + content;
+      workspaceContent.innerHTML = content;
 
       // Render mermaid diagrams if present
       if (a.type === 'mermaid' && window.mermaid) {
         window.mermaid.run({ querySelector: '.mermaid' });
+      }
+    }
+
+    function renderArtifactActions(a) {
+      const isRunnable = a.type === 'code' || a.type === 'html';
+      const editLabel = editingArtifact ? 'Save' : 'Edit';
+      const editCls = editingArtifact ? 'active' : '';
+
+      const actions = [
+        { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>', label: 'Run', onclick: 'runArtifact()', cls: 'accent-green', show: isRunnable },
+        { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>', label: editLabel, onclick: 'editArtifact()', cls: editCls, show: true },
+        { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>', label: 'Copy', onclick: 'copyArtifact()', cls: '', show: true },
+        { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>', label: 'Send to Claude', onclick: 'sendArtifactToClaude()', cls: '', show: true },
+        { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>', label: 'Download', onclick: 'downloadArtifact()', cls: '', show: true },
+        { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>', label: 'Regenerate', onclick: 'regenerateArtifact()', cls: 'accent-red', show: true },
+      ];
+
+      if (workspaceActions) {
+        workspaceActions.innerHTML = actions
+          .filter(a => a.show)
+          .map(a => `<button class="workspace-action-btn ${a.cls}" onclick="${a.onclick}">${a.icon} ${a.label}</button>`)
+          .join('');
       }
     }
 
@@ -2239,10 +3219,238 @@
       }
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+    let editingArtifact = false;
+
+    function editArtifact() {
+      const a = currentArtifacts.find(x => x.id === activeArtifactId);
+      if (!a) return;
+
+      if (editingArtifact) {
+        // Save and exit edit mode
+        const editor = document.getElementById('artifact-editor');
+        if (editor) {
+          const newContent = editor.value;
+          a.content = newContent;
+          // Persist to server
+          fetch(`/api/artifacts/${a.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: newContent })
+          }).catch(() => {});
+          showToast('info', 'Saved', 'Artifact updated', 2000);
+        }
+        editingArtifact = false;
+        renderArtifact();
+        return;
+      }
+
+      // Enter edit mode
+      editingArtifact = true;
+      workspaceContent.classList.add('editing');
+      workspaceContent.innerHTML = `<textarea id="artifact-editor" class="workspace-editor" spellcheck="false">${escapeHtml(a.content)}</textarea>`;
+
+      // Support Tab key for indentation
+      const editor = document.getElementById('artifact-editor');
+      editor.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          const start = editor.selectionStart;
+          const end = editor.selectionEnd;
+          editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end);
+          editor.selectionStart = editor.selectionEnd = start + 2;
+        }
+      });
+
+      // Update button states
+      renderArtifactActions(a);
+    }
+
+    async function sendArtifactToClaude() {
+      const a = currentArtifacts.find(x => x.id === activeArtifactId);
+      if (!a) return;
+
+      // Copy code to clipboard first
+      try {
+        await navigator.clipboard.writeText(a.content);
+      } catch (e) { /* clipboard may fail in non-secure context */ }
+
+      showToast('info', 'Opening', 'Opening Claude Code with your code...', 2000);
+
+      // Open Claude Code terminal with the review task as --prompt
+      try {
+        const resp = await fetch('/api/send_to_claude', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: a.content,
+            language: a.language || a.type,
+            title: a.title,
+          })
+        });
+        const data = await resp.json();
+        if (data.error) {
+          showToast('error', 'Failed', data.error, 3000);
+        } else {
+          showToast('info', 'Sent', 'Claude Code terminal opened with your code. Also copied to clipboard.', 4000);
+        }
+      } catch (e) {
+        showToast('error', 'Failed', 'Could not open Claude Code: ' + e.message, 3000);
+      }
+    }
+
+    function downloadArtifact() {
+      const a = currentArtifacts.find(x => x.id === activeArtifactId);
+      if (!a) return;
+      const ext = { code: a.language || 'txt', markdown: 'md', html: 'html', mermaid: 'mmd', json: 'json' };
+      const filename = `${a.title.replace(/\s+/g, '_').toLowerCase()}.${ext[a.type] || 'txt'}`;
+      const blob = new Blob([a.content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast('info', 'Downloaded', filename, 2000);
+    }
+
+    async function regenerateArtifact() {
+      const a = currentArtifacts.find(x => x.id === activeArtifactId);
+      if (!a) return;
+      showToast('info', 'Regenerating', 'Asking HAL to regenerate...', 2000);
+      try {
+        await api('chat', 'POST', { text: `regenerate the ${a.type} artifact "${a.title}" with improvements` });
+      } catch (e) {
+        showToast('error', 'Failed', 'Could not regenerate', 3000);
+      }
+    }
+
+    async function runArtifact() {
+      const a = currentArtifacts.find(x => x.id === activeArtifactId);
+      if (!a) return;
+      if (a.type !== 'code' && a.type !== 'html') return;
+
+      // If in edit mode, use editor content
+      let code = a.content;
+      const editor = document.getElementById('artifact-editor');
+      if (editor) code = editor.value;
+
+      const lang = a.language || a.type || 'python';
+
+      // JS/HTML runs in browser sandbox
+      if (lang === 'javascript' || lang === 'js' || lang === 'html' || a.type === 'html') {
+        showRunOutput('running', 'Running in browser...');
+        try {
+          const iframe = document.createElement('iframe');
+          iframe.sandbox = 'allow-scripts';
+          iframe.style.display = 'none';
+          document.body.appendChild(iframe);
+
+          // Capture console.log
+          const logs = [];
+          const script = `
+            const _logs = [];
+            const _origLog = console.log;
+            console.log = (...args) => { _logs.push(args.map(String).join(' ')); _origLog(...args); };
+            console.error = (...args) => { _logs.push('ERROR: ' + args.map(String).join(' ')); };
+            try { ${code} } catch(e) { _logs.push('ERROR: ' + e.message); }
+            parent.postMessage({ type: 'hal-run-result', logs: _logs }, '*');
+          `;
+          iframe.srcdoc = `<script>${script}<\/script>`;
+
+          const result = await new Promise((resolve) => {
+            const handler = (e) => {
+              if (e.data && e.data.type === 'hal-run-result' && (e.origin === 'null' || e.origin === window.location.origin)) {
+                window.removeEventListener('message', handler);
+                resolve(e.data.logs.join('\n') || '(no output)');
+              }
+            };
+            window.addEventListener('message', handler);
+            setTimeout(() => { resolve('(timed out)'); }, 5000);
+          });
+
+          document.body.removeChild(iframe);
+          showRunOutput('success', result);
+        } catch (e) {
+          showRunOutput('error', e.message);
+        }
+        return;
+      }
+
+      // Python/bash/node runs on server
+      showRunOutput('running', `Running ${lang}...`);
+      try {
+        const resp = await fetch('/api/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, language: lang })
+        });
+        const data = await resp.json();
+
+        if (data.error) {
+          showRunOutput('error', data.error);
+        } else {
+          const output = (data.stdout || '') + (data.stderr ? '\n[stderr] ' + data.stderr : '');
+          showRunOutput(data.returncode === 0 ? 'success' : 'error', output || '(no output)');
+        }
+      } catch (e) {
+        showRunOutput('error', 'Failed to execute: ' + e.message);
+      }
+    }
+
+    function showRunOutput(status, text) {
+      if (!workspacePanel) return;
+
+      let outputEl = document.getElementById('workspace-run-output');
+      if (!outputEl) {
+        outputEl = document.createElement('div');
+        outputEl.id = 'workspace-run-output';
+        outputEl.className = 'workspace-output';
+        workspacePanel.appendChild(outputEl);
+      }
+
+      const dotCls = status === 'error' ? 'error' : status === 'running' ? 'running' : '';
+      const bodyCls = status === 'error' ? 'error' : status === 'running' ? 'running' : '';
+      const a = currentArtifacts.find(x => x.id === activeArtifactId);
+      const lang = a ? (a.language || a.type) : 'code';
+      const title = status === 'running' ? 'Running...' : status === 'error' ? 'Error' : 'Output';
+
+      // Format output lines with prompt
+      const lines = text.split('\n');
+      let bodyHtml = '';
+
+      if (status === 'running') {
+        bodyHtml = `<div class="workspace-output-line"><span class="workspace-output-prompt">$ </span>${escapeHtml(lang)} running...</div>`;
+      } else {
+        bodyHtml = `<div class="workspace-output-line"><span class="workspace-output-prompt">$ </span>${escapeHtml(lang)} run</div>`;
+        lines.forEach(line => {
+          bodyHtml += `<div class="workspace-output-line">${escapeHtml(line)}</div>`;
+        });
+        if (status !== 'error') {
+          bodyHtml += `<div class="workspace-output-line" style="color:var(--text-dim);margin-top:4px"><span class="workspace-output-prompt">$ </span>exit 0</div>`;
+        } else {
+          bodyHtml += `<div class="workspace-output-line" style="color:var(--red);margin-top:4px"><span class="workspace-output-prompt">$ </span>exit 1</div>`;
+        }
+      }
+
+      outputEl.innerHTML = `
+        <div class="workspace-output-header">
+          <div class="workspace-output-header-left">
+            <div class="workspace-output-dot ${dotCls}"></div>
+            <span class="workspace-output-title">${title}</span>
+          </div>
+          <span class="workspace-output-close" onclick="closeRunOutput()">&#x2715;</span>
+        </div>
+        <div class="workspace-output-body ${bodyCls}">${bodyHtml}</div>
+      `;
+
+      // Auto-scroll to bottom
+      const body = outputEl.querySelector('.workspace-output-body');
+      if (body) body.scrollTop = body.scrollHeight;
+    }
+
+    function closeRunOutput() {
+      const el = document.getElementById('workspace-run-output');
+      if (el) el.remove();
     }
 
     // ── Waveform Visualizer (fits red block in HAL image) ──
@@ -2258,8 +3466,8 @@
     const BLOCK_W = 605 / IMG_W;
     const BLOCK_H = 144 / IMG_H;
     // Blank strip (between eye and red block) — buttons go here
-    const STRIP_TOP = 880 / IMG_H;     // 71.2%
-    const STRIP_H = 120 / IMG_H;       // 9.7%
+    const STRIP_TOP = 860 / IMG_H;     // slightly higher to give more room
+    const STRIP_H = 150 / IMG_H;       // taller strip for bigger buttons
 
     function wfResize() {
       // Calculate where the image actually renders inside the panel
@@ -2306,10 +3514,10 @@
       halControls.style.width = rendW + 'px';
       halControls.style.height = sH + 'px';
 
-      // Scale buttons proportionally — keep smaller than strip to avoid clipping
-      const btnSize = Math.max(16, Math.min(36, Math.round(sH * 0.55)));
-      const iconSize = Math.round(btnSize * 0.44);
-      const btnGap = Math.round(btnSize * 0.3);
+      // Scale buttons proportionally — 60% of strip height, max 42px
+      const btnSize = Math.max(18, Math.min(42, Math.round(sH * 0.58)));
+      const iconSize = Math.round(btnSize * 0.46);
+      const btnGap = Math.round(btnSize * 0.22);
       halControls.style.gap = btnGap + 'px';
       halControls.querySelectorAll('.hal-ctrl-btn').forEach(btn => {
         btn.style.width = btnSize + 'px';
@@ -2330,10 +3538,16 @@
       WF_H = ch;
     }
 
-    // Resize on load, window resize, and when HAL panel changes size
+    // Debounce only window resize; ResizeObserver runs live for smooth transitions
+    let wfWindowTimer;
+    function wfWindowResizeDebounced() {
+      clearTimeout(wfWindowTimer);
+      wfWindowTimer = setTimeout(wfResize, 50);
+    }
+
     wfResize();
-    window.addEventListener('resize', wfResize);
-    new ResizeObserver(wfResize).observe(halPanel);
+    window.addEventListener('resize', wfWindowResizeDebounced);
+    new ResizeObserver(() => requestAnimationFrame(wfResize)).observe(halPanel);
 
     function ensureAudioCtx() {
       if (audioCtx) return;
@@ -2344,9 +3558,18 @@
       freqData = new Uint8Array(analyser.frequencyBinCount);
     }
 
+    let currentSource = null; // track active audio source to prevent overlap
+
     async function playSpeechAudio(speechId) {
       if (speechId <= lastSpeechId) return;
       lastSpeechId = speechId;
+
+      // Stop any currently playing audio to prevent overlap
+      if (currentSource) {
+        try { currentSource.stop(); } catch (e) { /* already stopped */ }
+        currentSource = null;
+        wfSpeaking = false;
+      }
 
       ensureAudioCtx();
       if (audioCtx.state === 'suspended') await audioCtx.resume();
@@ -2361,6 +3584,7 @@
         const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
         const source = audioCtx.createBufferSource();
         source.buffer = audioBuf;
+        currentSource = source;
 
         source.connect(analyser);
         analyser.connect(audioCtx.destination);
@@ -2370,6 +3594,7 @@
         wfSpeaking = true;
 
         source.onended = () => {
+          currentSource = null;
           wfSpeaking = false;
           fetch('/api/speech_done', { method: 'POST' }).catch(() => {});
         };
@@ -2377,17 +3602,30 @@
         source.start();
       } catch (err) {
         console.error('[Waveform] Audio playback error:', err);
+        currentSource = null;
         wfSpeaking = false;
         fetch('/api/speech_done', { method: 'POST' }).catch(() => {});
       }
     }
 
     function wfDraw() {
+      // Skip rendering when idle — save CPU
+      if (!wfSpeaking && !wfMicActive) {
+        setTimeout(wfDraw, 200); // check again in 200ms instead of 16ms
+        return;
+      }
       if (WF_W < 1 || WF_H < 1) { requestAnimationFrame(wfDraw); return; }
       wfCtx.clearRect(0, 0, WF_W, WF_H);
 
-      if (analyser && wfSpeaking) {
-        analyser.getByteFrequencyData(freqData);
+      // Pick the active analyser: mic takes priority over speech
+      const activeAnalyser = (wfMicActive && micAnalyser) ? micAnalyser : (wfSpeaking && analyser) ? analyser : null;
+      const isMic = wfMicActive && micAnalyser;
+
+      if (activeAnalyser) {
+        if (!freqData || freqData.length !== activeAnalyser.frequencyBinCount) {
+          freqData = new Uint8Array(activeAnalyser.frequencyBinCount);
+        }
+        activeAnalyser.getByteFrequencyData(freqData);
       }
 
       const padX = Math.round(WF_W * 0.03);
@@ -2396,8 +3634,13 @@
       const drawH = WF_H - padY * 2;
       const barW = Math.max(1, Math.floor(drawW / WF_BARS) - WF_GAP);
 
+      // Color: cyan for mic recording, red for speech output
+      const r = isMic ? 0 : 255;
+      const g = isMic ? 188 : 23;
+      const b = isMic ? 255 : 68;
+
       for (let i = 0; i < WF_BARS; i++) {
-        const val = (analyser && wfSpeaking) ? freqData[i] || 0 : 0;
+        const val = activeAnalyser ? (freqData[i] || 0) : 0;
         const norm = val / 255;
         const h = norm * drawH;
         const x = padX + i * (barW + WF_GAP);
@@ -2406,17 +3649,18 @@
         if (h < 1) continue;
 
         const alpha = 0.5 + norm * 0.5;
-        wfCtx.fillStyle = `rgba(255, 23, 68, ${alpha})`;
+        wfCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         wfCtx.fillRect(x, y, barW, h);
 
         if (h > 2) {
-          wfCtx.fillStyle = `rgba(255, 100, 130, ${alpha * 0.7})`;
+          wfCtx.fillStyle = `rgba(${r + 50}, ${g + 50}, ${b + 50}, ${alpha * 0.7})`;
           wfCtx.fillRect(x, y, barW, 1);
           wfCtx.fillRect(x, y + h - 1, barW, 1);
         }
       }
 
-      if (!wfSpeaking) {
+      // Keep waveform visible while mic or speech is active
+      if (!wfSpeaking && !wfMicActive) {
         waveformWrap.classList.remove('active');
       }
 

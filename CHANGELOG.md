@@ -4,6 +4,96 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.4.0] — 2026-03-19
+
+### Added — Streaming, Voice, Commands
+
+#### Token Streaming
+- **Real-time streaming responses** — tokens appear word-by-word as the LLM generates them
+- **`/api/chat/stream`** SSE endpoint — streams `token`, `tool`, `done` events
+- **Streaming `think_stream()`** method on OpenAI brain with tool call support
+- **Chunked TTS** — sentences spoken as they complete, not after full response
+- **TTS queue** — thread-safe `queue.Queue` prevents audio overlap
+- **List detection** — TTS stops before numbered/bulleted lists (intro only)
+
+#### Browser Microphone
+- **Browser-side mic recording** via Web Audio API (`getUserMedia` + `ScriptProcessorNode`)
+- **Live waveform** during recording — cyan bars on HAL's red block
+- **Silence auto-detection** — 1.5s silence → auto-stop recording
+- **Click-to-stop** — click mic again to stop early
+- **WAV encoding** in pure JS — no server-side pyaudio needed for web UI
+- **`/api/transcribe`** endpoint — accepts audio blob, returns transcription
+- **Mic stops HAL speaking** — clicking mic cancels any playing audio
+
+#### Slash Commands
+- **35 slash commands** — type `/` in chat for full categorized menu
+- **Categories**: System, Memory, Voice, Vision, Apps, Control, Claude, Files, Web, Workspace
+- **Arrow key navigation**, Enter to execute, Tab to autocomplete, Escape to close
+- **Filter by typing** — `/vo` filters to `/voice`, `/volume`, `/vision`
+
+#### UI Improvements
+- **Terminal-style chat** — monospace, left-aligned, prompt prefixes (`>` HAL, `$` user, `#` system, `~` tool)
+- **Formatted lists** — numbered and bulleted lists render as styled items (inline lists auto-split)
+- **Terminal-style choice sheet** — flat, minimal, amber title, hover borders
+- **Status pill** — centered above input, shows recording/transcribing/thinking phases
+- **Workspace actions** — Run, Edit, Copy, Send to Claude, Download, Regenerate
+- **Mini terminal output** — code execution results in terminal-style panel
+- **Inline code editor** — edit artifacts with Tab indentation support
+- **HAL image power button** — 4 buttons: Power, Vision, Voice, Claude with tooltips
+
+#### Smart Features
+- **Dynamic user name** — first-boot onboarding asks "What shall I call you?", remembers forever
+- **Fresh memory in system prompt** — `@property` rebuilds prompt on each think() with latest memories
+- **Parallel tool execution** — `ThreadPoolExecutor(4)` for multi-tool calls
+- **Processing guard** — prevents concurrent messages, auto-expires after 180s
+- **History auto-repair** — `_repair_history()` fixes orphaned tool_calls on error
+- **Honesty rule** — system prompt prevents hallucinating features/commands
+
+### Changed
+- Mic input: server-side pyaudio → browser Web Audio API (web UI)
+- Chat: bubble style → terminal style with prompt prefixes
+- Choice sheet: glass-morphism modal → flat terminal selection
+- TTS: full-response → sentence-by-sentence chunked
+- `MAX_TOKENS`: 1024 → 2048 (artifacts no longer truncated)
+- Grid layout: `1fr 1fr` → `1fr 2fr` (more chat width)
+- System prompt: hardcoded "Shandar" → dynamic from memory
+- Error messages: "Dave" → removed
+- Tool descriptions: "Mac" → "computer" (cross-platform)
+- `escapeHtml()`: creates DOM element per call → reuses single element
+- `wfDraw()`: 60fps always → idle skip (200ms setTimeout when inactive)
+- `wfResize()`: debounced window resize, live ResizeObserver for smooth transitions
+
+### Removed
+- Continuous listening / wake word detection
+- `WAKE_WORD_ENABLED` config
+- `hearing_enabled` toggle
+- Hearing button from HAL image
+- Browser TTS fallback (caused voice mismatch)
+- Header power button (moved to HAL image)
+- Dead code: `_load_memories`, `_save_memories`, `MEMORY_DIR` in tools/__init__
+- Dead config: `CONVERSATION_HISTORY_LIMIT`
+- Dead CSS: `.power-btn` (72 lines)
+
+### Fixed
+- **Engine reference bug** — `from server import engine` created duplicate instances; replaced with `set_engine()` pattern
+- **API key leak** — `ANTHROPIC_API_KEY` stripped from Claude Code subprocess env (uses Max plan OAuth)
+- **History corruption** — `_thinking_lock` on all brain providers + `_repair_history()` auto-heals
+- **Audio overlap** — `currentSource.stop()` before new playback + TTS queue
+- **XSS in task/agent panels** — all dynamic content escaped via `escapeHtml()`
+- **SSE JSON.parse** — wrapped in try/catch (malformed JSON no longer kills handler)
+- **`postMessage` origin check** — artifact runner validates message origin
+- **Processing lock stuck** — 180s auto-expire prevents permanent lock
+- **Double messages** — `streamingUntil` timestamp dedup prevents SSE re-rendering streamed messages
+- **Service worker cache** — network-first for HTML, no-cache headers on `/`
+- **Slash command `//`** — strip leading `/` from textContent before prepending
+
+### Security
+- Hardcoded macOS PATH → `os.environ.get("PATH")` in code execution
+- `postMessage` origin validation on artifact runner
+- No-cache headers on HTML to prevent stale JS
+
+---
+
 ## [1.3.0] — 2026-03-18
 
 ### Added — Free Mode + Cross-Platform

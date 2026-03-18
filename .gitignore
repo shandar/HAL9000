@@ -16,3 +16,5 @@ docs/
 product-page/
 assets/llms/
 knowledge/*.txt
+MONETIZATION.md
+.claude/

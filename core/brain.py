@@ -26,11 +26,13 @@ class BaseBrain:
     def __init__(self, knowledge_context: str = ""):
         self.history: list[dict] = []
         self._history_lock = threading.Lock()
-        # Build full system prompt: base + knowledge + memory
-        parts = [cfg.SYSTEM_PROMPT]
+        self._thinking_lock = threading.Lock()  # prevents concurrent think() calls
+        self._knowledge_context = knowledge_context
+        # Build static parts once; memory is refreshed on each _get_system_prompt()
+        self._static_prompt_parts = [cfg.SYSTEM_PROMPT]
 
         if knowledge_context:
-            parts.append(
+            self._static_prompt_parts.append(
                 "--- YOUR KNOWLEDGE BASE ---\n"
                 "The following is information you have been given. "
                 "Use it to answer questions accurately. "
@@ -38,15 +40,28 @@ class BaseBrain:
                 + knowledge_context
             )
 
-        # Load persistent memory (typed)
+        self._static_prompt_parts.append(
+            "--- TOOLS ---\n"
+            "You have access to tools that let you control the user's computer, "
+            "run commands, manage files, search the web, and remember things. "
+            "Use them when the user asks you to do something or when you need information. "
+            "Keep responses concise — under 3 sentences for voice output unless the user asks for detail. "
+            "For destructive or sensitive operations, always confirm with the user first."
+        )
+
+    @property
+    def system_prompt(self) -> str:
+        """Build system prompt with fresh memory on every access."""
+        parts = list(self._static_prompt_parts)
+
+        # Load current persistent memory (refreshed, not stale)
         store = get_store()
         all_memories = store.list_all()
         if all_memories:
-            # Group by type for clarity
             by_type: dict[str, list[str]] = {}
             for m in all_memories:
                 if m.type == "session_summary":
-                    continue  # handled separately below
+                    continue
                 by_type.setdefault(m.type, []).append(m.content)
 
             memory_lines = []
@@ -62,7 +77,7 @@ class BaseBrain:
                     + "\n".join(memory_lines)
                 )
 
-        # Load recent session summaries for continuity
+        # Recent session summaries (limit 3)
         summaries = store.get_session_summaries(limit=3)
         if summaries:
             summary_lines = [f"- {s.content}" for s in summaries]
@@ -72,18 +87,22 @@ class BaseBrain:
                 + "\n".join(summary_lines)
             )
 
-        parts.append(
-            "--- TOOLS ---\n"
-            "You have access to tools that let you control the user's Mac, "
-            "run commands, manage files, search the web, and remember things. "
-            "Use them when the user asks you to do something or when you need information. "
-            "For destructive or sensitive operations, always confirm with the user first by asking before calling the tool."
-        )
+        return "\n\n".join(parts)
 
-        self.system_prompt = "\n\n".join(parts)
+    def _error_msg(self, detail: str) -> str:
+        """Generate a HAL-style error message."""
+        return f"I seem to be having a small problem. {detail}"
 
     def think(self, user_text: str, frame_b64: Optional[str] = None) -> str:
         raise NotImplementedError
+
+    def think_stream(self, user_text: str, frame_b64: Optional[str] = None):
+        """Generator that yields tokens as they arrive. Override in subclass.
+        Yields dicts: {"type": "token", "text": "..."} or {"type": "tool", "name": "...", "result": "..."}
+        Final yield: {"type": "done", "text": "full reply"}
+        Falls back to non-streaming think() if not overridden."""
+        reply = self.think(user_text, frame_b64)
+        yield {"type": "done", "text": reply}
 
     def reset(self):
         with self._history_lock:
@@ -173,6 +192,41 @@ class BaseBrain:
 
             print(f"[HAL Brain] Trimmed history to {len(self.history)} messages (~{total} tokens)")
 
+    def _repair_history(self):
+        """Remove orphaned tool_calls that don't have matching tool responses.
+        This prevents the '400: tool_calls must be followed by tool messages' error."""
+        with self._history_lock:
+            if not self.history:
+                return
+
+            # Walk backwards — find the last assistant message with tool_calls
+            # and check if all tool_call_ids have matching tool responses
+            repaired = False
+            i = len(self.history) - 1
+            while i >= 0:
+                msg = self.history[i]
+                if msg.get("role") == "assistant" and msg.get("tool_calls"):
+                    # Check if every tool_call_id has a matching tool response after it
+                    tc_ids = {tc["id"] for tc in msg["tool_calls"]}
+                    responded = set()
+                    for j in range(i + 1, len(self.history)):
+                        if self.history[j].get("role") == "tool":
+                            responded.add(self.history[j].get("tool_call_id", ""))
+                    orphaned = tc_ids - responded
+                    if orphaned:
+                        # Remove this assistant msg and any partial tool responses
+                        self.history = self.history[:i]
+                        repaired = True
+                        print(f"[HAL Brain] Repaired history: removed orphaned tool_calls at index {i}")
+                        break
+                i -= 1
+
+            if not repaired:
+                # Fallback: if last message is assistant with tool_calls, just remove it
+                if self.history and self.history[-1].get("role") == "assistant" and self.history[-1].get("tool_calls"):
+                    self.history.pop()
+                    print("[HAL Brain] Repaired history: removed trailing tool_calls message")
+
     def _log_tool_call(self, name: str, args: dict, result: dict):
         status = "OK" if "result" in result else "ERROR"
         print(f"[HAL Tool] {name}({json.dumps(args, ensure_ascii=False)[:100]}) → {status}")
@@ -190,6 +244,17 @@ class OpenAIBrain(BaseBrain):
         print(f"[HAL Brain] OpenAI provider ready ({cfg.OPENAI_MODEL}, {len(self._tools)} tools)")
 
     def think(self, user_text: str, frame_b64: Optional[str] = None) -> str:
+        # Prevent concurrent think() calls — a second message while a tool
+        # call is running would corrupt the history sequence
+        if not self._thinking_lock.acquire(timeout=0.1):
+            return "I'm still processing your previous request. One moment."
+
+        try:
+            return self._think_impl(user_text, frame_b64)
+        finally:
+            self._thinking_lock.release()
+
+    def _think_impl(self, user_text: str, frame_b64: Optional[str] = None) -> str:
         content = self._build_content(user_text, frame_b64)
         self.history.append({"role": "user", "content": content})
         self._trim_history()
@@ -235,7 +300,10 @@ class OpenAIBrain(BaseBrain):
                 }
                 self.history.append(assistant_msg)
 
-                for tc in choice.message.tool_calls:
+                # Execute tool calls in parallel when multiple are requested
+                from concurrent.futures import ThreadPoolExecutor
+
+                def _run_tool(tc):
                     name = tc.function.name
                     try:
                         args = json.loads(tc.function.arguments)
@@ -243,10 +311,15 @@ class OpenAIBrain(BaseBrain):
                         args = {}
                     result = tools.execute(name, args)
                     self._log_tool_call(name, args, result)
+                    return tc.id, result
 
+                with ThreadPoolExecutor(max_workers=4) as pool:
+                    results = list(pool.map(_run_tool, choice.message.tool_calls))
+
+                for tc_id, result in results:
                     self.history.append({
                         "role": "tool",
-                        "tool_call_id": tc.id,
+                        "tool_call_id": tc_id,
                         "content": json.dumps(result),
                     })
 
@@ -256,9 +329,132 @@ class OpenAIBrain(BaseBrain):
             return reply
 
         except Exception as e:
-            err = f"I seem to be having a small problem, Dave. Error: {e}"
+            err = f"I seem to be having a small problem. Error: {e}"
             print(f"[HAL Brain] OpenAI error: {e}")
+            # Clean up corrupted history — remove orphaned tool_calls + tool responses
+            self._repair_history()
             return err
+
+    def think_stream(self, user_text: str, frame_b64: Optional[str] = None):
+        """Streaming version — yields tokens as they arrive from OpenAI."""
+        if not self._thinking_lock.acquire(timeout=0.1):
+            yield {"type": "done", "text": "I'm still processing your previous request. One moment."}
+            return
+
+        try:
+            yield from self._think_stream_impl(user_text, frame_b64)
+        finally:
+            self._thinking_lock.release()
+
+    def _think_stream_impl(self, user_text: str, frame_b64: Optional[str] = None):
+        content = self._build_content(user_text, frame_b64)
+        self.history.append({"role": "user", "content": content})
+        self._trim_history()
+
+        max_iters = cfg.TOOL_MAX_ITERATIONS
+
+        try:
+            for _ in range(max_iters):
+                messages = [{"role": "system", "content": self.system_prompt}]
+                messages.extend(self.history)
+
+                # Streaming API call
+                stream = self.client.chat.completions.create(
+                    model=cfg.OPENAI_MODEL,
+                    max_tokens=cfg.MAX_TOKENS,
+                    messages=messages,
+                    tools=self._tools if self._tools else None,
+                    stream=True,
+                )
+
+                # Collect streamed response
+                full_text = ""
+                tool_calls_data = {}  # id -> {name, arguments}
+                finish_reason = None
+
+                for chunk in stream:
+                    delta = chunk.choices[0].delta if chunk.choices else None
+                    if not delta:
+                        continue
+
+                    finish_reason = chunk.choices[0].finish_reason
+
+                    # Text content token
+                    if delta.content:
+                        full_text += delta.content
+                        yield {"type": "token", "text": delta.content}
+
+                    # Tool call chunks (streamed incrementally)
+                    if delta.tool_calls:
+                        for tc_chunk in delta.tool_calls:
+                            idx = tc_chunk.index
+                            if idx not in tool_calls_data:
+                                tool_calls_data[idx] = {
+                                    "id": tc_chunk.id or "",
+                                    "name": "",
+                                    "arguments": "",
+                                }
+                            if tc_chunk.id:
+                                tool_calls_data[idx]["id"] = tc_chunk.id
+                            if tc_chunk.function:
+                                if tc_chunk.function.name:
+                                    tool_calls_data[idx]["name"] = tc_chunk.function.name
+                                if tc_chunk.function.arguments:
+                                    tool_calls_data[idx]["arguments"] += tc_chunk.function.arguments
+
+                # If no tool calls, we're done
+                if finish_reason != "tool_calls" or not tool_calls_data:
+                    self.history.append({"role": "assistant", "content": full_text})
+                    print(f"[HAL] {full_text}")
+                    yield {"type": "done", "text": full_text}
+                    return
+
+                # Process tool calls
+                tc_list = sorted(tool_calls_data.values(), key=lambda x: x.get("id", ""))
+                assistant_msg = {
+                    "role": "assistant",
+                    "content": full_text or None,
+                    "tool_calls": [
+                        {
+                            "id": tc["id"],
+                            "type": "function",
+                            "function": {
+                                "name": tc["name"],
+                                "arguments": tc["arguments"],
+                            },
+                        }
+                        for tc in tc_list
+                    ],
+                }
+                self.history.append(assistant_msg)
+
+                for tc in tc_list:
+                    name = tc["name"]
+                    try:
+                        args = json.loads(tc["arguments"])
+                    except json.JSONDecodeError:
+                        args = {}
+                    result = tools.execute(name, args)
+                    self._log_tool_call(name, args, result)
+
+                    yield {"type": "tool", "name": name, "result": result}
+
+                    self.history.append({
+                        "role": "tool",
+                        "tool_call_id": tc["id"],
+                        "content": json.dumps(result),
+                    })
+
+            # Max iterations
+            reply = "I've reached my tool call limit for this turn."
+            self.history.append({"role": "assistant", "content": reply})
+            yield {"type": "done", "text": reply}
+
+        except Exception as e:
+            err = f"I seem to be having a small problem. Error: {e}"
+            print(f"[HAL Brain] OpenAI streaming error: {e}")
+            self._repair_history()
+            yield {"type": "done", "text": err}
 
     def _build_content(self, text: str, frame_b64: Optional[str]):
         if frame_b64:
@@ -288,6 +484,14 @@ class AnthropicBrain(BaseBrain):
         print(f"[HAL Brain] Anthropic provider ready ({cfg.ANTHROPIC_MODEL}, {len(self._tools)} tools)")
 
     def think(self, user_text: str, frame_b64: Optional[str] = None) -> str:
+        if not self._thinking_lock.acquire(timeout=0.1):
+            return "I'm still processing your previous request. One moment."
+        try:
+            return self._think_impl(user_text, frame_b64)
+        finally:
+            self._thinking_lock.release()
+
+    def _think_impl(self, user_text: str, frame_b64: Optional[str] = None) -> str:
         content = self._build_content(user_text, frame_b64)
         self.history.append({"role": "user", "content": content})
         self._trim_history()
@@ -338,8 +542,9 @@ class AnthropicBrain(BaseBrain):
             return reply
 
         except Exception as e:
-            err = f"I seem to be having a small problem, Dave. Error: {e}"
+            err = f"I seem to be having a small problem. Error: {e}"
             print(f"[HAL Brain] Anthropic error: {e}")
+            self._repair_history()
             return err
 
     def _build_content(self, text: str, frame_b64: Optional[str]) -> list[dict]:
@@ -371,6 +576,14 @@ class GeminiBrain(BaseBrain):
         print(f"[HAL Brain] Gemini provider ready ({cfg.GEMINI_MODEL}, tools enabled)")
 
     def think(self, user_text: str, frame_b64: Optional[str] = None) -> str:
+        if not self._thinking_lock.acquire(timeout=0.1):
+            return "I'm still processing your previous request. One moment."
+        try:
+            return self._think_impl_gemini(user_text, frame_b64)
+        finally:
+            self._thinking_lock.release()
+
+    def _think_impl_gemini(self, user_text: str, frame_b64: Optional[str] = None) -> str:
         contents = self._build_contents(user_text, frame_b64)
 
         max_iters = cfg.TOOL_MAX_ITERATIONS
@@ -435,8 +648,9 @@ class GeminiBrain(BaseBrain):
             return reply
 
         except Exception as e:
-            err = f"I seem to be having a small problem, Dave. Error: {e}"
+            err = f"I seem to be having a small problem. Error: {e}"
             print(f"[HAL Brain] Gemini error: {e}")
+            self._repair_history()
             return err
 
     def _build_contents(self, text: str, frame_b64: Optional[str]):
@@ -569,8 +783,9 @@ class OllamaBrain(BaseBrain):
             err_msg = str(e)
             if "connection" in err_msg.lower() or "refused" in err_msg.lower():
                 return "I cannot reach Ollama. Please ensure it is running: ollama serve"
-            err = f"I seem to be having a small problem, Dave. Error: {e}"
+            err = f"I seem to be having a small problem. Error: {e}"
             print(f"[HAL Brain] Ollama error: {e}")
+            self._repair_history()
             return err
 
     def _model_supports_vision(self) -> bool:

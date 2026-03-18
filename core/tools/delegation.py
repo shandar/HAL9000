@@ -8,6 +8,15 @@ import time
 from core.platform import platform
 from core.tools import tool, _escape_applescript
 
+# Engine reference — set by server.py at startup to avoid circular import
+_engine_ref = None
+
+
+def set_engine(engine):
+    """Called by server.py to provide the engine reference."""
+    global _engine_ref
+    _engine_ref = engine
+
 # Debounce guard — prevent duplicate Terminal opens
 _last_open_time = 0
 _OPEN_COOLDOWN = 5  # seconds
@@ -114,6 +123,8 @@ def delegate_to_claude_code(task: str, working_directory: str = "") -> str:
         + "/opt/homebrew/bin:/usr/local/bin:"
         + env.get("PATH", "")
     )
+    # Remove API key so Claude Code uses OAuth (Max plan) instead of API credits
+    env.pop("ANTHROPIC_API_KEY", None)
 
     try:
         result = subprocess.run(
@@ -147,12 +158,10 @@ def delegate_to_claude_code(task: str, working_directory: str = "") -> str:
 
 
 def _get_task_runner():
-    """Get the task runner from the engine (lazy import to avoid circular)."""
-    try:
-        from server import engine
-        return engine.task_runner
-    except Exception:
-        return None
+    """Get the task runner from the engine."""
+    if _engine_ref:
+        return _engine_ref.task_runner
+    return None
 
 
 @tool(
@@ -248,11 +257,9 @@ def cancel_task(task_id: str) -> str:
 
 def _get_orchestrator():
     """Get the orchestrator from the engine."""
-    try:
-        from server import engine
-        return getattr(engine, "orchestrator", None)
-    except Exception:
-        return None
+    if _engine_ref:
+        return getattr(_engine_ref, "orchestrator", None)
+    return None
 
 
 @tool(

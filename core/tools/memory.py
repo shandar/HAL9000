@@ -3,6 +3,15 @@
 from core.memory_store import get_store
 from core.tools import tool
 
+# Engine reference — set by server.py at startup to avoid circular import
+_engine_ref = None
+
+
+def set_engine(engine):
+    """Called by server.py to provide the engine reference."""
+    global _engine_ref
+    _engine_ref = engine
+
 
 @tool(
     name="remember",
@@ -102,10 +111,10 @@ def list_memories(type: str = "") -> str:
     params={},
 )
 def save_session() -> str:
-    # Import here to avoid circular imports — engine is created in hal9000.py
+    if not _engine_ref:
+        return "Session save not available. Is HAL running?"
     try:
-        from server import engine
-        result = engine.summarize_session()
+        result = _engine_ref.summarize_session()
         return f"Session saved: {result['summary']}"
     except Exception as e:
         return f"Could not save session: {e}"

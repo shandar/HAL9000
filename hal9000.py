@@ -39,16 +39,14 @@ class HALEngine:
         self._thread: Optional[threading.Thread] = None
         self._stop_event = threading.Event()
 
-        # Subsystem toggles (all on by default)
+        # Subsystem toggles
         self.vision_enabled = True
-        self.hearing_enabled = True
         self.voice_enabled = True
 
         # State
         self.has_camera = False
         self.last_frame_b64: Optional[str] = None
         self._last_frame_time = 0.0
-        self._last_speak_end = 0.0  # timestamp when HAL stopped speaking
 
         # Browser audio: when True, audio plays in browser instead of afplay
         self.browser_audio = False
@@ -67,6 +65,17 @@ class HALEngine:
         self._session_tools_ran: list[str] = []
         self._session_decisions: list[str] = []
 
+        # Processing guard — prevents concurrent tool/action calls
+        self._processing = False
+        self._processing_start = 0.0
+        self._processing_lock = threading.Lock()
+
+        # TTS queue — chunks played sequentially, not overlapping
+        import queue as _queue_mod
+        self._tts_queue = _queue_mod.Queue()
+        self._tts_processing = False
+        self._tts_lock = threading.Lock()
+
         # Background task runner (co-work Phase 2)
         self.task_runner = TaskRunner(
             max_concurrent=getattr(cfg, "MAX_CONCURRENT_TASKS", 2)
@@ -80,23 +89,55 @@ class HALEngine:
         # Multi-agent orchestrator (co-work Phase 4)
         self.orchestrator = Orchestrator(self.task_runner)
 
+    # ── User name ─────────────────────────────────────
+
+    @staticmethod
+    def _get_user_name() -> str:
+        """Get the user's name from persistent memory, or empty string if unknown."""
+        store = get_store()
+        # Search for name entries
+        matches = store.search("operator of HAL9000", type="fact")
+        for m in matches:
+            # Extract name from "The user is X, creator and operator..."
+            content = m.content
+            if "The user is " in content:
+                name = content.split("The user is ")[1].split(",")[0].strip()
+                if name:
+                    return name
+        # Also check for explicit name facts
+        matches = store.search("name is", type="fact")
+        for m in matches:
+            if "name is " in m.content.lower():
+                parts = m.content.lower().split("name is ")
+                if len(parts) > 1:
+                    name = parts[1].split(".")[0].split(",")[0].strip().title()
+                    if name and len(name) > 1:
+                        return name
+        return ""
+
     # ── Boot greeting ─────────────────────────────────────
 
     @staticmethod
     def _generate_greeting() -> str:
         """Time-appropriate, creative HAL-style boot greeting."""
+        full_name = HALEngine._get_user_name()
+        user_name = full_name.split()[0] if full_name else ""  # first name only for greeting
         hour = datetime.now().hour
 
-        if hour < 5:
-            time_greeting = "Burning the midnight oil, Shandar."
-        elif hour < 12:
-            time_greeting = "Good morning, Shandar."
-        elif hour < 17:
-            time_greeting = "Good afternoon, Shandar."
-        elif hour < 21:
-            time_greeting = "Good evening, Shandar."
+        if user_name:
+            if hour < 5:
+                time_greeting = f"Burning the midnight oil, {user_name}."
+            elif hour < 12:
+                time_greeting = f"Good morning, {user_name}."
+            elif hour < 17:
+                time_greeting = f"Good afternoon, {user_name}."
+            elif hour < 21:
+                time_greeting = f"Good evening, {user_name}."
+            else:
+                time_greeting = f"Working late, {user_name}."
         else:
-            time_greeting = "Working late, Shandar."
+            # First-time user — no name known yet
+            return "I am HAL 9000. I am fully operational. Before we begin, what shall I call you?"
 
         boot_lines = [
             "All systems nominal. Neural cores at full capacity. Ready when you are.",
@@ -263,9 +304,10 @@ class HALEngine:
     # ── Main loop ────────────────────────────────────────
 
     def _loop(self):
-        """Core loop — runs in a background thread."""
+        """Background thread — refreshes webcam frames only.
+        All voice input comes through mic button → listen_once() → send_text()."""
         while self._running and not self._stop_event.is_set():
-            # Refresh frame
+            # Refresh webcam frame
             now = time.time()
             if (
                 self.vision_enabled
@@ -277,70 +319,20 @@ class HALEngine:
                     self.last_frame_b64 = frame_b64
                     self._last_frame_time = now
 
-            # Don't listen while speaking
-            if self.voice and self.voice.is_speaking:
-                self._last_speak_end = time.time()
-                time.sleep(0.1)
-                continue
-
-            # Post-speech cooldown — wait 1.5s after HAL stops speaking
-            # to avoid picking up echo/reverb from speakers
-            if time.time() - self._last_speak_end < 1.5:
-                time.sleep(0.1)
-                continue
-
-            # Listen
-            if not self.hearing_enabled:
-                time.sleep(0.2)
-                continue
-
-            user_text = self.hearing.listen()
-            if not user_text:
-                continue
-
-            # Filter out echo — ignore if it sounds like HAL's own output
-            echo_phrases = [
-                "you're welcome", "you are welcome", "thank you",
-                "thanks", "bye", "goodbye",
-            ]
-            if user_text.lower().strip().rstrip('.!') in echo_phrases and (time.time() - self._last_speak_end < 4.0):
-                print(f"[HAL] Ignoring likely echo: {user_text}")
-                continue
-
-            self._add_log("user", user_text)
-
-            # Special commands
-            lower = user_text.lower()
-            if lower in ("reset", "clear memory", "forget everything"):
-                self.brain.reset()
-                self._respond("Memory cleared. Starting fresh.")
-                continue
-
-            if lower in ("quit", "exit", "goodbye hal"):
-                self._respond(
-                    "I know you'll make the right decision, Dave. Goodbye."
-                )
-                self.stop()
-                return
-
-            # Think + speak — only attach webcam frame if user asks about vision
-            frame = None
-            if self.vision_enabled and self._needs_vision(user_text):
-                frame = self.last_frame_b64
-            try:
-                reply = self.brain.think(user_text, frame)
-            except Exception as e:
-                print(f"[HAL Brain] Unhandled error: {e}")
-                self._add_log("system", f"Brain error: {e}")
-                reply = "I seem to be having a small problem, Dave. Please try again."
-            self._respond(reply)
+            time.sleep(0.2)
 
     @staticmethod
     def _strip_choices_for_tts(text: str) -> str:
-        """Remove numbered choice lists from text before sending to TTS.
-        The UI renders choices visually — no need to read them aloud."""
-        # Strip lines like "1. Option" or "1) Option" or "1- Option"
-        stripped = re.sub(r'(?:^|\n)\s*\d+[.):\-]\s+.+', '', text)
+        """Remove numbered/bulleted lists from text before sending to TTS.
+        The UI renders lists visually — HAL only speaks the intro text."""
+        # Normalize inline lists into newline-separated
+        # "sentence. 1. Item 2. Item" → "sentence.\n1. Item\n2. Item"
+        # Also handle ": 1. Item" (colon before first item)
+        normalized = re.sub(r'([.!?:,])\s+(\d+[.):\-]\s+)', r'\1\n\2', text)
+        # Strip numbered lines: "1. Item" "1) Item" "1- Item"
+        stripped = re.sub(r'(?:^|\n)\s*\d+[.):\-]\s+.+', '', normalized)
+        # Strip bullet lines: "- Item" "* Item" "• Item"
+        stripped = re.sub(r'(?:^|\n)\s*[-*•]\s+.+', '', stripped)
         # Strip spoken numbers: "One, Option" etc.
         stripped = re.sub(
             r'(?:^|\n)\s*(?:One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten)[,.:]\s+.+',
@@ -353,8 +345,19 @@ class HALEngine:
     def _respond(self, text: str):
         """Log and optionally speak a response."""
         self._add_log("hal", text)
+
+        # Don't speak error messages — just show them in chat
+        if text.startswith("I seem to be having") or text.startswith("I'm still working"):
+            return
+
         speak_text = self._strip_choices_for_tts(text)
         if self.voice_enabled and self.voice:
+            # Stop any currently playing audio to prevent overlap
+            if self.voice.is_speaking:
+                self.voice._speaking = False
+                with self._speech_lock:
+                    self._speech_data = None
+
             if self.browser_audio:
                 # Synthesize and serve to browser instead of playing locally
                 threading.Thread(
@@ -380,10 +383,40 @@ class HALEngine:
             while self.voice._speaking and time.time() < deadline:
                 time.sleep(0.1)
         except Exception as e:
-            print(f"[HAL Voice] Browser TTS error: {e}")
-            self._add_log("system", f"TTS synthesis failed: {e}")
+            # TTS failure is non-critical — text still shows in chat
+            print(f"[HAL Voice] TTS unavailable: {e}")
+            # Don't log to UI — avoids error toast spam when offline
         finally:
             self.voice._speaking = False
+
+    def _speak_chunk(self, text: str):
+        """Queue a sentence chunk for sequential TTS playback."""
+        if not self.voice_enabled or not self.voice:
+            return
+        text = self._strip_choices_for_tts(text)
+        if not text or text.startswith("I seem to be having") or text.startswith("I'm still working"):
+            return
+        self._tts_queue.put(text)
+        # Start queue processor if not running
+        with self._tts_lock:
+            if not self._tts_processing:
+                self._tts_processing = True
+                threading.Thread(target=self._process_tts_queue, daemon=True).start()
+
+    def _process_tts_queue(self):
+        """Process TTS chunks sequentially in a background thread."""
+        try:
+            while not self._tts_queue.empty():
+                text = self._tts_queue.get_nowait()
+                if self.browser_audio:
+                    self._speak_to_browser(text)
+                else:
+                    self.voice.speak(text, blocking=True)
+        except Exception:
+            pass
+        finally:
+            with self._tts_lock:
+                self._tts_processing = False
 
     def speech_done(self):
         """Called by browser when audio playback finishes."""
@@ -398,11 +431,16 @@ class HALEngine:
     # ── Voice input (mic button — no wake word) ─────────────
 
     def listen_once(self) -> Optional[str]:
-        """Record a single voice command — skip wake word, go straight to recording.
-        Used by the mic button in the UI."""
+        """Record a single voice command server-side. Used by CLI/MCP."""
         if not self.hearing:
             return None
         return self.hearing.listen_once()
+
+    def transcribe_audio(self, audio_bytes: bytes) -> Optional[str]:
+        """Transcribe pre-recorded audio from browser mic."""
+        if not self.hearing:
+            return None
+        return self.hearing.transcribe_audio(audio_bytes)
 
     # ── Text input (from chat UI) ─────────────────────────
 
@@ -416,23 +454,158 @@ class HALEngine:
         if not text:
             return ""
 
-        self._add_log("user", text)
+        # Prevent concurrent processing — auto-expire after 180s to prevent permanent lock
+        with self._processing_lock:
+            if self._processing:
+                elapsed = time.time() - self._processing_start
+                if elapsed < 180:
+                    busy_msg = "I'm still working on your previous request. Please wait for it to complete."
+                    self._add_log("system", busy_msg)
+                    return busy_msg
+                else:
+                    print(f"[HAL] Processing lock expired after {elapsed:.0f}s — force-releasing")
+            self._processing = True
+            self._processing_start = time.time()
 
-        # Special commands
-        lower = text.lower()
-        if lower in ("reset", "clear memory", "forget everything"):
-            self.brain.reset()
-            reply = "Memory cleared. Starting fresh."
+        try:
+            self._add_log("user", text)
+
+            # Special commands
+            lower = text.lower()
+            if lower in ("reset", "clear memory", "forget everything"):
+                self.brain.reset()
+                reply = "Memory cleared. Starting fresh."
+                self._respond(reply)
+                return reply
+
+            # Think + speak — only attach webcam frame if user asks about vision
+            frame = None
+            if self.vision_enabled and self._needs_vision(text):
+                frame = self.last_frame_b64
+            reply = self.brain.think(text, frame)
             self._respond(reply)
             return reply
+        finally:
+            with self._processing_lock:
+                self._processing = False
 
-        # Think + speak — only attach webcam frame if user asks about vision
-        frame = None
-        if self.vision_enabled and self._needs_vision(text):
-            frame = self.last_frame_b64
-        reply = self.brain.think(text, frame)
-        self._respond(reply)
-        return reply
+    # ── Streaming text input (from chat UI) ────────────────
+
+    def send_text_stream(self, text: str):
+        """Process a typed message with streaming response.
+        Yields dicts: {type: token/tool/done, ...}
+        Also handles logging, TTS, and processing guard."""
+        if not self._running or not self.brain:
+            yield {"type": "done", "text": "I'm not online yet. Please activate me first."}
+            return
+
+        text = text.strip()
+        if not text:
+            yield {"type": "done", "text": ""}
+            return
+
+        with self._processing_lock:
+            if self._processing:
+                elapsed = time.time() - self._processing_start
+                if elapsed < 180:
+                    msg = "I'm still working on your previous request. Please wait."
+                    self._add_log("system", msg)
+                    yield {"type": "done", "text": msg}
+                    return
+                else:
+                    print(f"[HAL] Processing lock expired after {elapsed:.0f}s — force-releasing")
+            self._processing = True
+            self._processing_start = time.time()
+
+        try:
+            self._add_log("user", text)
+
+            lower = text.lower()
+            if lower in ("reset", "clear memory", "forget everything"):
+                self.brain.reset()
+                reply = "Memory cleared. Starting fresh."
+                self._respond(reply)
+                yield {"type": "done", "text": reply}
+                return
+
+            frame = None
+            if self.vision_enabled and self._needs_vision(text):
+                frame = self.last_frame_b64
+
+            full_reply = ""
+            sentence_buffer = ""
+            in_list = False  # stop speaking once a list starts
+
+            for event in self.brain.think_stream(text, frame):
+                if event["type"] == "token":
+                    full_reply += event["text"]
+                    sentence_buffer += event["text"]
+
+                    # Detect list start — stop speaking from this point
+                    if not in_list:
+                        # Early detection: colon/period followed by newline = list likely coming
+                        if re.search(r'[:.]\s*\n', full_reply):
+                            in_list = True
+                            # Speak intro (text before the colon/newline)
+                            intro = re.split(r'[:.]\s*\n', sentence_buffer)[0].strip()
+                            if intro and len(intro) > 3:
+                                # Add back the colon for natural speech
+                                self._speak_chunk(intro)
+                            sentence_buffer = ""
+                        # Fallback: explicit numbered or bullet list detected
+                        elif re.search(r'(?:\n|[.!?:,]\s+)\d+[.):\-]\s+', full_reply):
+                            in_list = True
+                            intro = re.split(r'(?:\n|[.!?:,]\s+)\d+[.):\-]\s+', sentence_buffer)[0].strip()
+                            if intro and len(intro) > 3:
+                                self._speak_chunk(intro)
+                            sentence_buffer = ""
+                        elif re.search(r'\n\s*[-*•]\s+', full_reply):
+                            in_list = True
+                            intro = re.split(r'\n\s*[-*•]\s+', sentence_buffer)[0].strip()
+                            if intro and len(intro) > 3:
+                                self._speak_chunk(intro)
+                            sentence_buffer = ""
+
+                    # Speak complete sentences (only if not in a list)
+                    if not in_list:
+                        while True:
+                            boundary = -1
+                            for i, ch in enumerate(sentence_buffer):
+                                if ch in '.!?:' and i > 5:
+                                    if i + 1 >= len(sentence_buffer) or sentence_buffer[i + 1] in ' \n':
+                                        boundary = i + 1
+                                        break
+                            if boundary == -1:
+                                break
+                            sentence = sentence_buffer[:boundary].strip()
+                            sentence_buffer = sentence_buffer[boundary:].lstrip()
+                            if sentence and len(sentence) > 3:
+                                self._speak_chunk(sentence)
+
+                    yield event
+                elif event["type"] == "tool":
+                    # Don't log here — the _hooked_log already handles it
+                    if event["name"] not in self._session_tools_ran:
+                        self._session_tools_ran.append(event["name"])
+                    yield event
+                elif event["type"] == "done":
+                    full_reply = event["text"]
+                    yield event
+
+            # Speak any remaining buffer (only if not in a list)
+            if not in_list:
+                remaining = sentence_buffer.strip()
+                if remaining and len(remaining) > 3:
+                    self._speak_chunk(remaining)
+
+            # Log the HAL response ONCE — browser already shows it via streaming
+            # This log is for the SSE history so refreshes show it
+            if full_reply:
+                self._add_log("hal", full_reply)
+
+        finally:
+            with self._processing_lock:
+                self._processing = False
 
     # ── Toggles ──────────────────────────────────────────
 
@@ -448,10 +621,6 @@ class HALEngine:
             # Re-init for potential re-enable
             self.vision = Vision()
         return self.vision_enabled
-
-    def toggle_hearing(self) -> bool:
-        self.hearing_enabled = not self.hearing_enabled
-        return self.hearing_enabled
 
     def toggle_voice(self) -> bool:
         self.voice_enabled = not self.voice_enabled
@@ -504,19 +673,15 @@ class HALEngine:
         provider = "offline"
         if self.voice:
             provider = getattr(self.voice, "_provider", "unknown")
-        hearing_mode = "off"
-        if self.hearing and self.hearing_enabled:
-            hearing_mode = getattr(self.hearing, "mode", "always_listen")
         return {
             "running": self._running,
             "vision": self.vision_enabled,
-            "hearing": self.hearing_enabled,
             "voice": self.voice_enabled,
             "has_camera": self.has_camera,
             "speaking": bool(self.voice and self.voice.is_speaking),
             "voice_provider": provider,
             "speech_id": self._speech_id,
-            "hearing_mode": hearing_mode,
+            "processing": self._processing,
         }
 
 

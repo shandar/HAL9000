@@ -3,7 +3,7 @@
   "short_name": "HAL 9000",
   "description": "HAL9000 AI Agent — Vision, Voice, Brain, Control",
   "start_url": "/",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#050507",
   "theme_color": "#ff1744",
   "orientation": "any",

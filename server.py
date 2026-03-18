@@ -11,21 +11,34 @@ import json
 import os
 import time
 
-from flask import Flask, Response, jsonify, render_template, request
+from flask import Flask, Response, jsonify, make_response, render_template, request
 
 from config import cfg
 from hal9000 import HALEngine, startup_check
 
 app = Flask(__name__, static_folder="assets", static_url_path="/assets")
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB max for audio uploads
 engine = HALEngine()
 engine.browser_audio = True  # Audio plays in browser when using web UI
+
+# Wire engine reference into tools that need it (avoids circular imports)
+from core.tools.artifacts import set_engine as _set_artifact_engine
+from core.tools.delegation import set_engine as _set_delegation_engine
+from core.tools.memory import set_engine as _set_memory_engine
+_set_artifact_engine(engine)
+_set_delegation_engine(engine)
+_set_memory_engine(engine)
 
 
 # ── Pages ────────────────────────────────────────────────
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    resp = make_response(render_template("index.html"))
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp
 
 
 # ── API ──────────────────────────────────────────────────
@@ -63,7 +76,6 @@ def api_stop():
 def api_toggle(subsystem: str):
     toggles = {
         "vision": engine.toggle_vision,
-        "hearing": engine.toggle_hearing,
         "voice": engine.toggle_voice,
     }
     fn = toggles.get(subsystem)
@@ -107,9 +119,27 @@ def api_speech_done():
     return jsonify({"ok": True})
 
 
+@app.route("/api/transcribe", methods=["POST"])
+def api_transcribe():
+    """Transcribe browser-recorded audio. Expects multipart file 'audio' (WAV)."""
+    if not engine.running or not engine.hearing:
+        return jsonify({"error": "HAL is not active"}), 503
+
+    audio_file = request.files.get("audio")
+    if not audio_file:
+        return jsonify({"error": "No audio file"}), 400
+
+    audio_bytes = audio_file.read()
+    if len(audio_bytes) < 1000:
+        return jsonify({"text": None, "error": "Audio too short"})
+
+    text = engine.transcribe_audio(audio_bytes)
+    return jsonify({"text": text})
+
+
 @app.route("/api/voice_chat", methods=["POST"])
 def api_voice_chat():
-    """Record → transcribe → think → respond, all in one call. No wake word."""
+    """Record → transcribe → think → respond, all in one call. Legacy/CLI mode."""
     if not engine.running or not engine.hearing:
         return jsonify({"error": "HAL is not active"}), 503
 
@@ -168,6 +198,30 @@ def api_chat():
     if error["msg"]:
         return jsonify({"error": error["msg"]}), 500
     return jsonify({"reply": result["reply"]})
+
+
+@app.route("/api/chat/stream", methods=["POST"])
+def api_chat_stream():
+    """Streaming chat — returns SSE events with tokens as they arrive."""
+    data = request.get_json(silent=True) or {}
+    text = data.get("text", "").strip()
+    if not text:
+        return jsonify({"error": "Empty message"}), 400
+    if len(text) > 2000:
+        return jsonify({"error": "Message too long"}), 413
+
+    def generate():
+        try:
+            for event in engine.send_text_stream(text):
+                yield f"data: {json.dumps(event)}\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'type': 'done', 'text': str(e)})}\n\n"
+
+    return Response(
+        generate(),
+        mimetype="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.route("/api/frame")
@@ -234,6 +288,132 @@ def api_artifact(artifact_id):
             if a["id"] == artifact_id:
                 return jsonify(a)
     return jsonify({"error": "Not found"}), 404
+
+
+@app.route("/api/artifacts/<artifact_id>", methods=["PUT"])
+def api_update_artifact(artifact_id):
+    """Update an artifact's content."""
+    data = request.get_json(force=True)
+    content = data.get("content", "")
+    with engine._artifact_lock:
+        for a in engine._artifacts:
+            if a["id"] == artifact_id:
+                a["content"] = content
+                a["updated_at"] = __import__("time").time()
+                engine._artifact_version += 1
+                return jsonify({"ok": True})
+    return jsonify({"error": "Not found"}), 404
+
+
+@app.route("/api/run", methods=["POST"])
+def api_run_code():
+    """Execute code in a sandboxed subprocess. Returns stdout/stderr."""
+    import subprocess as _sp
+
+    data = request.get_json(force=True)
+    code = data.get("code", "")
+    language = data.get("language", "python").lower()
+
+    if not code.strip():
+        return jsonify({"error": "No code provided"})
+
+    try:
+        if language in ("python", "python3", "py"):
+            result = _sp.run(
+                ["python3", "-c", code],
+                capture_output=True, text=True, timeout=10,
+                cwd="/tmp",
+                env={"PATH": os.environ.get("PATH", "/usr/bin:/usr/local/bin")}
+            )
+        elif language in ("javascript", "js", "node"):
+            result = _sp.run(
+                ["node", "-e", code],
+                capture_output=True, text=True, timeout=10,
+                cwd="/tmp",
+                env={"PATH": os.environ.get("PATH", "/usr/bin:/usr/local/bin")}
+            )
+        elif language in ("bash", "sh", "shell"):
+            result = _sp.run(
+                ["bash", "-c", code],
+                capture_output=True, text=True, timeout=10,
+                cwd="/tmp",
+                env={"PATH": os.environ.get("PATH", "/usr/bin:/usr/local/bin")}
+            )
+        else:
+            return jsonify({"error": f"Unsupported language: {language}"})
+
+        return jsonify({
+            "stdout": result.stdout[:5000],
+            "stderr": result.stderr[:2000],
+            "returncode": result.returncode,
+        })
+    except _sp.TimeoutExpired:
+        return jsonify({"error": "Execution timed out (10s limit)"})
+    except FileNotFoundError:
+        return jsonify({"error": f"Runtime not found for {language}"})
+    except Exception as e:
+        return jsonify({"error": str(e)[:500]})
+
+
+# ── Open Claude Code (direct, no brain) ──────────────────
+
+@app.route("/api/open_claude", methods=["POST"])
+def api_open_claude():
+    """Open Claude Code CLI in a new Terminal window — direct tool call, no LLM."""
+    from core.tools import execute
+    result = execute("open_claude_code", {})
+    if "error" in result:
+        return jsonify({"error": result["error"]})
+    return jsonify({"ok": True, "result": result.get("result", "")})
+
+
+# ── Send to Claude Code (open terminal with code) ────────
+
+@app.route("/api/send_to_claude", methods=["POST"])
+def api_send_to_claude():
+    """Open a new Claude Code terminal with code pre-loaded as a prompt."""
+    import subprocess as _sp
+    import tempfile
+
+    data = request.get_json(force=True)
+    code = data.get("code", "")
+    language = data.get("language", "code")
+    title = data.get("title", "artifact")
+
+    if not code.strip():
+        return jsonify({"error": "No code provided"})
+
+    # Write code to a temp file so Claude Code can read it
+    # (avoids shell escaping issues with large code blocks)
+    tmp = tempfile.NamedTemporaryFile(
+        mode="w", suffix=f".{language}", prefix="hal_artifact_",
+        dir="/tmp", delete=False
+    )
+    tmp.write(code)
+    tmp.close()
+
+    from core.tools.delegation import _find_claude_bin
+    claude_bin = _find_claude_bin()
+
+    # Build the prompt as positional argument (no --prompt flag)
+    prompt = f"Review and improve the code in {tmp.name} — it is a {language} {title}. Read the file first."
+    # Escape single quotes for shell safety
+    safe_prompt = prompt.replace("'", "'\\''")
+
+    from core.platform import platform
+    # Open terminal with claude + prompt as positional arg
+    # Use home directory as working dir (universally trusted, no trust prompt)
+    import os
+    home_dir = os.path.expanduser("~")
+    result = platform.open_terminal(
+        f'"{claude_bin}" \'{safe_prompt}\'',
+        home_dir
+    )
+
+    if "Failed" in result:
+        return jsonify({"error": result})
+
+    return jsonify({"ok": True, "file": tmp.name})
 
 
 # ── Orchestrator API ──────────────────────────────────────

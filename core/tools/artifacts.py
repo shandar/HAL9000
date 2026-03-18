@@ -5,14 +5,14 @@ import uuid
 
 from core.tools import tool
 
+# Engine reference — set by server.py at startup to avoid circular import
+_engine_ref = None
 
-def _get_engine():
-    """Get the HAL engine (lazy import to avoid circular)."""
-    try:
-        from server import engine
-        return engine
-    except Exception:
-        return None
+
+def set_engine(engine):
+    """Called by server.py to provide the engine reference."""
+    global _engine_ref
+    _engine_ref = engine
 
 
 @tool(
@@ -46,8 +46,7 @@ def _get_engine():
     },
 )
 def create_artifact(title: str, type: str, content: str, language: str = "") -> str:
-    eng = _get_engine()
-    if not eng:
+    if not _engine_ref:
         return "Artifact system not available. Is HAL running?"
 
     artifact = {
@@ -60,9 +59,9 @@ def create_artifact(title: str, type: str, content: str, language: str = "") -> 
         "updated_at": time.time(),
     }
 
-    with eng._artifact_lock:
-        eng._artifacts.append(artifact)
-        eng._artifact_version += 1
+    with _engine_ref._artifact_lock:
+        _engine_ref._artifacts.append(artifact)
+        _engine_ref._artifact_version += 1
 
     return f"Artifact '{title}' created (id: {artifact['id']}, type: {type})"
 
@@ -83,16 +82,15 @@ def create_artifact(title: str, type: str, content: str, language: str = "") -> 
     },
 )
 def update_artifact(artifact_id: str, content: str) -> str:
-    eng = _get_engine()
-    if not eng:
+    if not _engine_ref:
         return "Artifact system not available."
 
-    with eng._artifact_lock:
-        for a in eng._artifacts:
+    with _engine_ref._artifact_lock:
+        for a in _engine_ref._artifacts:
             if a["id"] == artifact_id:
                 a["content"] = content
                 a["updated_at"] = time.time()
-                eng._artifact_version += 1
+                _engine_ref._artifact_version += 1
                 return f"Artifact '{a['title']}' updated."
 
     return f"Artifact {artifact_id} not found."

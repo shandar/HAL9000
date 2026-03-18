@@ -5,15 +5,15 @@ Each tool is a decorated Python function that HAL can call via LLM function call
 
 Tool implementations are split by domain:
   shell.py      — run_shell
-  apps.py       — open/quit/list applications, open URLs
+  apps.py       — open/quit/list applications, open URLs, app_action
   files.py      — list/read/write/search/info
-  macos.py      — volume, brightness, notifications, clipboard, screenshot
+  system.py     — volume, brightness, notifications, clipboard, screenshot (cross-platform)
   web.py        — web_search, fetch_url
-  memory.py     — remember, recall, forget, list_memories
-  delegation.py — delegate_to_claude_code
+  memory.py     — remember, recall, forget, list_memories, save_session
+  delegation.py — claude_code, background_task, orchestrate, agents
+  artifacts.py  — create_artifact, update_artifact
 """
 
-import json
 import os
 from dataclasses import dataclass, field
 from typing import Callable
@@ -51,10 +51,6 @@ def _escape_applescript(s: str) -> str:
     return s.replace("\\", "\\\\").replace('"', '\\"')
 
 
-# ── Memory persistence path (legacy — use core.memory_store instead) ──
-
-MEMORY_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "memory")
-MEMORY_FILE = os.path.join(MEMORY_DIR, "facts.json")
 
 
 # ── Tool Registry ────────────────────────────────────────
@@ -236,19 +232,6 @@ def _human_size(nbytes: int) -> str:
             return f"{nbytes:.1f} {unit}"
         nbytes /= 1024
     return f"{nbytes:.1f} TB"
-
-
-def _load_memories() -> list[dict]:
-    if os.path.isfile(MEMORY_FILE):
-        with open(MEMORY_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
-
-
-def _save_memories(memories: list[dict]):
-    os.makedirs(MEMORY_DIR, exist_ok=True)
-    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(memories, f, indent=2, ensure_ascii=False)
 
 
 # ── Import all tool modules to trigger @tool registration ─
