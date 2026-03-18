@@ -27,6 +27,11 @@ duckduckgo-search>=6.0.0
 # MCP server (Claude Code integration)
 mcp>=1.0.0
 
+# Free mode — local LLM + local STT (no API keys needed)
+# Set FREE_MODE=true in .env to use these
+ollama>=0.4.0           # local LLM (Llama 3, Mistral, Phi-3)
+faster-whisper>=1.0.0   # local Whisper STT (CTranslate2)
+
 # Local voice cloning (optional — requires Python 3.11)
 # TTS>=0.22.0
 # torch>=2.5,<2.6

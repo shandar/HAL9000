@@ -465,6 +465,130 @@ class GeminiBrain(BaseBrain):
         return contents
 
 
+# ── Ollama (local, free) ────────────────────────────────
+
+class OllamaBrain(BaseBrain):
+    """Local LLM via Ollama — no API key required."""
+
+    def __init__(self, knowledge_context: str = ""):
+        super().__init__(knowledge_context)
+        import ollama as _ollama
+        self._ollama = _ollama
+        self._client = _ollama.Client(host=cfg.OLLAMA_BASE_URL)
+        self._tools = tools.to_openai_tools()  # Ollama uses OpenAI tool format
+        self._model = cfg.OLLAMA_MODEL
+
+        # Verify model is available
+        try:
+            models = self._client.list()
+            available = [m.model.split(":")[0] for m in models.models]
+            base_name = self._model.split(":")[0]
+            if base_name not in available:
+                print(f"[HAL Brain] WARNING: Model '{self._model}' not found locally.")
+                print(f"[HAL Brain] Available: {', '.join(available)}")
+                print(f"[HAL Brain] Run: ollama pull {self._model}")
+        except Exception as e:
+            print(f"[HAL Brain] WARNING: Could not connect to Ollama at {cfg.OLLAMA_BASE_URL}: {e}")
+            print(f"[HAL Brain] Make sure Ollama is running: ollama serve")
+
+        print(f"[HAL Brain] Ollama provider ready ({self._model}, {len(self._tools)} tools, FREE)")
+
+    def think(self, user_text: str, frame_b64: Optional[str] = None) -> str:
+        # Ollama vision support depends on model — skip frame for non-vision models
+        content = user_text
+        if frame_b64 and self._model_supports_vision():
+            content = self._build_content(user_text, frame_b64)
+
+        self.history.append({"role": "user", "content": content})
+        self._trim_history()
+
+        max_iters = cfg.TOOL_MAX_ITERATIONS
+
+        try:
+            for _ in range(max_iters):
+                messages = [{"role": "system", "content": self.system_prompt}]
+                messages.extend(self.history)
+
+                response = self._client.chat(
+                    model=self._model,
+                    messages=messages,
+                    tools=self._tools if self._tools else None,
+                )
+
+                msg = response.message
+
+                # If no tool calls, return text
+                if not msg.tool_calls:
+                    reply = msg.content or ""
+                    self.history.append({"role": "assistant", "content": reply})
+                    print(f"[HAL] {reply}")
+                    return reply
+
+                # Process tool calls
+                assistant_msg = {
+                    "role": "assistant",
+                    "content": msg.content or "",
+                    "tool_calls": [
+                        {
+                            "id": f"call_{i}",
+                            "type": "function",
+                            "function": {
+                                "name": tc.function.name,
+                                "arguments": json.dumps(tc.function.arguments)
+                                    if isinstance(tc.function.arguments, dict)
+                                    else tc.function.arguments,
+                            },
+                        }
+                        for i, tc in enumerate(msg.tool_calls)
+                    ],
+                }
+                self.history.append(assistant_msg)
+
+                for i, tc in enumerate(msg.tool_calls):
+                    name = tc.function.name
+                    args = tc.function.arguments if isinstance(tc.function.arguments, dict) else {}
+                    if isinstance(args, str):
+                        try:
+                            args = json.loads(args)
+                        except json.JSONDecodeError:
+                            args = {}
+
+                    result = tools.execute(name, args)
+                    self._log_tool_call(name, args, result)
+
+                    self.history.append({
+                        "role": "tool",
+                        "content": json.dumps(result),
+                    })
+
+            reply = "I've reached my tool call limit for this turn."
+            self.history.append({"role": "assistant", "content": reply})
+            return reply
+
+        except Exception as e:
+            err_msg = str(e)
+            if "connection" in err_msg.lower() or "refused" in err_msg.lower():
+                return "I cannot reach Ollama. Please ensure it is running: ollama serve"
+            err = f"I seem to be having a small problem, Dave. Error: {e}"
+            print(f"[HAL Brain] Ollama error: {e}")
+            return err
+
+    def _model_supports_vision(self) -> bool:
+        """Check if the current model supports vision/images."""
+        vision_models = {"llava", "bakllava", "moondream", "llava-llama3"}
+        base = self._model.split(":")[0].lower()
+        return base in vision_models
+
+    def _build_content(self, text: str, frame_b64: Optional[str]):
+        """Build content with image for vision-capable models."""
+        if frame_b64:
+            return [
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{frame_b64}"}},
+                {"type": "text", "text": text},
+            ]
+        return text
+
+
 # ── Factory ──────────────────────────────────────────────
 
 def create_brain(knowledge_context: str = "") -> BaseBrain:
@@ -477,8 +601,10 @@ def create_brain(knowledge_context: str = "") -> BaseBrain:
         return AnthropicBrain(knowledge_context)
     elif provider == "gemini":
         return GeminiBrain(knowledge_context)
+    elif provider == "ollama":
+        return OllamaBrain(knowledge_context)
     else:
         raise ValueError(
             f"Unknown AI_PROVIDER: '{provider}'. "
-            f"Use 'openai', 'anthropic', or 'gemini'."
+            f"Use 'openai', 'anthropic', 'gemini', or 'ollama'."
         )

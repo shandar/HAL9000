@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HAL 9000 — A local multimodal AI agent that sees, hears, thinks, speaks, and acts on your Mac. 40 tools, 3 LLM providers, co-work platform with Claude Code.">
+  <meta name="theme-color" content="#ff1744">
+  <title>HAL 9000 — Local Multimodal AI Agent</title>
+  <link rel="icon" type="image/png" href="assets/HAL-eye-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/landing.css">
+</head>
+<body>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-eye-wrap" data-parallax="0.3">
+        <div class="hero-eye-glow"></div>
+        <div class="hero-ring"></div>
+        <div class="hero-ring-2"></div>
+        <img src="assets/HAL-eye.png" alt="HAL 9000 Eye" class="hero-eye" />
+      </div>
+      <h1 class="hero-title">HAL <span>9000</span></h1>
+      <p class="hero-tagline">"I am completely operational, and all my circuits are functioning perfectly."</p>
+      <p class="hero-subtitle">A local, multimodal AI agent that <strong>sees</strong>, <strong>hears</strong>, <strong>thinks</strong>, <strong>speaks</strong>, and <strong>acts</strong> on your Mac — with a co-work platform for Claude Code.</p>
+      <a href="#guide" class="hero-cta">Get Started ↓</a>
+      <a href="#tutorial" class="hero-cta" style="background:transparent; border:1px solid var(--border); color:var(--text-dim); margin-left:12px;">Interactive Tutorial ↓</a>
+    </div>
+    <div class="scroll-indicator">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
+    </div>
+  </section>
+
+  <!-- ═══ CAPABILITIES ═══ -->
+  <section class="capabilities">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">Capabilities</div>
+        <h2 class="section-title">What I Can Do</h2>
+        <p class="section-desc">Six integrated subsystems working in concert — perception, cognition, voice, action, memory, and collaboration.</p>
+      </div>
+
+      <div class="cap-grid">
+        <div class="cap-card reveal" style="transition-delay:0.05s">
+          <div class="cap-icon red">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          </div>
+          <h3>See</h3>
+          <p>Webcam vision with HUD overlay — scanlines, corner brackets, real-time analysis. HAL observes your environment.</p>
+        </div>
+
+        <div class="cap-card reveal" style="transition-delay:0.1s">
+          <div class="cap-icon green">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+          </div>
+          <h3>Hear</h3>
+          <p>Continuous microphone listening with voice activity detection and OpenAI Whisper transcription.</p>
+        </div>
+
+        <div class="cap-card reveal" style="transition-delay:0.15s">
+          <div class="cap-icon cyan">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79s7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-12.72 0-3.5-3.47-3.5-9.12 0-12.6 3.51-3.47 9.14-3.49 12.65-.06L21 3v7.12z"/></svg>
+          </div>
+          <h3>Think</h3>
+          <p>Multi-provider LLM brain — GPT-4o, Claude, or Gemini — with function calling and 40-tool agent layer.</p>
+        </div>
+
+        <div class="cap-card reveal" style="transition-delay:0.2s">
+          <div class="cap-icon red">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          </div>
+          <h3>Speak</h3>
+          <p>Three voice engines — Edge TTS (free), ElevenLabs (premium), XTTS (local voice cloning). Switchable at runtime.</p>
+        </div>
+
+        <div class="cap-card reveal" style="transition-delay:0.25s">
+          <div class="cap-icon green">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14zM6 13h5v4H6v-4zm6-6h4v3h-4V7zM6 7h5v5H6V7zm6 4h4v6h-4v-6z"/></svg>
+          </div>
+          <h3>Act</h3>
+          <p>40 OS-level tools — shell commands, file operations, app control, web search, clipboard, screenshots, AppleScript automation.</p>
+        </div>
+
+        <div class="cap-card reveal" style="transition-delay:0.3s">
+          <div class="cap-icon cyan">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          </div>
+          <h3>Co-Work</h3>
+          <p>Background task runner, artifact workspace, multi-agent orchestration, and cross-agent context handoff with Claude Code.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ARCHITECTURE ═══ -->
+  <section class="architecture">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <div class="section-label">Architecture</div>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-desc" style="margin:0 auto 20px;">Six subsystems connected through a multi-provider brain with a 40-tool agent layer.</p>
+      </div>
+
+      <div class="arch-flow reveal">
+        <div class="arch-node">
+          <div class="arch-node-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+          </div>
+          <span class="arch-node-label">Vision</span>
+          <span class="arch-node-sub">Webcam + CV</span>
+        </div>
+
+        <span class="arch-arrow">→</span>
+
+        <div class="arch-node">
+          <div class="arch-node-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/></svg>
+          </div>
+          <span class="arch-node-label">Hearing</span>
+          <span class="arch-node-sub">VAD + Whisper</span>
+        </div>
+
+        <span class="arch-arrow">→</span>
+
+        <div class="arch-node" style="border-color: rgba(255,23,68,0.3); box-shadow: 0 0 30px rgba(255,23,68,0.05);">
+          <div class="arch-node-icon" style="width:44px; height:44px;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79s7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-12.72 0-3.5-3.47-3.5-9.12 0-12.6 3.51-3.47 9.14-3.49 12.65-.06L21 3v7.12z"/></svg>
+          </div>
+          <span class="arch-node-label">Brain</span>
+          <span class="arch-node-sub">LLM + Tools</span>
+        </div>
+
+        <span class="arch-arrow">→</span>
+
+        <div class="arch-node">
+          <div class="arch-node-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+          </div>
+          <span class="arch-node-label">Voice</span>
+          <span class="arch-node-sub">3 TTS Engines</span>
+        </div>
+
+        <span class="arch-arrow">→</span>
+
+        <div class="arch-node">
+          <div class="arch-node-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2z"/></svg>
+          </div>
+          <span class="arch-node-label">Tools</span>
+          <span class="arch-node-sub">40 Agent Tools</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CO-WORK ═══ -->
+  <section class="cowork">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">Co-Work Platform</div>
+        <h2 class="section-title">Your AI Operations Hub</h2>
+        <p class="section-desc">HAL coordinates work across itself, Claude Code CLI, and Claude Desktop — with shared memory, background tasks, and multi-agent orchestration.</p>
+      </div>
+
+      <div class="cowork-strip reveal-left">
+        <div class="cowork-text">
+          <h3>Typed Memory & Context Handoff</h3>
+          <p>Memories are categorized — facts, decisions, preferences, session summaries. When a Claude Code session ends, context is distilled and pushed to HAL's persistent store. Next session loads where you left off.</p>
+          <div class="cowork-tags">
+            <span class="cowork-tag">hal_save_session</span>
+            <span class="cowork-tag">hal_get_context</span>
+            <span class="cowork-tag green">auto-summarize</span>
+          </div>
+        </div>
+        <div class="cowork-visual">
+          <div class="cowork-visual-inner">
+<span style="color:var(--text-muted)">memory/facts.json</span>
+<span style="color:var(--red)">{ type: "decision" }</span>
+<span style="color:var(--text-dim)">  "Use layered memory arch"</span>
+<span style="color:var(--green)">{ type: "session_summary" }</span>
+<span style="color:var(--text-dim)">  "Refactored auth module (42m)"</span>
+<span style="color:var(--cyan)">{ type: "preference" }</span>
+<span style="color:var(--text-dim)">  "Dark mode, monospace fonts"</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cowork-strip reverse reveal-right">
+        <div class="cowork-text">
+          <h3>Background Task Runner</h3>
+          <p>Submit long-running coding tasks that execute asynchronously via Claude Code. Real-time progress, configurable concurrency, and cancellation. HAL keeps working while tasks run.</p>
+          <div class="cowork-tags">
+            <span class="cowork-tag cyan">background_task</span>
+            <span class="cowork-tag cyan">list_tasks</span>
+            <span class="cowork-tag">cancel_task</span>
+          </div>
+        </div>
+        <div class="cowork-visual">
+          <div class="cowork-visual-inner">
+<span style="color:var(--cyan)">●</span> <span style="color:var(--text-dim)">Running</span>  <span style="color:var(--text)">Refactor auth module</span>  <span style="color:var(--text-muted)">42s</span>
+<span style="color:var(--cyan)">●</span> <span style="color:var(--text-dim)">Running</span>  <span style="color:var(--text)">Write unit tests</span>  <span style="color:var(--text-muted)">28s</span>
+<span style="color:var(--amber)">●</span> <span style="color:var(--text-dim)">Queued</span>   <span style="color:var(--text)">Update API docs</span>
+<span style="color:var(--green)">●</span> <span style="color:var(--text-dim)">Done</span>     <span style="color:var(--text)">Fix login bug</span>  <span style="color:var(--text-muted)">15s</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cowork-strip reveal-left">
+        <div class="cowork-text">
+          <h3>Shared Workspace</h3>
+          <p>HAL generates interactive artifacts — code, Mermaid diagrams, rendered HTML — in a tabbed workspace panel alongside the chat. Copy, close, or iterate vocally.</p>
+          <div class="cowork-tags">
+            <span class="cowork-tag green">create_artifact</span>
+            <span class="cowork-tag green">update_artifact</span>
+            <span class="cowork-tag">code · markdown · html · mermaid</span>
+          </div>
+        </div>
+        <div class="cowork-visual">
+          <div class="cowork-visual-inner" style="color:var(--text-dim)">
+<span style="color:var(--cyan);font-weight:600;">┌ config.py ┐  auth.py  │  diagram</span>
+<span style="color:var(--text-muted)">───────────────────────────────</span>
+<span style="color:var(--red)">class</span> <span style="color:var(--text)">Config:</span>
+  <span style="color:var(--text-dim)">AI_PROVIDER = "openai"</span>
+  <span style="color:var(--text-dim)">TTS_PROVIDER = "edge"</span>
+  <span style="color:var(--text-dim)">TASK_TIMEOUT = 600</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cowork-strip reverse reveal-right">
+        <div class="cowork-text">
+          <h3>Multi-Agent Orchestration</h3>
+          <p>Spawn multiple Claude Code agents on parallel tasks — one does frontend, another backend. HAL monitors all agents and detects file conflicts when they overlap.</p>
+          <div class="cowork-tags">
+            <span class="cowork-tag cyan">orchestrate</span>
+            <span class="cowork-tag cyan">list_agents</span>
+            <span class="cowork-tag">check_conflicts</span>
+          </div>
+        </div>
+        <div class="cowork-visual">
+          <div class="cowork-visual-inner">
+<span style="color:var(--cyan)">●</span> <span style="color:var(--cyan);font-weight:600;">frontend</span>  <span style="color:var(--text-dim)">Build login form</span>  <span style="color:var(--text-muted)">working</span>
+<span style="color:var(--green)">●</span> <span style="color:var(--cyan);font-weight:600;">backend</span>   <span style="color:var(--text-dim)">Add auth endpoint</span>  <span style="color:var(--text-muted)">done</span>
+<span style="color:var(--green)">●</span> <span style="color:var(--cyan);font-weight:600;">tests</span>     <span style="color:var(--text-dim)">Write test suite</span>  <span style="color:var(--text-muted)">done</span>
+
+<span style="color:var(--amber)">⚠ api.py modified by frontend + backend</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STATS ═══ -->
+  <section class="stats">
+    <div class="container">
+      <div class="stats-grid reveal">
+        <div>
+          <div class="stat-number"><span class="counter-val" data-target="40">0</span></div>
+          <div class="stat-label">Agent Tools</div>
+        </div>
+        <div>
+          <div class="stat-number"><span class="counter-val" data-target="20">0</span></div>
+          <div class="stat-label">MCP Tools</div>
+        </div>
+        <div>
+          <div class="stat-number"><span class="counter-val" data-target="3">0</span></div>
+          <div class="stat-label">LLM Providers</div>
+        </div>
+        <div>
+          <div class="stat-number"><span class="counter-val" data-target="3">0</span></div>
+          <div class="stat-label">Voice Engines</div>
+        </div>
+      </div>
+      <div class="stats-attribution reveal">
+        Built by <a href="https://affordance.design" target="_blank">Affordance Design</a> × <a href="https://shandarjunaid.com" target="_blank">Shandar Junaid</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ INTEGRATION ═══ -->
+  <section class="integration">
+    <div class="container">
+      <div class="reveal" style="text-align:center;">
+        <div class="section-label">Integration</div>
+        <h2 class="section-title">Claude Code Integration</h2>
+        <p class="section-desc" style="margin:0 auto;">Register HAL as an MCP server — Claude Code gains access to webcam, voice, macOS control, and shared memory.</p>
+      </div>
+      <div class="terminal reveal">
+        <div class="terminal-bar">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <span class="terminal-title">Terminal — hal-9000</span>
+        </div>
+        <div class="terminal-body"><span class="comment"># Register HAL as an MCP server for Claude Code</span>
+<span class="prompt">$</span> <span class="cmd">claude mcp add hal-9000</span> <span class="flag">--</span> <span class="cmd">python</span> <span class="url">/path/to/HAL9000/hal_mcp_server.py</span>
+
+<span class="comment"># Now Claude Code can:</span>
+<span class="comment">#   hal_see        — See through your webcam</span>
+<span class="comment">#   hal_speak      — Speak aloud in HAL's voice</span>
+<span class="comment">#   hal_remember   — Store typed memories</span>
+<span class="comment">#   hal_get_context — Load session context</span>
+<span class="comment">#   macos_*        — Control volume, brightness, apps...</span>
+<span class="comment">#   + 14 more tools</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ GUIDE ═══ -->
+  <section class="guide" id="guide">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">Installation</div>
+        <h2 class="section-title">Get Started</h2>
+        <p class="section-desc">HAL runs entirely on your Mac. No cloud infrastructure, no Docker, no containers. Just Python and your API keys.</p>
+      </div>
+
+      <div class="guide-steps">
+        <div class="guide-step reveal" style="transition-delay:0.05s">
+          <div class="guide-step-num">1</div>
+          <div class="guide-step-content">
+            <h4>Prerequisites</h4>
+            <p>You need Python 3.10+, macOS (for system controls and AppleScript), and at least an OpenAI API key.</p>
+          </div>
+        </div>
+
+        <div class="guide-step reveal" style="transition-delay:0.1s">
+          <div class="guide-step-num">2</div>
+          <div class="guide-step-content">
+            <h4>Clone & Install</h4>
+            <div class="guide-code"><span class="dim"># Clone the repository</span>
+git clone https://github.com/shandar/HAL9000.git
+cd HAL9000
+
+<span class="dim"># Create virtual environment and install</span>
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt</div>
+          </div>
+        </div>
+
+        <div class="guide-step reveal" style="transition-delay:0.15s">
+          <div class="guide-step-num">3</div>
+          <div class="guide-step-content">
+            <h4>Configure API Keys</h4>
+            <p>Copy the example env file and add your keys.</p>
+            <div class="guide-code"><span class="dim"># Copy template and edit</span>
+cp .env.example .env
+nano .env</div>
+            <table class="guide-table" style="margin-top:16px;">
+              <thead>
+                <tr><th>Key</th><th>Required</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>OPENAI_API_KEY</td><td class="required">Yes</td><td>GPT-4o brain + Whisper STT</td></tr>
+                <tr><td>ANTHROPIC_API_KEY</td><td class="optional">Optional</td><td>If using Claude as brain</td></tr>
+                <tr><td>GEMINI_API_KEY</td><td class="optional">Optional</td><td>If using Gemini as brain</td></tr>
+                <tr><td>ELEVENLABS_API_KEY</td><td class="optional">Optional</td><td>Premium voice (ElevenLabs)</td></tr>
+              </tbody>
+            </table>
+            <p style="margin-top:12px; font-size:0.82rem; color:var(--text-muted);">The default voice (Edge TTS) requires no API key — it's free.</p>
+          </div>
+        </div>
+
+        <div class="guide-step reveal" style="transition-delay:0.2s">
+          <div class="guide-step-num">4</div>
+          <div class="guide-step-content">
+            <h4>Launch HAL</h4>
+            <div class="guide-code"><span class="dim"># Start the web server</span>
+python server.py
+
+<span class="dim"># Open the dashboard</span>
+open http://localhost:9000</div>
+            <p>Click the <strong>power button</strong> in the top-left to activate HAL. He'll greet you.</p>
+          </div>
+        </div>
+
+        <div class="guide-step reveal" style="transition-delay:0.25s">
+          <div class="guide-step-num">5</div>
+          <div class="guide-step-content">
+            <h4>Connect Claude Code</h4>
+            <p>Register HAL's MCP server so Claude Code can use HAL's 20 tools — webcam, voice, macOS controls, memory, and context handoff.</p>
+            <div class="guide-code">claude mcp add hal-9000 -- python /path/to/HAL9000/hal_mcp_server.py</div>
+          </div>
+        </div>
+
+        <div class="guide-step reveal" style="transition-delay:0.3s">
+          <div class="guide-step-num">6</div>
+          <div class="guide-step-content">
+            <h4>Using HAL</h4>
+            <p>Interact via voice or text. HAL responds with speech and can control your Mac, run shell commands, search the web, manage files, and delegate tasks to Claude Code.</p>
+            <div class="guide-code"><span class="dim"># Voice examples:</span>
+"Hey HAL, what's on my screen?"
+"Open Slack and check my messages"
+"Run the tests in the background"
+"Orchestrate: frontend does X, backend does Y"
+
+<span class="dim"># Chat examples:</span>
+"Remember that we decided to use PostgreSQL"
+"What did we work on yesterday?"       <span class="dim">← session memory</span>
+"Show me the config as an artifact"    <span class="dim">← workspace</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TUTORIAL ═══ -->
+  <section class="tutorial" id="tutorial">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label">Interactive Tutorial</div>
+        <h2 class="section-title">Learn How HAL Works</h2>
+        <p class="section-desc">Explore real conversation flows, tool chains, and workflows. Click each scenario to see HAL in action — with animated step-by-step breakdowns.</p>
+      </div>
+
+      <!-- Scenario Tabs -->
+      <div class="tut-tabs reveal">
+        <button class="tut-tab active" data-panel="voice" onclick="switchTutTab(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+          Voice
+        </button>
+        <button class="tut-tab" data-panel="chat" onclick="switchTutTab(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+          Chat
+        </button>
+        <button class="tut-tab" data-panel="tools" onclick="switchTutTab(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14zM6 13h5v4H6v-4zm6-6h4v3h-4V7zM6 7h5v5H6V7zm6 4h4v6h-4v-6z"/></svg>
+          Tools
+        </button>
+        <button class="tut-tab" data-panel="cowork" onclick="switchTutTab(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          Co-Work
+        </button>
+        <button class="tut-tab" data-panel="memory" onclick="switchTutTab(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 9H9v6h6V9zm-2 4h-2v-2h2v2zm8-2V9h-2V7c0-1.1-.9-2-2-2h-2V3h-2v2h-2V3H9v2H7c-1.1 0-2 .9-2 2v2H3v2h2v2H3v2h2v2c0 1.1.9 2 2 2h2v2h2v-2h2v2h2v-2h2c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2zm-4 6H7V7h10v10z"/></svg>
+          Memory
+        </button>
+      </div>
+
+      <!-- ════ Panel: Voice ════ -->
+      <div class="tut-panels">
+        <div class="tut-panel active" id="panel-voice">
+          <div class="tut-scenario-title">Voice Interaction Flow</div>
+          <div class="tut-scenario-desc">
+            Speak naturally — HAL listens via your microphone, transcribes with Whisper, processes through the LLM brain, calls tools if needed, and responds with synthesized speech.
+          </div>
+
+          <div class="tut-content-frame">
+            <!-- Flow diagram -->
+            <div class="tut-flow" id="flow-voice">
+              <div class="tut-flow-node accent" data-delay="0">🎙️ You Speak<small>Mic captures audio</small></div>
+              <span class="tut-flow-arrow" data-delay="200">→</span>
+              <div class="tut-flow-node" data-delay="400">Whisper STT<small>Audio → text</small></div>
+              <span class="tut-flow-arrow" data-delay="600">→</span>
+              <div class="tut-flow-node accent" data-delay="800">Brain + Tools<small>LLM processes</small></div>
+              <span class="tut-flow-arrow" data-delay="1000">→</span>
+              <div class="tut-flow-node accent-green" data-delay="1200">TTS Engine<small>Text → speech</small></div>
+              <span class="tut-flow-arrow" data-delay="1400">→</span>
+              <div class="tut-flow-node" data-delay="1600">🔊 HAL Speaks<small>Browser audio</small></div>
+            </div>
+
+            <!-- Animated conversation -->
+            <div class="tut-convo" id="convo-voice">
+              <div class="tut-msg" data-delay="0">
+                <div class="tut-avatar user">YOU</div>
+                <div class="tut-bubble">
+                  <span class="tut-bubble-label">Voice input</span>
+                  "Hey HAL, what's on my screen right now?"
+                </div>
+              </div>
+
+              <div class="tut-tool-call" data-delay="600">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2z"/></svg>
+                <span>hal_screenshot()</span>
+                <span class="tut-tool-result">→ Screenshot captured (2.1 MB)</span>
+              </div>
+
+              <div class="tut-msg from-hal" data-delay="1200">
+                <div class="tut-avatar hal">HAL</div>
+                <div class="tut-bubble">
+                  <span class="tut-bubble-label">Voice response</span>
+                  You have VS Code open with a Python file — it appears to be your server configuration. There's also a browser tab with the HAL documentation. Terminal is running <code>python server.py</code>.
+                </div>
+              </div>
+            </div>
+
+            <button class="tut-replay" onclick="replayConvo('convo-voice', 'flow-voice')">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+              Replay
+            </button>
+          </div>
+        </div>
+
+        <!-- ════ Panel: Chat ════ -->
+        <div class="tut-panel" id="panel-chat">
+          <div class="tut-scenario-title">Chat with Disambiguation</div>
+          <div class="tut-scenario-desc">
+            When a request is ambiguous, HAL presents numbered choices in a slide-up sheet. You pick one — no need to wait for HAL to read options aloud.
+          </div>
+
+          <div class="tut-content-frame">
+            <div class="tut-flow" id="flow-chat">
+              <div class="tut-flow-node accent" data-delay="0">💬 You Type<small>"Open Claude Code"</small></div>
+              <span class="tut-flow-arrow" data-delay="200">→</span>
+              <div class="tut-flow-node accent" data-delay="400">Brain Detects<small>Ambiguous request</small></div>
+              <span class="tut-flow-arrow" data-delay="600">→</span>
+              <div class="tut-flow-node accent-cyan" data-delay="800">Choice Sheet<small>UI shows options</small></div>
+              <span class="tut-flow-arrow" data-delay="1000">→</span>
+              <div class="tut-flow-node accent-green" data-delay="1200">You Pick<small>Tap a choice</small></div>
+              <span class="tut-flow-arrow" data-delay="1400">→</span>
+              <div class="tut-flow-node" data-delay="1600">Tool Executes<small>Action runs</small></div>
+            </div>
+
+            <div class="tut-convo" id="convo-chat">
+              <div class="tut-msg" data-delay="0">
+                <div class="tut-avatar user">YOU</div>
+                <div class="tut-bubble">
+                  <span class="tut-bubble-label">Text input</span>
+                  Open Claude Code
+                </div>
+              </div>
+
+              <div class="tut-msg from-hal" data-delay="600">
+                <div class="tut-avatar hal">HAL</div>
+                <div class="tut-bubble">
+                  <span class="tut-bubble-label">HAL responds (spoken)</span>
+                  Which one?
+                </div>
+              </div>
+
+              <div class="tut-choice-sheet" data-delay="900">
+                <h5>Which one?</h5>
+                <div class="tut-choice-item"><span class="tut-choice-num">1</span> Claude Desktop app</div>
+                <div class="tut-choice-item"><span class="tut-choice-num">2</span> Claude Code terminal CLI</div>
+              </div>
+
+              <div class="tut-msg" data-delay="1500">
+                <div class="tut-avatar user">YOU</div>
+                <div class="tut-bubble">2</div>
+              </div>
+
+              <div class="tut-tool-call" data-delay="1800">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2z"/></svg>
+                <span>open_claude_code(cwd="~/projects")</span>
+                <span class="tut-tool-result">→ Terminal opened</span>
+              </div>
+
+              <div class="tut-msg from-hal" data-delay="2200">
+                <div class="tut-avatar hal">HAL</div>
+                <div class="tut-bubble">Claude Code CLI is open in your projects directory.</div>
+              </div>
+            </div>
+
+            <button class="tut-replay" onclick="replayConvo('convo-chat', 'flow-chat')">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+              Replay
+            </button>
+          </div>
+        </div>
+
+        <!-- ════ Panel: Tools ════ -->
+        <div class="tut-panel" id="panel-tools">
+          <div class="tut-scenario-title">40 Tools at HAL's Disposal</div>
+          <div class="tut-scenario-desc">
+            HAL's brain has function calling — it picks the right tool for any request. Click each use case below to see the tool chain in action.
+          </div>
+
+          <div class="tut-content-frame">
+            <div class="tut-usecases" id="usecases-tools">
+              <div class="tut-usecase reveal" onclick="toggleUseCase(this)">
+                <svg class="tut-uc-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                <h5><svg class="tut-uc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg> Open an Application</h5>
+                <p>Ask HAL to launch any installed app with AppleScript automation.</p>
+                <div class="tut-uc-expand">
+                  <div class="tut-uc-detail">
+                    <span class="tut-uc-cmd">"Open Slack"</span>
+                    <span class="tut-uc-result">→ <code>open_app(name="Slack")</code><br>HAL uses macOS <code>open -a</code> to launch Slack. Works with any of your 113+ installed apps. If ambiguous, HAL shows the choice sheet.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tut-usecase reveal" onclick="toggleUseCase(this)">
+                <svg class="tut-uc-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                <h5><svg class="tut-uc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg> Read & Write Files</h5>
+                <p>HAL reads, writes, searches, and manages files on your Mac.</p>
+                <div class="tut-uc-expand">
+                  <div class="tut-uc-detail">
+                    <span class="tut-uc-cmd">"What's in my config.py?"</span>
+                    <span class="tut-uc-result">→ <code>read_file(path="config.py")</code><br>HAL reads the file contents (up to 1500 chars), then summarizes the key settings: AI provider, TTS provider, model names, token limits.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tut-usecase reveal" onclick="toggleUseCase(this)">
+                <svg class="tut-uc-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                <h5><svg class="tut-uc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg> Control macOS</h5>
+                <p>Volume, brightness, clipboard, notifications, Wi-Fi, battery status.</p>
+                <div class="tut-uc-expand">
+                  <div class="tut-uc-detail">
+                    <span class="tut-uc-cmd">"Set volume to 40 and tell me the battery level"</span>
+                    <span class="tut-uc-result">→ <code>set_volume(level=40)</code> + <code>battery_status()</code><br>HAL chains multiple tools in one turn. The brain calls both, returns: "Volume set to 40%. Battery at 78%, charging."</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tut-usecase reveal" onclick="toggleUseCase(this)">
+                <svg class="tut-uc-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                <h5><svg class="tut-uc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Web Search</h5>
+                <p>Search the web and fetch page content in real time.</p>
+                <div class="tut-uc-expand">
+                  <div class="tut-uc-detail">
+                    <span class="tut-uc-cmd">"Search for the latest Python 3.13 features"</span>
+                    <span class="tut-uc-result">→ <code>web_search(query="Python 3.13 new features")</code><br>HAL searches DuckDuckGo, returns top 5 results with titles and snippets, then summarizes the key highlights vocally.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tut-usecase reveal" onclick="toggleUseCase(this)">
+                <svg class="tut-uc-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                <h5><svg class="tut-uc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/></svg> Shell Commands</h5>
+                <p>Run whitelisted shell commands with security guardrails.</p>
+                <div class="tut-uc-expand">
+                  <div class="tut-uc-detail">
+                    <span class="tut-uc-cmd">"Show me the git log for this project"</span>
+                    <span class="tut-uc-result">→ <code>run_shell(cmd="git log --oneline -10")</code><br>HAL runs the command in a sandboxed shell. Dangerous commands (<code>sudo</code>, <code>rm -rf /</code>, <code>shutdown</code>) are blocked. 70+ safe commands are whitelisted.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tut-usecase reveal" onclick="toggleUseCase(this)">
+                <svg class="tut-uc-chevron" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                <h5><svg class="tut-uc-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg> Vision Analysis</h5>
+                <p>Ask about your webcam, screen, or surroundings.</p>
+                <div class="tut-uc-expand">
+                  <div class="tut-uc-detail">
+                    <span class="tut-uc-cmd">"What am I holding?"</span>
+                    <span class="tut-uc-result">→ Vision keyword detected → webcam frame attached to LLM request<br>HAL analyzes the frame: "You're holding a coffee mug. It appears to be the large white one with text on it."</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ Panel: Co-Work ════ -->
+        <div class="tut-panel" id="panel-cowork">
+          <div class="tut-scenario-title">Background Tasks & Multi-Agent</div>
+          <div class="tut-scenario-desc">
+            Delegate heavy coding work to Claude Code agents running in the background. Monitor progress, run multiple agents in parallel, and detect file conflicts.
+          </div>
+
+          <div class="tut-content-frame">
+            <div class="tut-flow" id="flow-cowork">
+              <div class="tut-flow-node accent" data-delay="0">You Request<small>"Refactor auth"</small></div>
+              <span class="tut-flow-arrow" data-delay="200">→</span>
+              <div class="tut-flow-node accent-cyan" data-delay="400">HAL Queues<small>Task runner</small></div>
+              <span class="tut-flow-arrow" data-delay="600">→</span>
+              <div class="tut-flow-node accent-cyan" data-delay="800">Claude Code<small>Runs silently</small></div>
+              <span class="tut-flow-arrow" data-delay="1000">→</span>
+              <div class="tut-flow-node accent-green" data-delay="1200">Result Stored<small>In typed memory</small></div>
+              <span class="tut-flow-arrow" data-delay="1400">→</span>
+              <div class="tut-flow-node" data-delay="1600">HAL Reports<small>Progress in UI</small></div>
+            </div>
+
+            <div class="tut-convo" id="convo-cowork">
+              <div class="tut-msg" data-delay="0">
+                <div class="tut-avatar user">YOU</div>
+                <div class="tut-bubble">Run the test suite in the background while I keep working</div>
+              </div>
+
+              <div class="tut-tool-call" data-delay="500">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2z"/></svg>
+                <span>background_task(task="run pytest", cwd="~/project")</span>
+                <span class="tut-tool-result">→ Task a3f1 submitted</span>
+              </div>
+
+              <div class="tut-msg from-hal" data-delay="1000">
+                <div class="tut-avatar hal">HAL</div>
+                <div class="tut-bubble">Tests are running in the background. Task ID a3f1. I'll let you know when they finish. What else do you need?</div>
+              </div>
+
+              <div class="tut-msg" data-delay="1600">
+                <div class="tut-avatar user">YOU</div>
+                <div class="tut-bubble">Also orchestrate — frontend agent builds the login form, backend agent adds the auth API endpoint</div>
+              </div>
+
+              <div class="tut-tool-call" data-delay="2100">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3z"/></svg>
+                <span>orchestrate([{name:"frontend", task:"..."}, {name:"backend", task:"..."}])</span>
+              </div>
+
+              <div class="tut-msg from-hal" data-delay="2600">
+                <div class="tut-avatar hal">HAL</div>
+                <div class="tut-bubble">Two agents spawned — <code>frontend</code> and <code>backend</code>. Both are working. I'll flag any file conflicts.</div>
+              </div>
+            </div>
+
+            <button class="tut-replay" onclick="replayConvo('convo-cowork', 'flow-cowork')">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+              Replay
+            </button>
+          </div>
+        </div>
+
+        <!-- ════ Panel: Memory ════ -->
+        <div class="tut-panel" id="panel-memory">
+          <div class="tut-scenario-title">Cross-Agent Memory & Context Handoff</div>
+          <div class="tut-scenario-desc">
+            HAL's typed memory persists facts, decisions, preferences, and session summaries. When a Claude Code session ends, context is distilled and stored — the next session picks up where you left off.
+          </div>
+
+          <div class="tut-content-frame">
+            <div class="tut-flow" id="flow-memory">
+              <div class="tut-flow-node accent" data-delay="0">Session 1<small>HAL + you work</small></div>
+              <span class="tut-flow-arrow" data-delay="200">→</span>
+              <div class="tut-flow-node accent-green" data-delay="400">Auto-Summary<small>On shutdown</small></div>
+              <span class="tut-flow-arrow" data-delay="600">→</span>
+              <div class="tut-flow-node accent-cyan" data-delay="800">facts.json<small>Typed entries</small></div>
+              <span class="tut-flow-arrow" data-delay="1000">→</span>
+              <div class="tut-flow-node accent" data-delay="1200">Session 2<small>Context loaded</small></div>
+              <span class="tut-flow-arrow" data-delay="1400">→</span>
+              <div class="tut-flow-node accent-green" data-delay="1600">"Continue"<small>Full context</small></div>
+            </div>
+
+            <!-- Memory timeline -->
+            <div class="tut-timeline" id="timeline-memory">
+              <div class="tut-tl-item" data-delay="0">
+                <div class="tut-tl-label fact">fact</div>
+                <div class="tut-tl-content">"The user is Shandar Junaid, creator of HAL9000."</div>
+              </div>
+              <div class="tut-tl-item" data-delay="300">
+                <div class="tut-tl-label decision">decision</div>
+                <div class="tut-tl-content">"Use layered memory architecture — HAL owns persistent context, Claude sessions get ephemeral."</div>
+              </div>
+              <div class="tut-tl-item" data-delay="600">
+                <div class="tut-tl-label session">session_summary</div>
+                <div class="tut-tl-content">"Session lasted 42m. 15 user messages, 18 HAL responses. Tools used: background_task, orchestrate, remember. Topics: auth refactor, test suite."</div>
+              </div>
+              <div class="tut-tl-item" data-delay="900">
+                <div class="tut-tl-label pref">preference</div>
+                <div class="tut-tl-content">"Dark mode first. Monospace fonts. Edge TTS for voice."</div>
+              </div>
+            </div>
+
+            <div class="tut-convo" id="convo-memory">
+              <div class="tut-msg" data-delay="0">
+                <div class="tut-avatar user">YOU</div>
+                <div class="tut-bubble">What did we work on last session?</div>
+              </div>
+
+              <div class="tut-tool-call" data-delay="400">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 9H9v6h6V9zm-2 4h-2v-2h2v2z"/></svg>
+                <span>recall(query="", type="session_summary")</span>
+                <span class="tut-tool-result">→ 1 session found</span>
+              </div>
+
+              <div class="tut-msg from-hal" data-delay="900">
+                <div class="tut-avatar hal">HAL</div>
+                <div class="tut-bubble">Last session was 42 minutes. We worked on the auth refactor and ran the test suite. Two background agents were used — frontend and backend. All tests passed. There was one file conflict on <code>api.py</code> that was resolved.</div>
+              </div>
+            </div>
+
+            <button class="tut-replay" onclick="replayConvo('convo-memory', 'flow-memory'); replayTimeline('timeline-memory')">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+              Replay
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /tut-panels -->
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-quote">"I know I've made some very poor decisions recently, but I can give you my complete assurance that my work will be back to normal."</p>
+      <p class="footer-built">
+        Built by <a href="https://affordance.design" target="_blank">Affordance Design</a> and <a href="https://shandarjunaid.com" target="_blank">Shandar Junaid</a>
+      </p>
+      <div class="footer-links">
+        <a href="https://github.com/shandar/HAL9000" target="_blank">GitHub</a>
+        <a href="https://affordance.design" target="_blank">Affordance Design</a>
+        <a href="https://shandarjunaid.com" target="_blank">Shandar Junaid</a>
+      </div>
+      <p class="footer-copy">&copy; 2026 HAL 9000. All systems operational.</p>
+    </div>
+  </footer>
+
+  <script src="assets/landing.js"></script>
+</body>
+</html>

@@ -56,9 +56,19 @@ def _normalize(text: str) -> str:
 
 class Hearing:
     def __init__(self):
-        self.client = OpenAI(api_key=cfg.OPENAI_API_KEY)
         self._audio = pyaudio.PyAudio()
         self.wake_word_enabled = cfg.WAKE_WORD_ENABLED
+
+        # STT provider: Whisper API (paid) or faster-whisper (free/local)
+        stt = getattr(cfg, "STT_PROVIDER", "whisper_api").lower()
+        self._stt_provider = stt
+
+        if stt == "faster_whisper":
+            self.client = None  # no OpenAI client needed
+            self._init_faster_whisper()
+        else:
+            self.client = OpenAI(api_key=cfg.OPENAI_API_KEY)
+            print(f"[HAL Hearing] STT: OpenAI Whisper API")
 
         if self.wake_word_enabled:
             print(f"[HAL Hearing] Wake word mode ON — say 'Hey HAL' to activate")
@@ -66,6 +76,29 @@ class Hearing:
             print(f"[HAL Hearing] Set WAKE_WORD_ENABLED=false for always-listening mode")
         else:
             print("[HAL Hearing] Always-listening mode (no wake word)")
+
+    def _init_faster_whisper(self):
+        """Initialize local faster-whisper model."""
+        try:
+            from faster_whisper import WhisperModel
+            model_size = getattr(cfg, "WHISPER_MODEL_SIZE", "base")
+            print(f"[HAL Hearing] Loading faster-whisper '{model_size}' model (FREE, local)...")
+            # Use int8 for speed on CPU, float16 if CUDA available
+            self._whisper_model = WhisperModel(
+                model_size,
+                device="cpu",
+                compute_type="int8",
+            )
+            print(f"[HAL Hearing] STT: faster-whisper '{model_size}' ready (local, free)")
+        except ImportError:
+            print("[HAL Hearing] ERROR: faster-whisper not installed. Run: pip install faster-whisper")
+            print("[HAL Hearing] Falling back to Whisper API...")
+            self._stt_provider = "whisper_api"
+            self.client = OpenAI(api_key=cfg.OPENAI_API_KEY)
+        except Exception as e:
+            print(f"[HAL Hearing] ERROR loading faster-whisper: {e}")
+            self._stt_provider = "whisper_api"
+            self.client = OpenAI(api_key=cfg.OPENAI_API_KEY)
 
     @property
     def mode(self) -> str:
@@ -417,7 +450,13 @@ class Hearing:
         return buf.getvalue()
 
     def _transcribe(self, audio_bytes: bytes) -> Optional[str]:
-        """Send WAV bytes to Whisper, return transcript."""
+        """Transcribe WAV bytes — routes to Whisper API or faster-whisper."""
+        if self._stt_provider == "faster_whisper":
+            return self._transcribe_local(audio_bytes)
+        return self._transcribe_api(audio_bytes)
+
+    def _transcribe_api(self, audio_bytes: bytes) -> Optional[str]:
+        """Send WAV bytes to OpenAI Whisper API."""
         try:
             audio_file = io.BytesIO(audio_bytes)
             audio_file.name = "audio.wav"
@@ -431,7 +470,25 @@ class Hearing:
                 print(f"[HAL Heard] {text}")
             return text or None
         except Exception as e:
-            print(f"[HAL Hearing] Transcription error: {e}")
+            print(f"[HAL Hearing] Whisper API error: {e}")
+            return None
+
+    def _transcribe_local(self, audio_bytes: bytes) -> Optional[str]:
+        """Transcribe WAV bytes locally with faster-whisper."""
+        try:
+            audio_file = io.BytesIO(audio_bytes)
+            segments, info = self._whisper_model.transcribe(
+                audio_file,
+                language="en",
+                beam_size=1,  # faster, slightly less accurate
+                vad_filter=True,  # skip silence segments
+            )
+            text = " ".join(seg.text.strip() for seg in segments).strip()
+            if text:
+                print(f"[HAL Heard] {text}")
+            return text or None
+        except Exception as e:
+            print(f"[HAL Hearing] faster-whisper error: {e}")
             return None
 
     def close(self):

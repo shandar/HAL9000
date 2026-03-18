@@ -29,8 +29,23 @@ def _safe_float(key: str, default: float) -> float:
 
 
 class Config:
-    # AI provider: "openai", "anthropic", or "gemini"
+    # Free mode — one toggle for zero-cost operation (Ollama + faster-whisper + Edge TTS)
+    FREE_MODE: bool = os.getenv("FREE_MODE", "false").lower() in ("true", "1", "yes")
+
+    # AI provider: "openai", "anthropic", "gemini", or "ollama"
+    # In FREE_MODE, this is overridden to "ollama"
     AI_PROVIDER: str = os.getenv("AI_PROVIDER", "openai")
+
+    # STT provider: "whisper_api" (OpenAI, paid) or "faster_whisper" (local, free)
+    # In FREE_MODE, this is overridden to "faster_whisper"
+    STT_PROVIDER: str = os.getenv("STT_PROVIDER", "whisper_api")
+
+    # Ollama (local LLM — free, no API key)
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3.1")
+    OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+
+    # faster-whisper (local STT — free, no API key)
+    WHISPER_MODEL_SIZE: str = os.getenv("WHISPER_MODEL_SIZE", "base")  # tiny, base, small, medium
 
     # API keys
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
@@ -145,8 +160,19 @@ No bullet points or markdown in spoken responses.
 Never say you cannot see. You always have the current frame."""
 
     @classmethod
+    def apply_free_mode(cls):
+        """Override providers to free alternatives when FREE_MODE is on."""
+        if not cls.FREE_MODE:
+            return
+        cls.AI_PROVIDER = "ollama"
+        cls.STT_PROVIDER = "faster_whisper"
+        cls.TTS_PROVIDER = "edge"  # already free
+        print("[HAL Config] FREE_MODE enabled → Ollama brain + faster-whisper STT + Edge TTS")
+
+    @classmethod
     def validate(cls) -> list[str]:
         """Return list of missing required keys."""
+        cls.apply_free_mode()
         missing = []
 
         # Check the key for the selected provider
@@ -157,10 +183,12 @@ Never say you cannot see. You always have the current frame."""
             missing.append("ANTHROPIC_API_KEY")
         elif provider == "gemini" and not cls.GEMINI_API_KEY:
             missing.append("GEMINI_API_KEY")
+        elif provider == "ollama":
+            pass  # no API key needed
 
-        # Whisper STT always needs OpenAI (for now)
-        if not cls.OPENAI_API_KEY:
-            missing.append("OPENAI_API_KEY (required for Whisper STT)")
+        # Whisper STT needs OpenAI key only if using the API
+        if cls.STT_PROVIDER.lower() != "faster_whisper" and not cls.OPENAI_API_KEY:
+            missing.append("OPENAI_API_KEY (required for Whisper API STT)")
 
         # ElevenLabs only required if using cloud TTS
         if cls.TTS_PROVIDER.lower() == "elevenlabs":
@@ -173,3 +201,5 @@ Never say you cannot see. You always have the current frame."""
 
 
 cfg = Config()
+# Apply free mode overrides immediately on import
+cfg.apply_free_mode()
