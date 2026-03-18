@@ -3,14 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="HAL 9000 — A cross-platform multimodal AI agent that sees, hears, thinks, speaks, and acts. 40 tools, 4 LLM providers (including free Ollama), co-work platform with Claude Code. Works on macOS, Windows, and Linux.">
+
+  <!-- SEO -->
+  <title>HAL 9000 — Local Multimodal AI Agent | See, Hear, Think, Speak, Act</title>
+  <meta name="description" content="HAL 9000 is a cross-platform, open-source multimodal AI agent that sees via webcam, hears your voice, thinks via LLM (GPT-4o, Claude, Gemini, Ollama), speaks with cloned voice, and acts with 40 OS-level tools. Free mode available — zero API keys. Works on macOS, Windows, and Linux.">
+  <meta name="keywords" content="HAL 9000, AI agent, multimodal AI, local AI, voice assistant, Ollama, Claude Code, MCP server, open source, cross-platform, GPT-4o, faster-whisper, Edge TTS, macOS, Windows, Linux, co-work, background tasks, multi-agent">
+  <meta name="author" content="Shandar Junaid, Affordance Design">
+  <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#ff1744">
-  <title>HAL 9000 — Local Multimodal AI Agent</title>
-  <link rel="icon" type="image/png" href="assets/HAL-eye-192.png">
+  <link rel="canonical" href="https://github.com/shandar/HAL9000">
+
+  <!-- Open Graph (Facebook, LinkedIn, Discord, Slack) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="HAL 9000 — Local Multimodal AI Agent">
+  <meta property="og:description" content="A cross-platform AI agent that sees, hears, thinks, speaks, and acts on your machine. 40 tools, 4 LLM providers, free mode with Ollama. Open source.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/shandar/HAL9000/main/assets/architecture.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://github.com/shandar/HAL9000">
+  <meta property="og:site_name" content="HAL 9000">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="HAL 9000 — Local Multimodal AI Agent">
+  <meta name="twitter:description" content="See, hear, think, speak, act — a cross-platform AI agent with 40 tools, free mode (Ollama), and Claude Code co-work. Open source.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/shandar/HAL9000/main/assets/architecture.png">
+  <meta name="twitter:image:alt" content="HAL 9000 architecture diagram showing Vision, Hearing, Brain, Voice, Tools, Memory, and Task Runner">
+
+  <!-- Favicon / Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/HAL-eye-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/HAL-eye-512.png">
+  <link rel="apple-touch-icon" href="assets/HAL-eye-192.png">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
   <link rel="stylesheet" href="assets/landing.css">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "HAL 9000",
+    "description": "A local, cross-platform, multimodal AI agent that sees, hears, thinks, speaks, and acts on your machine with 40 OS-level tools and Claude Code integration.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "macOS, Windows, Linux",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Shandar Junaid",
+      "url": "https://shandarjunaid.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Affordance Design",
+      "url": "https://affordance.design"
+    },
+    "url": "https://github.com/shandar/HAL9000",
+    "downloadUrl": "https://github.com/shandar/HAL9000",
+    "softwareVersion": "1.3.0",
+    "license": "https://opensource.org/licenses/MIT",
+    "image": "https://raw.githubusercontent.com/shandar/HAL9000/main/assets/HAL-eye.png",
+    "screenshot": "https://raw.githubusercontent.com/shandar/HAL9000/main/assets/architecture.png",
+    "featureList": [
+      "Webcam vision with real-time analysis",
+      "Voice input with Whisper STT (cloud or local)",
+      "Multi-provider LLM brain (GPT-4o, Claude, Gemini, Ollama)",
+      "3 TTS voice providers (Edge, ElevenLabs, XTTS)",
+      "40 OS-level tools with function calling",
+      "Cross-platform (macOS, Windows, Linux)",
+      "Free mode with zero API keys (Ollama + faster-whisper)",
+      "Background task runner with async queue",
+      "Multi-agent orchestration with conflict detection",
+      "Typed persistent memory with session handoff",
+      "MCP server for Claude Code integration (20 tools)",
+      "PWA support for mobile"
+    ]
+  }
+  </script>
 </head>
 <body>
 

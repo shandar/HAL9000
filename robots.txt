@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shandar.github.io/HAL9000/sitemap.xml
