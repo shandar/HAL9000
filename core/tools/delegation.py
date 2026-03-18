@@ -1,5 +1,6 @@
-"""Claude Code tools — open interactively or delegate tasks."""
+"""Claude Code tools — open interactively, delegate tasks, or run background jobs."""
 
+import json
 import os
 import subprocess
 import time
@@ -144,3 +145,214 @@ def delegate_to_claude_code(task: str, working_directory: str = "") -> str:
         return "Claude Code task timed out after 120 seconds."
     except Exception as e:
         return f"Claude Code error: {e}"
+
+
+# ── Background Task Tools ─────────────────────────────────
+
+
+def _get_task_runner():
+    """Get the task runner from the engine (lazy import to avoid circular)."""
+    try:
+        from server import engine
+        return engine.task_runner
+    except Exception:
+        return None
+
+
+@tool(
+    name="background_task",
+    description=(
+        "Submit a coding task to run in the background via Claude Code. "
+        "The task runs asynchronously — HAL continues while it executes. "
+        "Use for long-running tasks: refactoring, writing tests, building projects, "
+        "running analysis. Returns a task ID to check progress."
+    ),
+    safety="confirm",
+    params={
+        "task": {
+            "type": "string",
+            "description": "A clear, specific coding task description.",
+        },
+        "working_directory": {
+            "type": "string",
+            "description": "The directory to work in (defaults to home)",
+            "required": False,
+        },
+    },
+)
+def background_task(task: str, working_directory: str = "") -> str:
+    runner = _get_task_runner()
+    if not runner:
+        return "Background task runner not available. Is HAL running?"
+
+    t = runner.submit(task, working_directory)
+    queue_pos = len(runner.list_tasks(status="queued"))
+    running = runner.active_count()
+
+    status_msg = f"Task {t.id} submitted."
+    if t.status == "running":
+        status_msg += " Running now."
+    else:
+        status_msg += f" Queued (position {queue_pos}, {running} running)."
+    return status_msg
+
+
+@tool(
+    name="list_tasks",
+    description="List all background tasks and their current status.",
+    safety="safe",
+    params={},
+)
+def list_tasks() -> str:
+    runner = _get_task_runner()
+    if not runner:
+        return "Task runner not available."
+
+    tasks = runner.list_tasks()
+    if not tasks:
+        return "No background tasks."
+
+    lines = []
+    for t in tasks:
+        elapsed = ""
+        if t["started_at"]:
+            end = t["completed_at"] or time.time()
+            secs = int(end - t["started_at"])
+            elapsed = f" ({secs}s)"
+        line = f"[{t['status']}] {t['id']}: {t['description'][:60]}{elapsed}"
+        if t["progress"] and t["status"] == "running":
+            line += f"\n  → {t['progress'][:100]}"
+        lines.append(line)
+    return "\n".join(lines)
+
+
+@tool(
+    name="cancel_task",
+    description="Cancel a queued or running background task by its ID.",
+    safety="safe",
+    params={
+        "task_id": {
+            "type": "string",
+            "description": "The task ID to cancel (from list_tasks output)",
+        },
+    },
+)
+def cancel_task(task_id: str) -> str:
+    runner = _get_task_runner()
+    if not runner:
+        return "Task runner not available."
+
+    if runner.cancel(task_id):
+        return f"Task {task_id} cancelled."
+    return f"Could not cancel task {task_id} — not found or already completed."
+
+
+# ── Multi-Agent Orchestration ─────────────────────────────
+
+
+def _get_orchestrator():
+    """Get the orchestrator from the engine."""
+    try:
+        from server import engine
+        return getattr(engine, "orchestrator", None)
+    except Exception:
+        return None
+
+
+@tool(
+    name="orchestrate",
+    description=(
+        "Launch multiple Claude Code agents on parallel tasks. "
+        "Each agent gets a name and task, and they run concurrently. "
+        "HAL monitors all agents and reports conflicts if they touch the same files. "
+        "Pass tasks as a JSON array: [{\"name\": \"frontend\", \"task\": \"...\", \"cwd\": \"...\"}]"
+    ),
+    safety="confirm",
+    params={
+        "tasks": {
+            "type": "string",
+            "description": (
+                "JSON array of agent definitions. Each object has: "
+                "name (string), task (string), cwd (string, optional). "
+                "Example: [{\"name\": \"tests\", \"task\": \"write unit tests for auth\"}]"
+            ),
+        },
+    },
+)
+def orchestrate(tasks: str) -> str:
+    orch = _get_orchestrator()
+    if not orch:
+        return "Orchestrator not available. Is HAL running?"
+
+    try:
+        task_list = json.loads(tasks)
+    except json.JSONDecodeError:
+        return "Invalid JSON. Expected array of {name, task, cwd} objects."
+
+    if not isinstance(task_list, list) or not task_list:
+        return "Expected a non-empty JSON array."
+
+    agents = []
+    for t in task_list:
+        name = t.get("name", f"agent-{len(agents)+1}")
+        task_desc = t.get("task", "")
+        cwd = t.get("cwd", "")
+        if not task_desc:
+            continue
+        agent = orch.spawn_agent(name, task_desc, cwd)
+        agents.append(f"{agent.name} (id: {agent.id})")
+
+    if not agents:
+        return "No valid tasks provided."
+
+    return f"Spawned {len(agents)} agents: {', '.join(agents)}. Monitor via list_agents."
+
+
+@tool(
+    name="list_agents",
+    description="List all orchestrated agents and their current status.",
+    safety="safe",
+    params={},
+)
+def list_agents() -> str:
+    orch = _get_orchestrator()
+    if not orch:
+        return "Orchestrator not available."
+
+    agents = orch.list_agents()
+    if not agents:
+        return "No agents spawned."
+
+    lines = []
+    for a in agents:
+        elapsed = ""
+        if a["started_at"]:
+            end = a["completed_at"] or time.time()
+            elapsed = f" ({int(end - a['started_at'])}s)"
+        line = f"[{a['status']}] {a['name']} ({a['id']}): {a['task'][:60]}{elapsed}"
+        if a["files_touched"]:
+            line += f"\n  Files: {', '.join(a['files_touched'][:5])}"
+        lines.append(line)
+
+    return "\n".join(lines)
+
+
+@tool(
+    name="check_conflicts",
+    description="Check if any orchestrated agents modified the same files (potential conflicts).",
+    safety="safe",
+    params={},
+)
+def check_conflicts() -> str:
+    orch = _get_orchestrator()
+    if not orch:
+        return "Orchestrator not available."
+
+    conflicts = orch.check_conflicts()
+    if not conflicts:
+        return "No file conflicts detected."
+
+    lines = ["File conflicts detected:"]
+    for c in conflicts:
+        lines.append(f"  {c['file']} — modified by: {', '.join(c['agents'])}")
+    return "\n".join(lines)

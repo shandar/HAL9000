@@ -12,6 +12,7 @@ import re
 import sys
 import threading
 import time
+import uuid
 from datetime import datetime
 from typing import Optional
 
@@ -20,6 +21,9 @@ import cv2
 from config import cfg
 from core import create_brain, Hearing, Vision, Voice, knowledge
 from core.brain import BaseBrain
+from core.memory_store import get_store
+from core.orchestrator import Orchestrator
+from core.task_runner import TaskRunner
 
 
 class HALEngine:
@@ -56,6 +60,25 @@ class HALEngine:
         # Conversation log for the UI
         self._log: list[dict] = []
         self._log_lock = threading.Lock()
+
+        # Session tracking for co-work context handoff
+        self._session_id = str(uuid.uuid4())
+        self._session_start = time.time()
+        self._session_tools_ran: list[str] = []
+        self._session_decisions: list[str] = []
+
+        # Background task runner (co-work Phase 2)
+        self.task_runner = TaskRunner(
+            max_concurrent=getattr(cfg, "MAX_CONCURRENT_TASKS", 2)
+        )
+
+        # Artifacts store (co-work Phase 3)
+        self._artifacts: list[dict] = []
+        self._artifact_lock = threading.Lock()
+        self._artifact_version = 0
+
+        # Multi-agent orchestrator (co-work Phase 4)
+        self.orchestrator = Orchestrator(self.task_runner)
 
     # ── Boot greeting ─────────────────────────────────────
 
@@ -147,6 +170,9 @@ class HALEngine:
             original_log(name, args, result)
             summary = result.get("result", result.get("error", ""))[:200]
             engine_ref._add_log("tool", f"[{name}] {summary}")
+            # Track tools used in this session
+            if name not in engine_ref._session_tools_ran:
+                engine_ref._session_tools_ran.append(name)
 
         self.brain._log_tool_call = _hooked_log
 
@@ -162,10 +188,50 @@ class HALEngine:
         self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()
 
+    def summarize_session(self) -> dict:
+        """Generate and persist a session summary to typed memory."""
+        duration = int(time.time() - self._session_start)
+
+        # Collect user/HAL exchanges from the log
+        with self._log_lock:
+            user_msgs = [e["text"] for e in self._log if e["role"] == "user"]
+            hal_msgs = [e["text"] for e in self._log if e["role"] == "hal"]
+
+        topic_hints = user_msgs[:5]  # first 5 user messages hint at topics
+        summary_text = (
+            f"Session lasted {duration // 60}m {duration % 60}s. "
+            f"{len(user_msgs)} user messages, {len(hal_msgs)} HAL responses. "
+            f"Tools used: {', '.join(self._session_tools_ran) or 'none'}. "
+            f"Topics: {'; '.join(t[:80] for t in topic_hints) or 'none'}."
+        )
+
+        store = get_store()
+        entry = store.add(
+            content=summary_text,
+            type="session_summary",
+            source="hal",
+            session_id=self._session_id,
+            metadata={
+                "duration_seconds": duration,
+                "tools_ran": list(self._session_tools_ran),
+                "user_message_count": len(user_msgs),
+                "hal_message_count": len(hal_msgs),
+                "decisions": list(self._session_decisions),
+            },
+        )
+        print(f"[HAL] Session summary saved: {entry.id}")
+        return {"id": entry.id, "summary": summary_text}
+
     def stop(self):
         """Shut down all subsystems cleanly."""
         if not self._running:
             return
+
+        # Auto-summarize session before shutdown
+        try:
+            self.summarize_session()
+        except Exception as e:
+            print(f"[HAL] Session summary failed: {e}")
 
         self._running = False
         self._stop_event.set()

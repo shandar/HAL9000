@@ -15,6 +15,7 @@ from typing import Optional
 
 from config import cfg
 from core import tools
+from core.memory_store import get_store
 
 
 # ── Base ─────────────────────────────────────────────────
@@ -37,14 +38,38 @@ class BaseBrain:
                 + knowledge_context
             )
 
-        # Load persistent memory
-        memories = tools._load_memories()
-        if memories:
-            memory_text = "\n".join(f"- {m['fact']}" for m in memories)
+        # Load persistent memory (typed)
+        store = get_store()
+        all_memories = store.list_all()
+        if all_memories:
+            # Group by type for clarity
+            by_type: dict[str, list[str]] = {}
+            for m in all_memories:
+                if m.type == "session_summary":
+                    continue  # handled separately below
+                by_type.setdefault(m.type, []).append(m.content)
+
+            memory_lines = []
+            for mtype, items in by_type.items():
+                memory_lines.append(f"[{mtype}s]")
+                for item in items:
+                    memory_lines.append(f"  - {item}")
+
+            if memory_lines:
+                parts.append(
+                    "--- YOUR PERSISTENT MEMORY ---\n"
+                    "These are facts, decisions, and preferences you've stored:\n\n"
+                    + "\n".join(memory_lines)
+                )
+
+        # Load recent session summaries for continuity
+        summaries = store.get_session_summaries(limit=3)
+        if summaries:
+            summary_lines = [f"- {s.content}" for s in summaries]
             parts.append(
-                "--- YOUR PERSISTENT MEMORY ---\n"
-                "These are facts you've been asked to remember:\n\n"
-                + memory_text
+                "--- RECENT SESSIONS ---\n"
+                "Context from your recent sessions:\n\n"
+                + "\n".join(summary_lines)
             )
 
         parts.append(

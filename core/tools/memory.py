@@ -1,48 +1,56 @@
-"""Persistent memory tools — remember, recall, forget, list."""
+"""Persistent memory tools — remember, recall, forget, list, save_session."""
 
-import datetime
-
-from core.tools import tool, _load_memories, _save_memories
+from core.memory_store import get_store
+from core.tools import tool
 
 
 @tool(
     name="remember",
-    description="Store a fact in persistent memory. HAL will remember this across sessions.",
+    description=(
+        "Store a fact in persistent memory. HAL will remember this across sessions. "
+        "Optionally specify a type: fact, decision, preference."
+    ),
     safety="safe",
     params={
         "fact": {"type": "string", "description": "The fact or information to remember"},
+        "type": {
+            "type": "string",
+            "description": "Memory type: fact (default), decision, or preference",
+            "required": False,
+            "enum": ["fact", "decision", "preference"],
+        },
     },
 )
-def remember(fact: str) -> str:
-    memories = _load_memories()
-    entry = {
-        "fact": fact,
-        "timestamp": datetime.datetime.now().isoformat(),
-    }
-    memories.append(entry)
-    _save_memories(memories)
-    return f"Remembered: {fact}"
+def remember(fact: str, type: str = "fact") -> str:
+    store = get_store()
+    entry = store.add(content=fact, type=type, source="hal")
+    return f"Remembered ({entry.type}): {fact}"
 
 
 @tool(
     name="recall",
-    description="Search persistent memory for facts matching a query.",
+    description=(
+        "Search persistent memory for facts matching a query. "
+        "Optionally filter by memory type."
+    ),
     safety="safe",
     params={
         "query": {"type": "string", "description": "What to search for in memory"},
+        "type": {
+            "type": "string",
+            "description": "Filter by type: fact, decision, preference, task, session_summary",
+            "required": False,
+            "enum": ["fact", "decision", "preference", "task", "session_summary"],
+        },
     },
 )
-def recall(query: str) -> str:
-    memories = _load_memories()
-    if not memories:
-        return "No memories stored yet."
-
-    query_lower = query.lower()
-    matches = [m for m in memories if query_lower in m["fact"].lower()]
+def recall(query: str, type: str = "") -> str:
+    store = get_store()
+    matches = store.search(query, type=type or None)
     if not matches:
-        return f"No memories matching '{query}'"
+        return f"No memories matching '{query}'" + (f" (type={type})" if type else "")
 
-    lines = [f"- {m['fact']} (saved {m['timestamp'][:10]})" for m in matches]
+    lines = [f"- [{m.type}] {m.content} (saved {m.timestamp[:10]})" for m in matches]
     return f"Found {len(matches)} memories:\n" + "\n".join(lines)
 
 
@@ -55,25 +63,49 @@ def recall(query: str) -> str:
     },
 )
 def forget(query: str) -> str:
-    memories = _load_memories()
-    query_lower = query.lower()
-    before = len(memories)
-    memories = [m for m in memories if query_lower not in m["fact"].lower()]
-    removed = before - len(memories)
-    _save_memories(memories)
+    store = get_store()
+    removed = store.remove(query)
     return f"Removed {removed} memories matching '{query}'" if removed else f"No memories matching '{query}'"
 
 
 @tool(
     name="list_memories",
-    description="List all facts stored in persistent memory.",
+    description="List all facts stored in persistent memory, optionally filtered by type.",
+    safety="safe",
+    params={
+        "type": {
+            "type": "string",
+            "description": "Filter by type: fact, decision, preference, task, session_summary",
+            "required": False,
+            "enum": ["fact", "decision", "preference", "task", "session_summary"],
+        },
+    },
+)
+def list_memories(type: str = "") -> str:
+    store = get_store()
+    entries = store.list_all(type=type or None)
+    if not entries:
+        return "No memories stored yet." + (f" (type={type})" if type else "")
+
+    lines = [f"- [{m.type}] {m.content}" for m in entries]
+    return f"{len(entries)} memories:\n" + "\n".join(lines)
+
+
+@tool(
+    name="save_session",
+    description=(
+        "Manually save the current session context. Use this when the user says "
+        "'wrap up', 'save context', or 'save session'. Captures what was discussed "
+        "and what tools were used."
+    ),
     safety="safe",
     params={},
 )
-def list_memories() -> str:
-    memories = _load_memories()
-    if not memories:
-        return "No memories stored yet."
-
-    lines = [f"- {m['fact']}" for m in memories]
-    return f"{len(memories)} memories:\n" + "\n".join(lines)
+def save_session() -> str:
+    # Import here to avoid circular imports — engine is created in hal9000.py
+    try:
+        from server import engine
+        result = engine.summarize_session()
+        return f"Session saved: {result['summary']}"
+    except Exception as e:
+        return f"Could not save session: {e}"

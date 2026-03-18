@@ -51,7 +51,7 @@ def _escape_applescript(s: str) -> str:
     return s.replace("\\", "\\\\").replace('"', '\\"')
 
 
-# ── Memory persistence path ──────────────────────────────
+# ── Memory persistence path (legacy — use core.memory_store instead) ──
 
 MEMORY_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "memory")
 MEMORY_FILE = os.path.join(MEMORY_DIR, "facts.json")
@@ -249,3 +249,4 @@ from core.tools import macos      # noqa: E402, F401
 from core.tools import web        # noqa: E402, F401
 from core.tools import memory     # noqa: E402, F401
 from core.tools import delegation  # noqa: E402, F401
+from core.tools import artifacts   # noqa: E402, F401

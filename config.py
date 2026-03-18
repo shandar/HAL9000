@@ -76,6 +76,11 @@ class Config:
     TOOL_SAFETY: str = os.getenv("TOOL_SAFETY", "normal")
     TOOL_MAX_ITERATIONS: int = _safe_int("TOOL_MAX_ITERATIONS", 5)
 
+    # Co-work: Background tasks
+    TASK_TIMEOUT: int = _safe_int("TASK_TIMEOUT", 600)
+    MAX_CONCURRENT_TASKS: int = _safe_int("MAX_CONCURRENT_TASKS", 2)
+    MAX_AGENTS: int = _safe_int("MAX_AGENTS", 4)
+
     # Server
     SERVER_PORT: int = _safe_int("SERVER_PORT", 9000)
 

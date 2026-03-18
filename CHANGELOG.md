@@ -4,6 +4,53 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.2.0] — 2026-03-18
+
+### Added — Co-Work Platform
+
+#### Phase 1: Typed Memory + Session Context
+- **Typed memory store** (`core/memory_store.py`) — entries have `id`, `type`, `content`, `timestamp`, `source`, `session_id`, `metadata`
+- **Memory types**: `fact`, `decision`, `preference`, `task`, `session_summary`
+- **Auto-migration** from legacy `{fact, timestamp}` format — zero breaking changes
+- **Session tracking** — session ID, tools-ran list, auto-summarize on HAL shutdown
+- **`save_session` tool** — manual "wrap up" context capture
+- **MCP `hal_save_session`** — Claude Code saves session context for handoff
+- **MCP `hal_get_context`** — Claude Code loads recent sessions + decisions + preferences at start
+- **Brain prompt** groups memories by type, includes "RECENT SESSIONS" section
+
+#### Phase 2: Background Task Runner
+- **`core/task_runner.py`** — async queue with `subprocess.Popen`, real-time stdout progress, cancellation
+- **`background_task` tool** — submit long-running Claude Code tasks asynchronously
+- **`list_tasks` tool** — show all tasks with status
+- **`cancel_task` tool** — cancel queued or running tasks
+- **API**: `GET/POST /api/tasks`, `POST /api/tasks/<id>/cancel`
+- **Task queue panel** — collapsible UI with status dots, elapsed time, cancel buttons
+- **Config**: `TASK_TIMEOUT` (600s), `MAX_CONCURRENT_TASKS` (2)
+
+#### Phase 3: Shared Workspace (Artifacts)
+- **`core/tools/artifacts.py`** — `create_artifact` (code/markdown/html/mermaid/json) and `update_artifact`
+- **API**: `GET /api/artifacts`, `GET /api/artifacts/<id>`
+- **Workspace panel** — tabbed interface with copy/close buttons
+- **3-column grid layout** when artifacts exist
+- **Mermaid rendering** via CDN, HTML in sandboxed iframe
+
+#### Phase 4: Multi-Agent Orchestration
+- **`core/orchestrator.py`** — named agents, conflict detection, result summarization
+- **`orchestrate` tool** — spawn multiple Claude Code agents on parallel tasks
+- **`list_agents` + `check_conflicts` tools**
+- **API**: `GET /api/agents`, `GET /api/agents/conflicts`, `POST /api/agents/<id>/cancel`
+- **Agent dashboard** — cyan-accented cards with status, file lists, cancel controls
+- **Config**: `MAX_AGENTS` (4)
+
+### Changed
+- Tool count: 31 → 40 (+9 new tools)
+- MCP tool count: 18 → 20 (+2 new MCP tools)
+- `hal_remember` MCP tool accepts `type` and `source` params
+- `hal_recall` and `hal_list_memories` accept `type` filter
+- SSE stream extended with `tasks`, `agents`, `artifact_version`
+
+---
+
 ## [1.1.0] — 2026-03-18
 
 ### Added

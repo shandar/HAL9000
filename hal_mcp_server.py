@@ -14,7 +14,9 @@ This gives Claude Code access to:
     - hal_remember:      Store a fact in persistent memory
     - hal_recall:        Search persistent memory
     - hal_forget:        Remove a memory
-    - hal_list_memories: List all stored memories
+    - hal_list_memories: List all stored memories (with type filter)
+    - hal_save_session: Save session context for handoff
+    - hal_get_context:  Load context at session start
     - macos_volume:      Get or set system volume
     - macos_brightness:  Get or set display brightness
     - macos_notify:      Send a macOS notification
@@ -114,23 +116,9 @@ def _get_hearing():
         return _hearing
 
 
-# ── Memory helpers ──────────────────────────────────────────
+# ── Memory store (typed, shared with HAL engine) ──────────────
 
-MEMORY_DIR = os.path.join(PROJECT_ROOT, "memory")
-MEMORY_FILE = os.path.join(MEMORY_DIR, "facts.json")
-
-
-def _load_memories() -> list[dict]:
-    if os.path.isfile(MEMORY_FILE):
-        with open(MEMORY_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
-
-
-def _save_memories(memories: list[dict]):
-    os.makedirs(MEMORY_DIR, exist_ok=True)
-    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(memories, f, indent=2, ensure_ascii=False)
+from core.memory_store import get_store as _get_store
 
 
 # ══════════════════════════════════════════════════════════════
@@ -233,54 +221,102 @@ def hal_listen() -> str:
 # ── Memory ──────────────────────────────────────────────────
 
 @mcp.tool()
-def hal_remember(fact: str) -> str:
+def hal_remember(fact: str, type: str = "fact", source: str = "claude_code") -> str:
     """Store a fact in HAL's persistent memory. This survives restarts.
-    Use this to remember user preferences, project context, names, decisions, etc."""
-    memories = _load_memories()
-    entry = {
-        "fact": fact,
-        "timestamp": datetime.datetime.now().isoformat(),
-    }
-    memories.append(entry)
-    _save_memories(memories)
-    return f"Remembered: {fact}"
+    Use this to remember user preferences, project context, names, decisions, etc.
+    type: fact (default), decision, preference, task.
+    source: who is storing this — claude_code (default), hal, user."""
+    store = _get_store()
+    entry = store.add(content=fact, type=type, source=source)
+    return f"Remembered ({entry.type}): {fact}"
 
 
 @mcp.tool()
-def hal_recall(query: str) -> str:
+def hal_recall(query: str, type: str = "") -> str:
     """Search HAL's persistent memory for facts matching a query.
-    Returns all memories containing the query string."""
-    memories = _load_memories()
-    if not memories:
-        return "No memories stored yet."
-
-    matches = [m for m in memories if query.lower() in m["fact"].lower()]
+    Optionally filter by type: fact, decision, preference, task, session_summary."""
+    store = _get_store()
+    matches = store.search(query, type=type or None)
     if not matches:
-        return f"No memories matching '{query}'"
+        return f"No memories matching '{query}'" + (f" (type={type})" if type else "")
 
-    lines = [f"- {m['fact']} (saved {m['timestamp'][:10]})" for m in matches]
+    lines = [f"- [{m.type}] {m.content} (saved {m.timestamp[:10]})" for m in matches]
     return f"Found {len(matches)} memories:\n" + "\n".join(lines)
 
 
 @mcp.tool()
 def hal_forget(query: str) -> str:
     """Remove memories matching a keyword from HAL's persistent memory."""
-    memories = _load_memories()
-    before = len(memories)
-    memories = [m for m in memories if query.lower() not in m["fact"].lower()]
-    removed = before - len(memories)
-    _save_memories(memories)
+    store = _get_store()
+    removed = store.remove(query)
     return f"Removed {removed} memories matching '{query}'" if removed else f"No memories matching '{query}'"
 
 
 @mcp.tool()
-def hal_list_memories() -> str:
-    """List all facts stored in HAL's persistent memory."""
-    memories = _load_memories()
-    if not memories:
-        return "No memories stored yet."
-    lines = [f"- {m['fact']}" for m in memories]
-    return f"{len(memories)} memories:\n" + "\n".join(lines)
+def hal_list_memories(type: str = "") -> str:
+    """List all facts stored in HAL's persistent memory.
+    Optionally filter by type: fact, decision, preference, task, session_summary."""
+    store = _get_store()
+    entries = store.list_all(type=type or None)
+    if not entries:
+        return "No memories stored yet." + (f" (type={type})" if type else "")
+    lines = [f"- [{m.type}] {m.content}" for m in entries]
+    return f"{len(entries)} memories:\n" + "\n".join(lines)
+
+
+@mcp.tool()
+def hal_save_session(summary: str = "") -> str:
+    """Manually save the current session context to HAL's memory.
+    Use this when wrapping up a Claude Code session to hand off context.
+    If summary is empty, a generic marker is stored."""
+    store = _get_store()
+    content = summary or "Claude Code session ended (no summary provided)."
+    entry = store.add(
+        content=content,
+        type="session_summary",
+        source="claude_code",
+        metadata={"manual": True},
+    )
+    return f"Session saved: {entry.content}"
+
+
+@mcp.tool()
+def hal_get_context(query: str = "") -> str:
+    """Get relevant context from HAL's memory for a new session.
+    Returns recent session summaries and any memories matching the query.
+    Call this at the start of a Claude Code session to load context."""
+    store = _get_store()
+    parts = []
+
+    # Recent session summaries
+    summaries = store.get_session_summaries(limit=3)
+    if summaries:
+        parts.append("=== Recent Sessions ===")
+        for s in summaries:
+            parts.append(f"- {s.content}")
+
+    # Relevant memories if query provided
+    if query:
+        matches = store.search(query)
+        if matches:
+            parts.append(f"\n=== Memories matching '{query}' ===")
+            for m in matches:
+                parts.append(f"- [{m.type}] {m.content}")
+
+    # Decisions and preferences (always useful)
+    decisions = store.list_all(type="decision")
+    if decisions:
+        parts.append("\n=== Active Decisions ===")
+        for d in decisions:
+            parts.append(f"- {d.content}")
+
+    prefs = store.list_all(type="preference")
+    if prefs:
+        parts.append("\n=== Preferences ===")
+        for p in prefs:
+            parts.append(f"- {p.content}")
+
+    return "\n".join(parts) or "No context available yet."
 
 
 # ── macOS System ────────────────────────────────────────────

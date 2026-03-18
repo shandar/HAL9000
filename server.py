@@ -180,6 +180,73 @@ def api_log():
     return jsonify(engine.get_log(since))
 
 
+# ── Background Tasks API ─────────────────────────────────
+
+@app.route("/api/tasks")
+def api_tasks():
+    """List all background tasks with status."""
+    return jsonify(engine.task_runner.list_tasks())
+
+
+@app.route("/api/tasks", methods=["POST"])
+def api_submit_task():
+    """Submit a new background task."""
+    data = request.get_json(silent=True) or {}
+    desc = data.get("task", "").strip()
+    if not desc:
+        return jsonify({"error": "No task description"}), 400
+    cwd = data.get("working_directory", "")
+    task = engine.task_runner.submit(desc, cwd)
+    return jsonify({"id": task.id, "status": task.status})
+
+
+@app.route("/api/tasks/<task_id>/cancel", methods=["POST"])
+def api_cancel_task(task_id):
+    """Cancel a background task."""
+    ok = engine.task_runner.cancel(task_id)
+    return jsonify({"cancelled": ok})
+
+
+# ── Artifacts API ─────────────────────────────────────────
+
+@app.route("/api/artifacts")
+def api_artifacts():
+    """List all artifacts."""
+    with engine._artifact_lock:
+        return jsonify(list(engine._artifacts))
+
+
+@app.route("/api/artifacts/<artifact_id>")
+def api_artifact(artifact_id):
+    """Get a single artifact by ID."""
+    with engine._artifact_lock:
+        for a in engine._artifacts:
+            if a["id"] == artifact_id:
+                return jsonify(a)
+    return jsonify({"error": "Not found"}), 404
+
+
+# ── Orchestrator API ──────────────────────────────────────
+
+@app.route("/api/agents")
+def api_agents():
+    """List all orchestrated agents and their status."""
+    return jsonify(engine.orchestrator.list_agents())
+
+
+@app.route("/api/agents/conflicts")
+def api_agent_conflicts():
+    """Check for file conflicts between agents."""
+    return jsonify(engine.orchestrator.check_conflicts())
+
+
+@app.route("/api/agents/<agent_id>/cancel", methods=["POST"])
+def api_cancel_agent(agent_id):
+    """Cancel an agent."""
+    ok = engine.orchestrator.cancel_agent(agent_id)
+    return jsonify({"cancelled": ok})
+
+
 # ── Video stream (MJPEG) ─────────────────────────────────
 
 @app.route("/api/video")
@@ -223,6 +290,9 @@ def api_stream():
             payload = json.dumps({
                 "status": status,
                 "log": new_entries,
+                "tasks": engine.task_runner.list_tasks(),
+                "artifact_version": engine._artifact_version,
+                "agents": engine.orchestrator.list_agents(),
             })
             yield f"data: {payload}\n\n"
             time.sleep(1)

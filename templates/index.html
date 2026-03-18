@@ -11,6 +11,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/assets/HAL-eye-192.png">
   <link rel="apple-touch-icon" sizes="192x192" href="/assets/HAL-eye-192.png">
   <title>HAL 9000</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: false, theme: 'dark' });</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -957,6 +959,221 @@
     .chat-messages::-webkit-scrollbar { width: 3px; }
     .chat-messages::-webkit-scrollbar-track { background: transparent; }
     .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .task-panel::-webkit-scrollbar { width: 3px; }
+    .task-panel::-webkit-scrollbar-track { background: transparent; }
+    .task-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .workspace-content::-webkit-scrollbar { width: 3px; }
+    .workspace-content::-webkit-scrollbar-track { background: transparent; }
+    .workspace-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── 3-column layout when artifacts exist ── */
+    .dashboard.has-artifacts {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    /* ── Task Queue Panel ──────────────────────── */
+    .task-panel {
+      max-height: 180px;
+      overflow-y: auto;
+      background:
+        linear-gradient(180deg, #0c0c12 0%, #08080e 100%);
+      border: 1px solid #2a2a36;
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: none; /* hidden until tasks exist */
+    }
+
+    .task-panel.visible { display: block; }
+
+    .task-panel .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .task-badge {
+      background: var(--red-dim);
+      color: var(--red);
+      font-size: 0.36rem;
+      padding: 1px 5px;
+      border-radius: 8px;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    .task-list { padding: 4px 8px 6px; }
+
+    .task-card {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: 3px;
+      font-size: 0.42rem;
+      color: var(--text-dim);
+      background: rgba(255,255,255,0.01);
+      margin-bottom: 3px;
+    }
+
+    .task-card:hover { background: rgba(255,255,255,0.03); }
+
+    .task-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .task-dot.queued { background: var(--amber); }
+    .task-dot.running { background: var(--cyan); animation: taskPulse 1.5s ease-in-out infinite; }
+    .task-dot.completed { background: var(--green); }
+    .task-dot.failed { background: var(--red); }
+    .task-dot.cancelled { background: var(--text-dim); }
+    .task-dot.conflict { background: var(--amber); }
+
+    @keyframes taskPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .task-desc {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .task-time {
+      font-size: 0.36rem;
+      color: #333344;
+      flex-shrink: 0;
+    }
+
+    .task-cancel {
+      background: none;
+      border: 1px solid #2a2a36;
+      color: var(--text-dim);
+      font-size: 0.36rem;
+      padding: 1px 4px;
+      border-radius: 2px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .task-cancel:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── Workspace / Artifacts Panel ──────────── */
+    .workspace-panel {
+      display: none;
+      flex-direction: column;
+      background:
+        linear-gradient(180deg, #0c0c12 0%, #08080e 100%);
+      border: 1px solid #2a2a36;
+      border-radius: 6px;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .dashboard.has-artifacts .workspace-panel { display: flex; }
+
+    .workspace-tabs {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      background: linear-gradient(180deg, #131318 0%, #0e0e14 100%);
+      border-bottom: 1px solid #1a1a24;
+      flex-shrink: 0;
+    }
+
+    .workspace-tab {
+      padding: 6px 12px;
+      font-size: 0.4rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #444455;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .workspace-tab:hover { color: var(--text-dim); }
+    .workspace-tab.active {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+    }
+
+    .workspace-tab-close {
+      font-size: 0.5rem;
+      color: #333344;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .workspace-tab-close:hover { color: var(--red); }
+
+    .workspace-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      min-height: 0;
+    }
+
+    .workspace-content pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.44rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .workspace-content .artifact-html {
+      width: 100%;
+      border: none;
+      background: #fff;
+      border-radius: 4px;
+      min-height: 300px;
+    }
+
+    .workspace-copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid #2a2a36;
+      color: var(--text-dim);
+      font-size: 0.38rem;
+      padding: 3px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .workspace-copy-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ── Agent cards (in task panel) ──────────── */
+    .agent-section { margin-top: 4px; }
+
+    .agent-card {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: 3px;
+      font-size: 0.42rem;
+      color: var(--text-dim);
+      background: rgba(0,188,255,0.03);
+      border-left: 2px solid var(--cyan);
+      margin-bottom: 3px;
+    }
+
+    .agent-name {
+      font-weight: 600;
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
 
     /* ── Toast Notifications ──────────────────── */
     .toast-container {
@@ -1312,6 +1529,21 @@
           </div>
         </div>
       </div>
+
+      <!-- Task + Agent Queue -->
+      <div class="task-panel" id="task-panel">
+        <div class="panel-header">
+          Tasks <span class="task-badge" id="task-badge">0</span>
+        </div>
+        <div class="task-list" id="task-list"></div>
+        <div class="agent-section" id="agent-section"></div>
+      </div>
+    </div>
+
+    <!-- Workspace / Artifacts (hidden until artifacts exist) -->
+    <div class="workspace-panel" id="workspace-panel">
+      <div class="workspace-tabs" id="workspace-tabs"></div>
+      <div class="workspace-content" id="workspace-content" style="position:relative;"></div>
     </div>
 
     <!-- Right column -->
@@ -1825,6 +2057,9 @@
         applyStatus(data.status);
         appendLogEntries(data.log);
         checkForErrors(data.log);
+        if (data.tasks) updateTaskPanel(data.tasks);
+        if (data.agents) updateAgentPanel(data.agents);
+        if (data.artifact_version !== undefined) checkArtifacts(data.artifact_version);
       };
 
       eventSource.onerror = () => {
@@ -1836,6 +2071,179 @@
     }
 
     connectSSE();
+
+    // ── Task Queue Panel ─────────────────────────
+    const taskPanel = document.getElementById('task-panel');
+    const taskList = document.getElementById('task-list');
+    const taskBadge = document.getElementById('task-badge');
+
+    function updateTaskPanel(tasks) {
+      if (!tasks || tasks.length === 0) {
+        taskPanel.classList.remove('visible');
+        return;
+      }
+      taskPanel.classList.add('visible');
+
+      const active = tasks.filter(t => t.status === 'running' || t.status === 'queued').length;
+      taskBadge.textContent = active || tasks.length;
+
+      taskList.innerHTML = tasks.map(t => {
+        let elapsed = '';
+        if (t.started_at) {
+          const end = t.completed_at || (Date.now() / 1000);
+          elapsed = Math.round(end - t.started_at) + 's';
+        }
+        const cancelBtn = (t.status === 'running' || t.status === 'queued')
+          ? `<button class="task-cancel" onclick="cancelTask('${t.id}')">×</button>`
+          : '';
+        return `<div class="task-card">
+          <span class="task-dot ${t.status}"></span>
+          <span class="task-desc" title="${t.description}">${t.description.substring(0, 50)}</span>
+          <span class="task-time">${elapsed}</span>
+          ${cancelBtn}
+        </div>`;
+      }).join('');
+    }
+
+    async function cancelTask(id) {
+      await fetch(`/api/tasks/${id}/cancel`, { method: 'POST' });
+    }
+
+    // ── Agent Panel ─────────────────────────────
+    const agentSection = document.getElementById('agent-section');
+
+    function updateAgentPanel(agents) {
+      if (!agents || agents.length === 0) {
+        agentSection.innerHTML = '';
+        return;
+      }
+      agentSection.innerHTML = agents.map(a => {
+        let elapsed = '';
+        if (a.started_at) {
+          const end = a.completed_at || (Date.now() / 1000);
+          elapsed = Math.round(end - a.started_at) + 's';
+        }
+        const cancelBtn = a.status === 'working'
+          ? `<button class="task-cancel" onclick="cancelAgent('${a.id}')">×</button>`
+          : '';
+        const files = a.files_touched && a.files_touched.length
+          ? `<span class="task-time">${a.files_touched.length} files</span>`
+          : '';
+        return `<div class="agent-card">
+          <span class="task-dot ${a.status === 'working' ? 'running' : a.status}"></span>
+          <span class="agent-name">${a.name}</span>
+          <span class="task-desc" title="${a.task}">${a.task.substring(0, 40)}</span>
+          ${files}
+          <span class="task-time">${elapsed}</span>
+          ${cancelBtn}
+        </div>`;
+      }).join('');
+
+      // Show task panel if agents exist
+      if (agents.length > 0) taskPanel.classList.add('visible');
+    }
+
+    async function cancelAgent(id) {
+      await fetch(`/api/agents/${id}/cancel`, { method: 'POST' });
+    }
+
+    // ── Workspace / Artifacts Panel ──────────────
+    const dashboard = document.querySelector('.dashboard');
+    const workspacePanel = document.getElementById('workspace-panel');
+    const workspaceTabs = document.getElementById('workspace-tabs');
+    const workspaceContent = document.getElementById('workspace-content');
+    let currentArtifacts = [];
+    let activeArtifactId = null;
+    let lastArtifactVersion = -1;
+
+    function checkArtifacts(version) {
+      if (version === lastArtifactVersion) return;
+      lastArtifactVersion = version;
+      fetch('/api/artifacts').then(r => r.json()).then(artifacts => {
+        currentArtifacts = artifacts;
+        if (artifacts.length > 0) {
+          dashboard.classList.add('has-artifacts');
+          if (!activeArtifactId || !artifacts.find(a => a.id === activeArtifactId)) {
+            activeArtifactId = artifacts[artifacts.length - 1].id;
+          }
+          renderWorkspaceTabs();
+          renderArtifact();
+        } else {
+          dashboard.classList.remove('has-artifacts');
+          activeArtifactId = null;
+        }
+      }).catch(() => {});
+    }
+
+    function renderWorkspaceTabs() {
+      workspaceTabs.innerHTML = currentArtifacts.map(a => {
+        const active = a.id === activeArtifactId ? 'active' : '';
+        return `<div class="workspace-tab ${active}" onclick="selectArtifact('${a.id}')">
+          ${a.title.substring(0, 20)}
+          <span class="workspace-tab-close" onclick="event.stopPropagation(); closeArtifact('${a.id}')">×</span>
+        </div>`;
+      }).join('');
+    }
+
+    function selectArtifact(id) {
+      activeArtifactId = id;
+      renderWorkspaceTabs();
+      renderArtifact();
+    }
+
+    function renderArtifact() {
+      const a = currentArtifacts.find(x => x.id === activeArtifactId);
+      if (!a) {
+        workspaceContent.innerHTML = '';
+        return;
+      }
+
+      let content = '';
+      const copyBtn = `<button class="workspace-copy-btn" onclick="copyArtifact()">Copy</button>`;
+
+      if (a.type === 'html') {
+        content = `<iframe class="artifact-html" sandbox="allow-scripts" srcdoc="${a.content.replace(/"/g, '&quot;')}"></iframe>`;
+      } else if (a.type === 'mermaid') {
+        content = `<div class="mermaid">${a.content}</div>`;
+      } else {
+        content = `<pre><code>${escapeHtml(a.content)}</code></pre>`;
+      }
+
+      workspaceContent.innerHTML = copyBtn + content;
+
+      // Render mermaid diagrams if present
+      if (a.type === 'mermaid' && window.mermaid) {
+        window.mermaid.run({ querySelector: '.mermaid' });
+      }
+    }
+
+    function closeArtifact(id) {
+      // Remove from server (best-effort)
+      currentArtifacts = currentArtifacts.filter(a => a.id !== id);
+      if (activeArtifactId === id) {
+        activeArtifactId = currentArtifacts.length ? currentArtifacts[0].id : null;
+      }
+      if (currentArtifacts.length === 0) {
+        dashboard.classList.remove('has-artifacts');
+      }
+      renderWorkspaceTabs();
+      renderArtifact();
+    }
+
+    function copyArtifact() {
+      const a = currentArtifacts.find(x => x.id === activeArtifactId);
+      if (a) {
+        navigator.clipboard.writeText(a.content).then(() => {
+          showToast('info', 'Copied', 'Artifact copied to clipboard', 2000);
+        });
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
 
     // ── Waveform Visualizer (fits red block in HAL image) ──
     let wfSpeaking = false;
