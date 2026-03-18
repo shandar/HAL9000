@@ -1053,10 +1053,79 @@ section, footer, nav { position: relative; z-index: 2; }
   margin-top: 24px;
   padding: 32px;
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(14,14,20,0.8), rgba(10,10,14,0.9));
-  border: 1px solid var(--border);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+  background: rgba(235, 235, 240, 0.95);
+  border: 1px solid rgba(200, 200, 210, 0.3);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+  color: #1a1a2e;
 }
+.tut-content-frame .tut-msg:not(.from-hal) .tut-bubble {
+  background: #fff;
+  border-color: rgba(0,0,0,0.08);
+  color: #1a1a2e;
+}
+.tut-content-frame .tut-msg.from-hal .tut-bubble {
+  background: linear-gradient(135deg, rgba(255,23,68,0.08), rgba(255,23,68,0.03));
+  border-color: rgba(255,23,68,0.15);
+  color: #1a1a2e;
+}
+.tut-content-frame .tut-bubble-label { color: #666; }
+.tut-content-frame .tut-bubble code {
+  background: rgba(0,0,0,0.06);
+  color: #c41234;
+}
+.tut-content-frame .tut-tool-call {
+  background: rgba(0,120,200,0.06);
+  border-color: rgba(0,120,200,0.2);
+  color: #0070c0;
+}
+.tut-content-frame .tut-tool-result { color: #555; }
+.tut-content-frame .tut-avatar.user { background: rgba(0,150,255,0.1); color: #0070c0; border-color: rgba(0,120,200,0.2); }
+.tut-content-frame .tut-avatar.hal { background: rgba(255,23,68,0.08); color: var(--red); border-color: rgba(255,23,68,0.2); }
+.tut-content-frame .tut-choice-sheet {
+  background: #fff;
+  border-color: rgba(0,0,0,0.1);
+}
+.tut-content-frame .tut-choice-sheet h5 { color: #1a1a2e; }
+.tut-content-frame .tut-choice-item { color: #444; }
+.tut-content-frame .tut-choice-item:hover { background: rgba(255,23,68,0.06); color: #1a1a2e; }
+.tut-content-frame .tut-choice-num { background: rgba(0,0,0,0.05); color: #666; }
+.tut-content-frame .tut-flow-node {
+  background: #fff;
+  border-color: rgba(0,0,0,0.1);
+  color: #1a1a2e;
+}
+.tut-content-frame .tut-flow-node small { color: #777; }
+.tut-content-frame .tut-flow-arrow { color: #999; }
+.tut-content-frame .tut-replay {
+  background: #fff;
+  border-color: rgba(0,0,0,0.1);
+  color: #666;
+}
+.tut-content-frame .tut-replay:hover { border-color: rgba(255,23,68,0.3); color: var(--red); }
+.tut-content-frame .tut-timeline::before {
+  background: linear-gradient(180deg, var(--red), #0070c0, var(--green));
+}
+.tut-content-frame .tut-tl-item {
+  background: #fff;
+  border-color: rgba(0,0,0,0.08);
+  color: #1a1a2e;
+}
+.tut-content-frame .tut-tl-content { color: #444; }
+.tut-content-frame .tut-usecase {
+  background: #fff;
+  border-color: rgba(0,0,0,0.08);
+}
+.tut-content-frame .tut-usecase:hover {
+  border-color: rgba(255,23,68,0.2);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+.tut-content-frame .tut-usecase p { color: #555; }
+.tut-content-frame .tut-uc-chevron { color: #999; }
+.tut-content-frame .tut-uc-detail {
+  background: rgba(0,0,0,0.03);
+  border-color: rgba(0,0,0,0.06);
+}
+.tut-content-frame .tut-uc-detail .tut-uc-result { color: #444; }
 
 /* ── Conversation Flow ── */
 .tut-convo {
@@ -1503,6 +1572,57 @@ section, footer, nav { position: relative; z-index: 2; }
 @media (max-width: 580px) {
   .fab-top { bottom: 20px; right: 20px; width: 40px; height: 40px; }
   .fab-top svg { width: 18px; height: 18px; }
+}
+
+/* ── CTA install block ── */
+.cta-install {
+  position: relative;
+  padding: 18px 24px;
+  border-radius: 12px;
+  background: #0c0c10;
+  border: 1px solid #222230;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  text-align: left;
+  overflow: hidden;
+}
+.cta-install:hover {
+  border-color: rgba(255,23,68,0.3);
+  box-shadow: 0 0 30px rgba(255,23,68,0.08);
+}
+.cta-install code {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--green);
+  line-height: 1.8;
+  word-break: break-all;
+}
+.cta-copy-label {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+.cta-install:hover .cta-copy-label { color: var(--red); }
+.cta-copy-label.copied { color: var(--green) !important; }
+
+/* ── Demo terminal typewriter cursor ── */
+.demo-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  background: var(--green);
+  margin-left: 2px;
+  animation: blink 0.8s step-end infinite;
+  vertical-align: text-bottom;
+}
+@keyframes blink {
+  50% { opacity: 0; }
 }
 
 .footer {

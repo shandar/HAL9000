@@ -395,3 +395,143 @@ if (tutSection) {
   }, { threshold: 0.15 });
   tutObserver.observe(tutSection);
 }
+
+// ══════════════════════════════════════════
+//  LIVE DEMO: Typewriter terminal
+// ══════════════════════════════════════════
+
+(function() {
+  const el = document.getElementById('demo-terminal');
+  if (!el) return;
+
+  const scenarios = [
+    [
+      { type: 'prompt', text: '🎙️ "Hey HAL, set volume to 30 and check the battery"' },
+      { type: 'system', text: '[HAL Hearing] Speech detected → Whisper STT' },
+      { type: 'system', text: '[HAL Brain] Processing with GPT-4o...' },
+      { type: 'tool',   text: '⚡ set_volume(level=30) → Volume set to 30%' },
+      { type: 'tool',   text: '⚡ get_battery() → Battery: 78%, charging' },
+      { type: 'hal',    text: '🔴 HAL: "Volume is at 30. Battery at 78 percent, charging."' },
+    ],
+    [
+      { type: 'prompt', text: '💬 User typed: "Run the tests in the background"' },
+      { type: 'system', text: '[HAL Brain] Processing...' },
+      { type: 'tool',   text: '⚡ background_task(task="pytest", cwd="~/project")' },
+      { type: 'system', text: '[TaskRunner] Task a3f1 submitted → running' },
+      { type: 'hal',    text: '🔴 HAL: "Tests are running. Task ID a3f1. I\'ll report when done."' },
+      { type: 'system', text: '[TaskRunner] a3f1 completed (42s) — 28 passed, 0 failed' },
+      { type: 'hal',    text: '🔴 HAL: "All 28 tests passed in 42 seconds."' },
+    ],
+    [
+      { type: 'prompt', text: '🎙️ "Open Claude Code"' },
+      { type: 'system', text: '[HAL Brain] Ambiguous request → disambiguation' },
+      { type: 'hal',    text: '🔴 HAL: "Which one?"' },
+      { type: 'system', text: '[Choice Sheet] 1. Claude Desktop  2. Claude Code CLI' },
+      { type: 'prompt', text: '💬 User selected: 2' },
+      { type: 'tool',   text: '⚡ open_claude_code(cwd="~/projects")' },
+      { type: 'hal',    text: '🔴 HAL: "Claude Code CLI is open in your projects directory."' },
+    ],
+    [
+      { type: 'prompt', text: '💬 User typed: "Remember we decided to use PostgreSQL"' },
+      { type: 'tool',   text: '⚡ remember(fact="Decided to use PostgreSQL", type="decision")' },
+      { type: 'hal',    text: '🔴 HAL: "Noted. That decision is stored."' },
+      { type: 'prompt', text: '💬 User typed: "What decisions have we made?"' },
+      { type: 'tool',   text: '⚡ recall(query="", type="decision")' },
+      { type: 'system', text: '[Memory] Found 3 decisions' },
+      { type: 'hal',    text: '🔴 HAL: "Three decisions on record. PostgreSQL for the database, layered memory architecture, and Edge TTS as default voice."' },
+    ],
+  ];
+
+  let scenarioIndex = 0;
+  let lineIndex = 0;
+  let charIndex = 0;
+  let demoStarted = false;
+  let currentLine = '';
+
+  function colorize(type, text) {
+    const colors = {
+      prompt: 'color:#c8c8d0',
+      system: 'color:#5a5a6a',
+      tool:   'color:#00bcff',
+      hal:    'color:#ff1744',
+    };
+    return `<span style="${colors[type] || ''}">${text}</span>`;
+  }
+
+  function typeNext() {
+    const scenario = scenarios[scenarioIndex];
+    if (lineIndex >= scenario.length) {
+      // Pause, then next scenario
+      setTimeout(() => {
+        scenarioIndex = (scenarioIndex + 1) % scenarios.length;
+        lineIndex = 0;
+        charIndex = 0;
+        el.innerHTML = '';
+        typeNext();
+      }, 3000);
+      return;
+    }
+
+    const line = scenario[lineIndex];
+    if (charIndex === 0) currentLine = '';
+
+    const fullText = line.text;
+    const speed = line.type === 'system' ? 12 : line.type === 'tool' ? 15 : 22;
+
+    if (charIndex < fullText.length) {
+      currentLine += fullText[charIndex];
+      // Rebuild: all completed lines + current partial line + cursor
+      let html = '';
+      for (let i = 0; i < lineIndex; i++) {
+        html += colorize(scenario[i].type, scenario[i].text) + '\n';
+      }
+      html += colorize(line.type, currentLine) + '<span class="demo-cursor"></span>';
+      el.innerHTML = html;
+      el.scrollTop = el.scrollHeight;
+      charIndex++;
+      setTimeout(typeNext, speed);
+    } else {
+      // Line complete
+      lineIndex++;
+      charIndex = 0;
+      let html = '';
+      for (let i = 0; i < lineIndex; i++) {
+        html += colorize(scenario[i].type, scenario[i].text) + '\n';
+      }
+      el.innerHTML = html;
+      el.scrollTop = el.scrollHeight;
+      const pause = line.type === 'hal' ? 800 : line.type === 'tool' ? 400 : 300;
+      setTimeout(typeNext, pause);
+    }
+  }
+
+  // Start when demo section scrolls into view
+  const demoSection = document.getElementById('demo');
+  if (demoSection) {
+    const demoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !demoStarted) {
+          demoStarted = true;
+          typeNext();
+        }
+      });
+    }, { threshold: 0.3 });
+    demoObserver.observe(demoSection);
+  }
+})();
+
+// ── Copy install command ──
+function copyInstall() {
+  const cmd = 'git clone https://github.com/shandar/HAL9000.git && cd HAL9000 && pip install -r requirements.txt';
+  navigator.clipboard.writeText(cmd).then(() => {
+    const label = document.getElementById('cta-copy-label');
+    if (label) {
+      label.textContent = 'Copied!';
+      label.classList.add('copied');
+      setTimeout(() => {
+        label.textContent = 'Click to copy';
+        label.classList.remove('copied');
+      }, 2000);
+    }
+  });
+}
