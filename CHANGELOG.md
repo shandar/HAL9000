@@ -4,6 +4,48 @@ All notable changes to this project are documented here.
 
 ---
 
+## [1.3.0] — 2026-03-18
+
+### Added — Free Mode + Cross-Platform
+
+#### Free Mode (zero API keys)
+- **`FREE_MODE=true`** — one toggle switches brain, STT, and TTS to free alternatives
+- **`OllamaBrain`** class in `core/brain.py` — local LLM via Ollama with native tool calling
+- **faster-whisper** integration in `core/hearing.py` — local Whisper STT via CTranslate2
+- **Config**: `OLLAMA_MODEL` (llama3.1), `OLLAMA_BASE_URL`, `STT_PROVIDER`, `WHISPER_MODEL_SIZE`
+- **Auto-fallback** — if faster-whisper isn't installed, falls back to Whisper API
+- **Cascade override** — FREE_MODE overrides AI_PROVIDER, STT_PROVIDER, TTS_PROVIDER; individual overrides still work
+
+#### Cross-Platform (Windows + Linux)
+- **Platform abstraction layer** — `core/platform/` with auto-detection via `platform.system()`
+- **`core/platform/base.py`** — abstract `PlatformAPI` interface (15 methods)
+- **`core/platform/mac.py`** — macOS implementation (AppleScript, osascript)
+- **`core/platform/windows.py`** — Windows implementation (PowerShell, WMI, Toast, PIL)
+- **`core/platform/linux.py`** — Linux implementation (pactl, xclip, notify-send, brightnessctl)
+- **`core/tools/system.py`** — replaces `macos.py` with platform-neutral tool wrappers
+- **Cross-platform app discovery** — .app (mac), Start Menu/.lnk (Windows), .desktop (Linux)
+- **Cross-platform terminal** — Terminal.app (mac), Windows Terminal/cmd (Windows), gnome-terminal/konsole (Linux)
+- **Claude CLI binary detection** — searches platform-specific paths on all OSes
+
+#### Landing Page
+- **Interactive tutorial** section with 5 animated scenario tabs (Voice, Chat, Tools, Co-Work, Memory)
+- **Animated conversation flows** with staggered message reveals and tool call indicators
+- **Memory timeline** with color-coded type indicators
+- **Expandable use case cards** for 6 tool categories
+- **Split into 3 files**: `landing.html` + `assets/landing.css` + `assets/landing.js`
+
+### Changed
+- `core/tools/macos.py` → `core/tools/system.py` (platform-neutral)
+- `core/tools/apps.py` refactored to use `platform` API
+- `core/tools/delegation.py` uses `platform.open_terminal()` for cross-platform Terminal
+- `hal_mcp_server.py` system tools route through `platform` API
+- `create_brain()` factory accepts `"ollama"` provider
+- `config.validate()` skips API key checks for Ollama/faster-whisper
+- Brain providers: 3 → 4 (added Ollama)
+- README.md: added HAL eye hero image, Free Mode section, Cross-Platform table
+
+---
+
 ## [1.2.0] — 2026-03-18
 
 ### Added — Co-Work Platform

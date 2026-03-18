@@ -1,8 +1,30 @@
-# HAL 9000 — Local Multimodal AI Agent
+<p align="center">
+  <img src="assets/HAL-eye.png" alt="HAL 9000" width="200">
+</p>
 
-> "I am completely operational, and all my circuits are functioning perfectly."
+<h1 align="center">HAL 9000</h1>
 
-A local, multimodal AI agent that **sees** you via webcam, **hears** your voice, **thinks** via LLM, **speaks** with a cloned voice, **acts** on your Mac, and **integrates** with Claude Code via MCP. Runs entirely on your machine with a browser-based control panel.
+<p align="center">
+  <em>"I am completely operational, and all my circuits are functioning perfectly."</em>
+</p>
+
+<p align="center">
+  <strong>Local, multimodal AI agent</strong> — sees, hears, thinks, speaks, and acts on your machine.<br>
+  Cross-platform (macOS, Windows, Linux) · Free mode (zero API keys) · Claude Code co-work hub.
+</p>
+
+<p align="center">
+  <a href="#free-mode">Free Mode</a> ·
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="#co-work-features">Co-Work</a> ·
+  <a href="CHANGELOG.md">Changelog</a>
+</p>
+
+---
+
+A local, multimodal AI agent that **sees** you via webcam, **hears** your voice, **thinks** via LLM, **speaks** with a cloned voice, **acts** on your machine, and **integrates** with Claude Code via MCP. Runs entirely on your machine with a browser-based control panel.
+
+**Works on macOS, Windows, and Linux.** One codebase, auto-detects OS at runtime.
 
 ---
 
@@ -11,10 +33,10 @@ A local, multimodal AI agent that **sees** you via webcam, **hears** your voice,
 | Capability | How |
 |------------|-----|
 | **See** | Webcam feed with browser HUD — scanlines, corner brackets, REC indicator |
-| **Hear** | Continuous mic listening with VAD + OpenAI Whisper STT |
-| **Think** | Multi-provider LLM (GPT-4o, Claude, Gemini) with function calling |
+| **Hear** | Continuous mic listening with VAD + Whisper STT (API or local faster-whisper) |
+| **Think** | Multi-provider LLM (GPT-4o, Claude, Gemini, **Ollama**) with function calling |
 | **Speak** | 3 voice providers — Edge TTS (free/fast), ElevenLabs (paid/best), XTTS (local/cloned) |
-| **Act** | 40 OS-level tools — shell, apps, files, web search, memory, clipboard, app automation, Claude Code delegation, background tasks, artifacts, multi-agent orchestration |
+| **Act** | 40 cross-platform tools — shell, apps, files, web search, memory, clipboard, app automation, Claude Code delegation, background tasks, artifacts, multi-agent orchestration |
 | **Chat** | Browser chat window with text input + mic button — type or speak to HAL |
 | **Disambiguate** | Smart choice sheet UI — HAL presents numbered options, user clicks to select |
 | **Integrate** | MCP server exposes 20 tools to Claude Code/Desktop for bidirectional AI collaboration |
@@ -50,18 +72,76 @@ A local, multimodal AI agent that **sees** you via webcam, **hears** your voice,
 
 ---
 
+## Free Mode
+
+Run HAL with **zero API keys** and **zero cost** — fully local operation.
+
+```bash
+# 1. Install Ollama (local LLM)
+brew install ollama        # macOS
+# or: curl -fsSL https://ollama.com/install.sh | sh   # Linux
+# or: download from ollama.com                         # Windows
+
+# 2. Pull a model
+ollama pull llama3.1
+
+# 3. Set up HAL
+git clone https://github.com/shandar/HAL9000.git
+cd HAL9000 && python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+# 4. One line in .env
+echo "FREE_MODE=true" > .env
+
+# 5. Run
+python server.py
+```
+
+| Layer | Free Provider | Paid Alternative |
+|-------|--------------|------------------|
+| **Brain** | Ollama (Llama 3.1, Mistral, Phi-3) | GPT-4o, Claude, Gemini |
+| **STT** | faster-whisper (local Whisper) | OpenAI Whisper API |
+| **TTS** | Edge TTS (default, always free) | ElevenLabs, XTTS |
+
+`FREE_MODE=true` overrides `AI_PROVIDER`, `STT_PROVIDER`, and `TTS_PROVIDER` in one toggle. You can also mix — e.g., `FREE_MODE=true` with `STT_PROVIDER=whisper_api` for local brain + cloud STT.
+
+---
+
+## Cross-Platform Support
+
+HAL auto-detects your OS and uses the right system commands:
+
+| Feature | macOS | Windows | Linux |
+|---------|-------|---------|-------|
+| Volume | AppleScript | nircmd / PowerShell | pactl / amixer |
+| Brightness | ioreg | WMI | brightnessctl |
+| Notifications | osascript | Toast API | notify-send |
+| Clipboard | pbcopy/pbpaste | Get/Set-Clipboard | xclip / wl-clipboard |
+| Screenshot | screencapture | PIL.ImageGrab | scrot / grim |
+| Battery | pmset | psutil / WMI | psutil / sysfs |
+| WiFi | networksetup | netsh wlan | nmcli |
+| Apps | open -a + .app scan | start + Start Menu scan | gtk-launch + .desktop scan |
+| Terminal | AppleScript Terminal | Windows Terminal / cmd | gnome-terminal / konsole |
+
+No `#ifdef`, no separate builds — one `pip install`, one `python server.py`.
+
+---
+
 ## Quick Start
 
 ```bash
+git clone https://github.com/shandar/HAL9000.git
 cd HAL9000
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate         # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env              # fill in your API keys
+cp .env.example .env              # fill in your API keys (or set FREE_MODE=true)
 python server.py                  # start the web control panel
 ```
 
 Open **http://localhost:9000** → click **Activate**.
+
+> **Free mode?** Just `echo "FREE_MODE=true" > .env` — no API keys needed. See [Free Mode](#free-mode).
 
 ### Claude Code Integration
 
@@ -106,15 +186,17 @@ HAL operates as a **co-work hub** — coordinating work across HAL, Claude Code 
 
 ## API Keys
 
+> **With `FREE_MODE=true`, no API keys are needed at all.** See [Free Mode](#free-mode).
+
 | Key | Where | Required |
 |-----|-------|----------|
-| `OPENAI_API_KEY` | platform.openai.com | **Yes** — GPT-4o brain + Whisper STT |
+| `OPENAI_API_KEY` | platform.openai.com | Only if using GPT-4o brain or Whisper API STT |
 | `ANTHROPIC_API_KEY` | console.anthropic.com | Only if `AI_PROVIDER=anthropic` |
 | `GEMINI_API_KEY` | aistudio.google.com | Only if `AI_PROVIDER=gemini` |
 | `ELEVENLABS_API_KEY` | elevenlabs.io | Only if `TTS_PROVIDER=elevenlabs` |
 | `ELEVENLABS_VOICE_ID` | ElevenLabs voice library | Only if `TTS_PROVIDER=elevenlabs` |
 
-**No API key needed for the default voice** — Edge TTS is free.
+**No API key needed for**: Edge TTS (default voice), Ollama (local LLM), faster-whisper (local STT).
 
 ---
 
@@ -176,15 +258,22 @@ HAL9000/
 │   ├── memory_store.py    # Typed memory store with auto-migration
 │   ├── task_runner.py     # Async background task queue for Claude Code
 │   ├── orchestrator.py    # Multi-agent coordinator with conflict detection
+│   ├── platform/           # Cross-platform OS abstraction (auto-detected)
+│   │   ├── __init__.py     # Auto-detect: Darwin → mac, Windows → windows, Linux → linux
+│   │   ├── base.py         # Abstract PlatformAPI interface (15 methods)
+│   │   ├── mac.py          # macOS: AppleScript, osascript, pbcopy, screencapture
+│   │   ├── windows.py      # Windows: PowerShell, WMI, Toast, PIL.ImageGrab
+│   │   └── linux.py        # Linux: pactl, xclip, notify-send, brightnessctl
+│   │
 │   ├── tools/              # Tool registry + 40 tools across 8 domain modules
 │   │   ├── __init__.py     # Registry, execute(), format converters, security
 │   │   ├── shell.py        # run_shell (whitelisted commands)
-│   │   ├── apps.py         # open/quit/list apps, open URLs, app_action
+│   │   ├── apps.py         # open/quit/list apps, open URLs, app_action (cross-platform)
 │   │   ├── files.py        # list/read/write/search/info
-│   │   ├── macos.py        # volume, brightness, notifications, clipboard, screenshot
+│   │   ├── system.py       # volume, brightness, notifications, clipboard, screenshot (cross-platform)
 │   │   ├── web.py          # web_search, fetch_url
 │   │   ├── memory.py       # remember, recall, forget, list_memories, save_session
-│   │   ├── delegation.py   # claude_code, background_task, orchestrate, agents
+│   │   ├── delegation.py   # claude_code, background_task, orchestrate, agents (cross-platform)
 │   │   └── artifacts.py    # create_artifact, update_artifact
 │   └── knowledge.py       # Knowledge loader (files + URLs)
 │
@@ -232,8 +321,13 @@ All settings in `.env`. See `.env.example` for the full list.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `AI_PROVIDER` | `openai` | Brain provider: openai, anthropic, gemini |
+| `FREE_MODE` | `false` | One toggle for zero-cost: Ollama + faster-whisper + Edge TTS |
+| `AI_PROVIDER` | `openai` | Brain provider: openai, anthropic, gemini, **ollama** |
+| `STT_PROVIDER` | `whisper_api` | Speech-to-text: whisper_api (cloud) or **faster_whisper** (local) |
 | `TTS_PROVIDER` | `edge` | Voice provider: edge, elevenlabs, local |
+| `OLLAMA_MODEL` | `llama3.1` | Ollama model name (when using Ollama brain) |
+| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama server URL |
+| `WHISPER_MODEL_SIZE` | `base` | faster-whisper model: tiny, base, small, medium |
 | `EDGE_VOICE` | `en-US-GuyNeural` | Edge TTS voice ID |
 | `FRAME_INTERVAL` | `2.0` | Seconds between webcam samples |
 | `MIC_RECORD_SECONDS` | `5` | Max recording duration per utterance |

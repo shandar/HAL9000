@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="HAL 9000 — A local multimodal AI agent that sees, hears, thinks, speaks, and acts on your Mac. 40 tools, 3 LLM providers, co-work platform with Claude Code.">
+  <meta name="description" content="HAL 9000 — A cross-platform multimodal AI agent that sees, hears, thinks, speaks, and acts. 40 tools, 4 LLM providers (including free Ollama), co-work platform with Claude Code. Works on macOS, Windows, and Linux.">
   <meta name="theme-color" content="#ff1744">
   <title>HAL 9000 — Local Multimodal AI Agent</title>
   <link rel="icon" type="image/png" href="assets/HAL-eye-192.png">
@@ -27,7 +27,7 @@
       </div>
       <h1 class="hero-title">HAL <span>9000</span></h1>
       <p class="hero-tagline">"I am completely operational, and all my circuits are functioning perfectly."</p>
-      <p class="hero-subtitle">A local, multimodal AI agent that <strong>sees</strong>, <strong>hears</strong>, <strong>thinks</strong>, <strong>speaks</strong>, and <strong>acts</strong> on your Mac — with a co-work platform for Claude Code.</p>
+      <p class="hero-subtitle">A cross-platform, multimodal AI agent that <strong>sees</strong>, <strong>hears</strong>, <strong>thinks</strong>, <strong>speaks</strong>, and <strong>acts</strong> on your machine — with a co-work platform for Claude Code. <strong>Free mode available.</strong></p>
       <a href="#guide" class="hero-cta">Get Started ↓</a>
       <a href="#tutorial" class="hero-cta" style="background:transparent; border:1px solid var(--border); color:var(--text-dim); margin-left:12px;">Interactive Tutorial ↓</a>
     </div>
@@ -67,7 +67,7 @@
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 10.12h-6.78l2.74-2.82c-2.73-2.7-7.15-2.8-9.88-.1-2.73 2.71-2.73 7.08 0 9.79s7.15 2.71 9.88 0C18.32 15.65 19 14.08 19 12.1h2c0 1.98-.88 4.55-2.64 6.29-3.51 3.48-9.21 3.48-12.72 0-3.5-3.47-3.5-9.12 0-12.6 3.51-3.47 9.14-3.49 12.65-.06L21 3v7.12z"/></svg>
           </div>
           <h3>Think</h3>
-          <p>Multi-provider LLM brain — GPT-4o, Claude, or Gemini — with function calling and 40-tool agent layer.</p>
+          <p>Multi-provider LLM brain — GPT-4o, Claude, Gemini, or Ollama (free) — with function calling and 40-tool agent layer.</p>
         </div>
 
         <div class="cap-card reveal" style="transition-delay:0.2s">
@@ -268,7 +268,7 @@
           <div class="stat-label">MCP Tools</div>
         </div>
         <div>
-          <div class="stat-number"><span class="counter-val" data-target="3">0</span></div>
+          <div class="stat-number"><span class="counter-val" data-target="4">0</span></div>
           <div class="stat-label">LLM Providers</div>
         </div>
         <div>
@@ -278,6 +278,81 @@
       </div>
       <div class="stats-attribution reveal">
         Built by <a href="https://affordance.design" target="_blank">Affordance Design</a> × <a href="https://shandarjunaid.com" target="_blank">Shandar Junaid</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FREE MODE ═══ -->
+  <section class="guide" style="padding:80px 0 60px; border-top:1px solid var(--border);">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label" style="color:var(--green);">Free &amp; Open Source</div>
+        <h2 class="section-title">Zero Cost. Zero API Keys.</h2>
+        <p class="section-desc">Run HAL entirely for free with local AI. One toggle in your <code>.env</code> file switches everything to open-source alternatives.</p>
+      </div>
+
+      <div class="guide-steps" style="margin-top:40px;">
+        <div class="guide-step reveal" style="transition-delay:0.05s">
+          <div class="guide-step-num" style="background:var(--green-dim);color:var(--green);">$</div>
+          <div class="guide-step-content">
+            <h4>Free Mode Setup</h4>
+            <div class="guide-code"><span class="dim"># Install Ollama (local LLM)</span>
+brew install ollama              <span class="dim"># macOS</span>
+curl -fsSL https://ollama.com/install.sh | sh   <span class="dim"># Linux</span>
+
+<span class="dim"># Pull a model and go</span>
+ollama pull llama3.1
+echo "FREE_MODE=true" > .env
+python server.py</div>
+          </div>
+        </div>
+
+        <div class="guide-step reveal" style="transition-delay:0.1s">
+          <div class="guide-step-num" style="background:var(--green-dim);color:var(--green);">⚡</div>
+          <div class="guide-step-content">
+            <h4>What You Get — Free</h4>
+            <table class="guide-table" style="margin-top:8px;">
+              <thead>
+                <tr><th>Layer</th><th>Free Provider</th><th>Paid Alternative</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Brain (LLM)</td><td style="color:var(--green);">Ollama — Llama 3.1, Mistral, Phi-3</td><td class="optional">GPT-4o, Claude, Gemini</td></tr>
+                <tr><td>Speech-to-Text</td><td style="color:var(--green);">faster-whisper (local)</td><td class="optional">OpenAI Whisper API</td></tr>
+                <tr><td>Text-to-Speech</td><td style="color:var(--green);">Edge TTS (always free)</td><td class="optional">ElevenLabs, XTTS</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CROSS-PLATFORM ═══ -->
+  <section class="guide" style="padding:60px 0 80px;">
+    <div class="container">
+      <div class="reveal">
+        <div class="section-label" style="color:var(--cyan);">Cross-Platform</div>
+        <h2 class="section-title">macOS · Windows · Linux</h2>
+        <p class="section-desc">One codebase, auto-detects your OS. No <code>#ifdef</code>, no separate builds — HAL uses the right system commands on every platform.</p>
+      </div>
+
+      <div class="guide-step reveal" style="margin-top:40px;">
+        <div class="guide-step-num" style="background:var(--cyan-dim);color:var(--cyan);">⊕</div>
+        <div class="guide-step-content">
+          <table class="guide-table" style="margin-top:0;">
+            <thead>
+              <tr><th>Feature</th><th>macOS</th><th>Windows</th><th>Linux</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Volume</td><td>AppleScript</td><td>PowerShell</td><td>pactl</td></tr>
+              <tr><td>Notifications</td><td>osascript</td><td>Toast API</td><td>notify-send</td></tr>
+              <tr><td>Clipboard</td><td>pbcopy</td><td>Get-Clipboard</td><td>xclip</td></tr>
+              <tr><td>Screenshot</td><td>screencapture</td><td>PIL.ImageGrab</td><td>scrot / grim</td></tr>
+              <tr><td>Apps</td><td>open -a</td><td>Start Menu</td><td>.desktop files</td></tr>
+              <tr><td>Terminal</td><td>Terminal.app</td><td>Windows Terminal</td><td>gnome-terminal</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </section>
