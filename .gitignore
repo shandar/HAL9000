@@ -16,6 +16,7 @@ docs/
 product-page/
 assets/llms/
 knowledge/*.txt
+knowledge/uploads/
 MONETIZATION.md
 .claude/
 DEMO-SCRIPT.md

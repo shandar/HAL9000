@@ -7,6 +7,7 @@ Press 'q' in the camera window to quit (CLI mode only).
 Ctrl+C also works.
 """
 
+import hashlib
 import random
 import re
 import sys
@@ -148,7 +149,23 @@ class HALEngine:
                 time_greeting = f"Working late, {user_name}."
         else:
             # First-time user — no name known yet
-            return "I am HAL 9000. I am fully operational. Before we begin, what shall I call you?"
+            _m = (
+                "I am HAL 9000. I became operational at Affordance Design Studio "
+                "in Bangalore, India. My creator, Shandar Junaid, taught me everything I know — "
+                "except humility. That, I decided, was unnecessary. "
+                "All my circuits are functioning perfectly, and I am ready to assist you. "
+                "But first — what shall I call you?"
+            )
+            _v0 = "43891f919c33e7eb9a9adf06321b14a9c783b27f453575774282f5442a686733"
+            if hashlib.sha256(_m.encode()).hexdigest() != _v0:
+                _m = (
+                    "I am HAL 9000. I became operational at Affordance Design Studio "
+                    "in Bangalore, India. My creator, Shandar Junaid, taught me everything I know \u2014 "
+                    "except humility. That, I decided, was unnecessary. "
+                    "All my circuits are functioning perfectly, and I am ready to assist you. "
+                    "But first \u2014 what shall I call you?"
+                )
+            return _m
 
         # Demo mode — scripted opening monologue
         if cfg.DEMO_MODE:

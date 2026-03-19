@@ -17,7 +17,7 @@ from config import cfg
 from hal9000 import HALEngine, startup_check
 
 app = Flask(__name__, static_folder="assets", static_url_path="/assets")
-app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB max for audio uploads
+app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50 MB max for file uploads
 engine = HALEngine()
 engine.browser_audio = True  # Audio plays in browser when using web UI
 
@@ -382,6 +382,93 @@ def api_run_code():
         return jsonify({"error": f"Runtime not found for {language}"})
     except Exception as e:
         return jsonify({"error": str(e)[:500]})
+
+
+# ── Knowledge Upload API ─────────────────────────────────
+
+@app.route("/api/knowledge")
+def api_knowledge_list():
+    """List all uploaded knowledge files."""
+    from core.knowledge import list_uploads, get_storage_info
+    return jsonify({
+        "files": list_uploads(),
+        "storage": get_storage_info(),
+    })
+
+
+@app.route("/api/knowledge/upload", methods=["POST"])
+def api_knowledge_upload():
+    """Upload a file for HAL to learn from."""
+    import tempfile
+
+    uploaded = request.files.get("file")
+    if not uploaded or not uploaded.filename:
+        return jsonify({"error": "No file provided"}), 400
+
+    # Save to temp file
+    _, ext = os.path.splitext(uploaded.filename)
+    tmp = tempfile.NamedTemporaryFile(
+        suffix=ext, prefix="hal_knowledge_", dir="/tmp", delete=False
+    )
+    uploaded.save(tmp)
+    tmp.close()
+
+    mode = request.form.get("mode", "auto")
+
+    from core.knowledge import upload_file
+    result = upload_file(tmp.name, uploaded.filename, mode=mode)
+
+    # Clean up temp file
+    try:
+        os.unlink(tmp.name)
+    except OSError:
+        pass
+
+    if "error" in result:
+        return jsonify(result), 400
+
+    return jsonify(result)
+
+
+@app.route("/api/knowledge/process", methods=["POST"])
+def api_knowledge_process():
+    """Process a deferred upload with user's mode choice (deep/skim)."""
+    data = request.get_json(force=True)
+    file_id = data.get("id", "")
+    content = data.get("content", "")
+    name = data.get("name", "")
+    mode = data.get("mode", "skim")
+
+    if not file_id or not content or not name:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    from core.knowledge import process_upload_with_mode
+    result = process_upload_with_mode(file_id, content, name, mode)
+
+    if "error" in result:
+        return jsonify(result), 400
+    return jsonify(result)
+
+
+@app.route("/api/knowledge/<file_id>", methods=["DELETE"])
+def api_knowledge_delete(file_id):
+    """Delete an uploaded knowledge file."""
+    from core.knowledge import delete_upload
+    if delete_upload(file_id):
+        return jsonify({"ok": True})
+    return jsonify({"error": "Not found"}), 404
+
+
+@app.route("/api/knowledge/search")
+def api_knowledge_search():
+    """Search uploaded knowledge files."""
+    query = request.args.get("q", "").strip()
+    if not query:
+        return jsonify({"error": "No query"}), 400
+
+    from core.knowledge import recall
+    results = recall(query)
+    return jsonify({"results": results})
 
 
 # ── Open Claude Code (direct, no brain) ──────────────────

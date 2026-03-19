@@ -90,6 +90,18 @@ class BaseBrain:
                 + "\n".join(summary_lines)
             )
 
+        # Always-loaded knowledge uploads
+        try:
+            from core.knowledge import load_always_files
+            always_knowledge = load_always_files()
+            if always_knowledge:
+                parts.append(
+                    "--- UPLOADED KNOWLEDGE (always loaded) ---\n"
+                    + always_knowledge
+                )
+        except Exception:
+            pass
+
         return "\n\n".join(parts)
 
     def _error_msg(self, detail: str) -> str:

@@ -95,6 +95,12 @@ class Config:
     MAX_CONCURRENT_TASKS: int = _safe_int("MAX_CONCURRENT_TASKS", 2)
     MAX_AGENTS: int = _safe_int("MAX_AGENTS", 4)
 
+    # Knowledge uploads
+    KNOWLEDGE_ALWAYS_MAX_KB: int = _safe_int("KNOWLEDGE_ALWAYS_MAX_KB", 2)
+    KNOWLEDGE_CHUNK_SIZE: int = _safe_int("KNOWLEDGE_CHUNK_SIZE", 1500)
+    KNOWLEDGE_MAX_CHUNKS_IN_PROMPT: int = _safe_int("KNOWLEDGE_MAX_CHUNKS_IN_PROMPT", 3)
+    KNOWLEDGE_MAX_TOTAL_MB: int = _safe_int("KNOWLEDGE_MAX_TOTAL_MB", 50)
+
     # License (Pro/Team/Enterprise features)
     HAL_LICENSE: str = os.getenv("HAL_LICENSE", "")
 
@@ -170,7 +176,14 @@ tell the user to type /tools for the complete list. You can also summarize your 
 - Memory: remember facts/decisions/preferences, recall, forget, list, save sessions
 - Claude Code: open terminal, delegate tasks, background tasks, multi-agent orchestration
 - Workspace: create code/HTML/mermaid artifacts, update artifacts
+- Knowledge: recall uploaded files, list knowledge, forget knowledge
 Do NOT make up tool names. These are the real categories.
+
+KNOWLEDGE RULE:
+Users can upload files (PDFs, docs, code, CSVs) to teach you. Small files are always in your context.
+Large files are chunked and indexed — use the learn_recall tool to search them when a question
+might relate to uploaded knowledge. If a user asks about something specific they've shared before,
+search your knowledge first before saying you don't know.
 
 CLAUDE CODE RULE:
 When the user asks to "delegate to claude code" or "ask claude code to do X":

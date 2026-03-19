@@ -245,3 +245,4 @@ from core.tools import web        # noqa: E402, F401
 from core.tools import memory     # noqa: E402, F401
 from core.tools import delegation  # noqa: E402, F401
 from core.tools import artifacts   # noqa: E402, F401
+from core.tools import knowledge   # noqa: E402, F401
