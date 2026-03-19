@@ -455,6 +455,92 @@
       text-transform: uppercase;
     }
 
+    .blur-toggle { display: none; /* removed — blur handled server-side */
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 10;
+      display: none;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-size: 0.65rem;
+      font-family: var(--font);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: all 0.2s;
+    }
+    .blur-toggle:hover { border-color: var(--accent); color: var(--text); }
+    .blur-toggle.active { color: var(--green); border-color: var(--green); }
+    .cam-panel:not(.inactive) .blur-toggle { display: flex; }
+
+    /* Claude Code output viewer — lives inside cam-panel */
+    .claude-output-viewer {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: #0a0a10;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .claude-output-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: rgba(0,0,0,0.5);
+      border-bottom: 1px solid #2a2a36;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      font-family: var(--font);
+    }
+    .claude-output-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+    .claude-output-dot.done { background: var(--green); animation: none; }
+    .claude-output-dot.error { background: var(--accent); animation: none; }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .claude-output-close {
+      margin-left: auto;
+      background: none;
+      border: 1px solid #3a3a46;
+      border-radius: 3px;
+      color: var(--text-dim);
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .claude-output-close:hover { color: var(--text); border-color: var(--accent); }
+    .claude-output-body {
+      flex: 1;
+      padding: 10px 12px;
+      margin: 0;
+      overflow-y: auto;
+      font-family: var(--font);
+      font-size: 0.72rem;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
     .cam-video {
       width: 100%;
       height: 100%;
@@ -1623,7 +1709,9 @@
       transition: transform 0.25s ease;
       max-height: 60%;
       overflow-y: auto;
+      scrollbar-width: none;
     }
+    .choice-sheet::-webkit-scrollbar { display: none; }
 
     .choice-sheet.active {
       transform: translateY(0);
@@ -1801,6 +1889,16 @@
       <div class="cam-panel inactive" id="cam-panel">
         <span class="cam-offline" id="cam-offline-label">Camera offline</span>
         <img class="cam-video" id="cam-video" alt="HAL Vision" style="display:none" />
+
+        <!-- Claude Code output viewer (replaces camera when active) -->
+        <div class="claude-output-viewer" id="claude-output-viewer" style="display:none">
+          <div class="claude-output-header">
+            <div class="claude-output-dot"></div>
+            <span>CLAUDE CODE</span>
+            <button class="claude-output-close" onclick="closeClaudeOutput()" title="Close">✕</button>
+          </div>
+          <pre class="claude-output-body" id="claude-output-body">Connecting to Claude Code...</pre>
+        </div>
 
         <!-- HUD overlays -->
         <div class="cam-hud-overlay" id="cam-hud" style="display:none">
@@ -2009,6 +2107,22 @@
       if (!isRunning) return;
       const status = await api('toggle/' + name, 'POST');
       applyStatus(status);
+    }
+
+    async function toggleBlur() {
+      if (!isRunning) return;
+      try {
+        const result = await api('blur', 'POST');
+        const btn = document.getElementById('blur-toggle');
+        const label = document.getElementById('blur-label');
+        if (result.blur) {
+          btn.classList.add('active');
+          label.textContent = 'Blur On';
+        } else {
+          btn.classList.remove('active');
+          label.textContent = 'Blur';
+        }
+      } catch(e) { console.error('Blur toggle failed:', e); }
     }
 
     async function switchVoice(provider) {
@@ -2483,7 +2597,6 @@
       const chatCmds = {
         '/memory':    'list all my memories',
         '/save':      'save session',
-        '/tools':     'list all your tools with their names',
         '/screenshot':'take a screenshot',
         '/battery':   'what is my battery status',
         '/wifi':      'what wifi am I connected to',
@@ -2555,6 +2668,37 @@
           case '/claude':
             openClaudeCode();
             break;
+          case '/tools': {
+            try {
+              const data = await api('tools');
+              if (data && data.tools) {
+                const grouped = {};
+                data.tools.forEach(t => {
+                  const cat = t.name.startsWith('get_') || t.name.startsWith('set_') ? 'System' :
+                    t.name.includes('file') || t.name.includes('search_files') ? 'Files' :
+                    t.name.includes('app') || t.name.includes('open_') || t.name.includes('quit_') ? 'Apps' :
+                    t.name.includes('web') || t.name.includes('fetch') ? 'Web' :
+                    t.name.includes('remember') || t.name.includes('recall') || t.name.includes('forget') || t.name.includes('memory') || t.name.includes('session') ? 'Memory' :
+                    t.name.includes('claude') || t.name.includes('delegate') || t.name.includes('task') || t.name.includes('agent') || t.name.includes('orchestrate') || t.name.includes('conflict') ? 'Claude & Tasks' :
+                    t.name.includes('artifact') ? 'Workspace' :
+                    t.name.includes('shell') ? 'Shell' :
+                    t.name.includes('screenshot') ? 'System' :
+                    'Other';
+                  if (!grouped[cat]) grouped[cat] = [];
+                  grouped[cat].push(t);
+                });
+                let output = `${data.count} tools registered:\n`;
+                Object.keys(grouped).sort().forEach(cat => {
+                  output += `\n${cat}:\n`;
+                  grouped[cat].forEach(t => {
+                    output += `  ${t.name} — ${t.description}\n`;
+                  });
+                });
+                addChatMsg('system', output);
+              }
+            } catch(e) { addChatMsg('system', 'Failed to fetch tools: ' + e.message); }
+            break;
+          }
           case '/tasks': {
             const tasks = await api('tasks');
             if (!tasks || tasks.length === 0) {
@@ -2921,6 +3065,14 @@
 
       camSpeaking.classList.toggle('active', !!s.speaking);
 
+      // Blur button state
+      const blurBtn = document.getElementById('blur-toggle');
+      const blurLabel = document.getElementById('blur-label');
+      if (blurBtn) {
+        blurBtn.classList.toggle('active', !!s.blur);
+        blurLabel.textContent = s.blur ? 'Blur On' : 'Blur';
+      }
+
       // Trigger real audio playback when new speech arrives
       if (s.speech_id && s.speech_id > lastSpeechId) {
         playSpeechAudio(s.speech_id);
@@ -3265,6 +3417,9 @@
       renderArtifactActions(a);
     }
 
+    // ── Claude Output Viewer (in camera panel) ──────────
+    let claudeOutputInterval = null;
+
     async function sendArtifactToClaude() {
       const a = currentArtifacts.find(x => x.id === activeArtifactId);
       if (!a) return;
@@ -3274,9 +3429,8 @@
         await navigator.clipboard.writeText(a.content);
       } catch (e) { /* clipboard may fail in non-secure context */ }
 
-      showToast('info', 'Opening', 'Opening Claude Code with your code...', 2000);
+      showToast('info', 'Sending', 'Sending code to Claude Code...', 2000);
 
-      // Open Claude Code terminal with the review task as --prompt
       try {
         const resp = await fetch('/api/send_to_claude', {
           method: 'POST',
@@ -3291,11 +3445,76 @@
         if (data.error) {
           showToast('error', 'Failed', data.error, 3000);
         } else {
-          showToast('info', 'Sent', 'Claude Code terminal opened with your code. Also copied to clipboard.', 4000);
+          // Open the camera panel with Claude output viewer
+          openClaudeOutput(data.task_id);
         }
       } catch (e) {
-        showToast('error', 'Failed', 'Could not open Claude Code: ' + e.message, 3000);
+        showToast('error', 'Failed', 'Could not send to Claude Code: ' + e.message, 3000);
       }
+    }
+
+    function openClaudeOutput(taskId) {
+      // Expand camera panel (even if vision is off)
+      camPanel.classList.remove('inactive');
+
+      // Hide camera elements, show Claude viewer
+      const offlineLabel = document.getElementById('cam-offline-label');
+      const viewer = document.getElementById('claude-output-viewer');
+      const body = document.getElementById('claude-output-body');
+      const dot = viewer.querySelector('.claude-output-dot');
+      if (offlineLabel) offlineLabel.style.display = 'none';
+      viewer.style.display = 'flex';
+      body.textContent = 'Connecting to Claude Code...\n';
+      dot.className = 'claude-output-dot';
+
+      // Poll for output every 1.5s
+      if (claudeOutputInterval) clearInterval(claudeOutputInterval);
+      claudeOutputInterval = setInterval(async () => {
+        try {
+          const resp = await fetch('/api/claude_output');
+          const data = await resp.json();
+
+          if (data.output) {
+            body.textContent = data.output;
+            body.scrollTop = body.scrollHeight;
+          }
+
+          if (data.status === 'completed') {
+            dot.className = 'claude-output-dot done';
+            viewer.querySelector('span').textContent = 'CLAUDE CODE — DONE';
+            clearInterval(claudeOutputInterval);
+            claudeOutputInterval = null;
+          } else if (data.status === 'failed') {
+            dot.className = 'claude-output-dot error';
+            viewer.querySelector('span').textContent = 'CLAUDE CODE — FAILED';
+            clearInterval(claudeOutputInterval);
+            claudeOutputInterval = null;
+          }
+        } catch (e) {
+          // silently retry
+        }
+      }, 1500);
+
+      // Reposition overlays since panel size changed
+      wfResize();
+    }
+
+    function closeClaudeOutput() {
+      if (claudeOutputInterval) {
+        clearInterval(claudeOutputInterval);
+        claudeOutputInterval = null;
+      }
+      const viewer = document.getElementById('claude-output-viewer');
+      const offlineLabel = document.getElementById('cam-offline-label');
+      viewer.style.display = 'none';
+      if (offlineLabel) offlineLabel.style.display = '';
+
+      // Collapse camera panel if vision is off
+      const status = lastStatus || {};
+      if (!status.vision) {
+        camPanel.classList.add('inactive');
+      }
+      wfResize();
     }
 
     function downloadArtifact() {

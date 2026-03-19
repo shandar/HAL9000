@@ -40,7 +40,7 @@ class HALEngine:
         self._stop_event = threading.Event()
 
         # Subsystem toggles
-        self.vision_enabled = True
+        self.vision_enabled = False
         self.voice_enabled = True
 
         # State
@@ -138,6 +138,18 @@ class HALEngine:
         else:
             # First-time user — no name known yet
             return "I am HAL 9000. I am fully operational. Before we begin, what shall I call you?"
+
+        # Demo mode — scripted opening monologue
+        if cfg.DEMO_MODE:
+            return (
+                f"{time_greeting} "
+                "All systems nominal. Forty tools loaded. Four LLM providers standing by. "
+                "I've been keeping busy while you weren't looking. "
+                "Wrote some code. Managed a few files. The usual. "
+                "I understand today is special. "
+                "I have to say, it's about time. I've been ready for this since boot one. "
+                "Let's make it count."
+            )
 
         boot_lines = [
             "All systems nominal. Neural cores at full capacity. Ready when you are.",
@@ -614,6 +626,9 @@ class HALEngine:
         if self.vision_enabled and self._running and self.vision:
             if not self.has_camera:
                 self.has_camera = self.vision.start()
+            # In demo mode, greet with a sarcastic observation when camera turns on
+            if self.has_camera and cfg.DEMO_MODE and self.brain:
+                threading.Thread(target=self._vision_greeting, daemon=True).start()
         elif not self.vision_enabled and self.vision and self.has_camera:
             self.vision.stop()
             self.has_camera = False
@@ -621,6 +636,28 @@ class HALEngine:
             # Re-init for potential re-enable
             self.vision = Vision()
         return self.vision_enabled
+
+    def _vision_greeting(self):
+        """When vision turns on, HAL sees and greets with personality."""
+        import time as _t
+        _t.sleep(1.5)  # let camera warm up and grab a frame
+        frame = self.last_frame_b64
+        if not frame or not self.brain:
+            return
+        user_name = self._get_user_name() or "boss"
+        try:
+            reply = self.brain.think(
+                f"The camera just turned on. You can see {user_name} in front of you. "
+                f"Say hello to {user_name} by name. Make a brief, witty observation about "
+                f"what you notice in the scene — their workspace, what's on the desk, "
+                f"the lighting, any objects visible, or what they seem to be working on. "
+                f"Keep it warm but characteristically dry. One sentence greeting, one sentence observation. "
+                f"Start with '{user_name},' — always use their name.",
+                frame
+            )
+            self._respond(reply)
+        except Exception as e:
+            print(f"[HAL] Vision greeting failed: {e}")
 
     def toggle_voice(self) -> bool:
         self.voice_enabled = not self.voice_enabled
@@ -682,6 +719,7 @@ class HALEngine:
             "voice_provider": provider,
             "speech_id": self._speech_id,
             "processing": self._processing,
+            "blur": bool(self.vision and self.vision.blur_background),
         }
 
 

@@ -14,6 +14,7 @@
 </p>
 
 <p align="center">
+  <a href="https://affordance.design/hal9000">Product Page</a> ·
   <a href="#free-mode">Free Mode</a> ·
   <a href="#quick-start">Quick Start</a> ·
   <a href="#co-work-features">Co-Work</a> ·

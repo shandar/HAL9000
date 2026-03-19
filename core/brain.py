@@ -29,7 +29,10 @@ class BaseBrain:
         self._thinking_lock = threading.Lock()  # prevents concurrent think() calls
         self._knowledge_context = knowledge_context
         # Build static parts once; memory is refreshed on each _get_system_prompt()
-        self._static_prompt_parts = [cfg.SYSTEM_PROMPT]
+        base_prompt = cfg.SYSTEM_PROMPT
+        if cfg.DEMO_MODE:
+            base_prompt += cfg.DEMO_PROMPT
+        self._static_prompt_parts = [base_prompt]
 
         if knowledge_context:
             self._static_prompt_parts.append(

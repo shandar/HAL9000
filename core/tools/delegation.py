@@ -109,7 +109,9 @@ def open_claude_code(working_directory: str = "") -> str:
     },
 )
 def delegate_to_claude_code(task: str, working_directory: str = "") -> str:
-    cwd = os.path.expanduser(working_directory or "~")
+    # Default to HAL project dir (not home) so Claude Code has project context
+    hal_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    cwd = os.path.expanduser(working_directory) if working_directory else hal_dir
     if not os.path.isdir(cwd):
         return f"Directory not found: {cwd}"
 
@@ -190,6 +192,9 @@ def background_task(task: str, working_directory: str = "") -> str:
     if not runner:
         return "Background task runner not available. Is HAL running?"
 
+    # Default to HAL project dir
+    if not working_directory:
+        working_directory = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     t = runner.submit(task, working_directory)
     queue_pos = len(runner.list_tasks(status="queued"))
     running = runner.active_count()
@@ -225,8 +230,12 @@ def list_tasks() -> str:
             secs = int(end - t["started_at"])
             elapsed = f" ({secs}s)"
         line = f"[{t['status']}] {t['id']}: {t['description'][:60]}{elapsed}"
-        if t["progress"] and t["status"] == "running":
+        if t["status"] == "running" and t["progress"]:
             line += f"\n  → {t['progress'][:100]}"
+        elif t["status"] == "completed" and t.get("result"):
+            line += f"\n  Result: {t['result'][:300]}"
+        elif t["status"] == "failed" and t.get("error"):
+            line += f"\n  Error: {t['error'][:200]}"
         lines.append(line)
     return "\n".join(lines)
 

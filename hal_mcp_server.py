@@ -11,6 +11,7 @@ This gives Claude Code access to:
     - hal_screenshot:    Capture the macOS screen
     - hal_speak:         Speak text aloud in HAL's cloned voice
     - hal_listen:        Listen via microphone and transcribe speech
+    - hal_chat:          Send a message to HAL and get his response back
     - hal_remember:      Store a fact in persistent memory
     - hal_recall:        Search persistent memory
     - hal_forget:        Remove a memory
@@ -220,6 +221,35 @@ def hal_listen() -> str:
     if text:
         return f"Heard: {text}"
     return "No speech detected. The user may not have spoken, or the audio was too quiet."
+
+
+# ── Chat (bidirectional — Claude Code ↔ HAL) ──────────────────
+
+@mcp.tool()
+def hal_chat(message: str) -> str:
+    """Send a message to HAL and get his spoken response back.
+    HAL will think about your message, speak the reply aloud, and return the text.
+    Use this for bidirectional conversation between Claude Code and HAL.
+    Example: hal_chat("I've finished reviewing the code. Found 3 issues.")
+    HAL will process this as if the user said it, respond with his personality,
+    and speak the response aloud through the browser."""
+    import urllib.request
+    import json as _json
+
+    try:
+        payload = _json.dumps({"text": f"[From Claude Code]: {message}"}).encode("utf-8")
+        req = urllib.request.Request(
+            "http://localhost:9000/api/chat",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = _json.loads(resp.read())
+        reply = data.get("reply", "(no response)")
+        return f"HAL said: {reply}"
+    except Exception as e:
+        return f"Could not reach HAL server: {e}. Make sure HAL is running (python server.py)."
 
 
 # ── Memory ──────────────────────────────────────────────────

@@ -85,6 +85,15 @@ def api_toggle(subsystem: str):
     return jsonify(engine.get_status())
 
 
+@app.route("/api/blur", methods=["POST"])
+def api_blur():
+    """Toggle background blur on webcam feed."""
+    if engine.vision:
+        engine.vision.blur_background = not engine.vision.blur_background
+        return jsonify({"blur": engine.vision.blur_background})
+    return jsonify({"error": "Vision not available"}), 400
+
+
 @app.route("/api/voice_provider", methods=["GET", "POST"])
 def api_voice_provider():
     """Get or switch the active voice provider."""
@@ -305,6 +314,20 @@ def api_update_artifact(artifact_id):
     return jsonify({"error": "Not found"}), 404
 
 
+@app.route("/api/tools")
+def api_tools():
+    """List all registered tools with names and descriptions."""
+    from core.tools import TOOL_REGISTRY
+    tool_list = []
+    for name, tdef in TOOL_REGISTRY.items():
+        tool_list.append({
+            "name": name,
+            "description": tdef.description[:120],
+            "safety": tdef.safety,
+        })
+    return jsonify({"tools": tool_list, "count": len(tool_list)})
+
+
 @app.route("/api/run", methods=["POST"])
 def api_run_code():
     """Execute code in a sandboxed subprocess. Returns stdout/stderr."""
@@ -323,21 +346,21 @@ def api_run_code():
                 ["python3", "-c", code],
                 capture_output=True, text=True, timeout=10,
                 cwd="/tmp",
-                env={"PATH": os.environ.get("PATH", "/usr/bin:/usr/local/bin")}
+                env={"PATH": os.environ.get("PATH", "/usr/bin:/usr/local/bin"), "HOME": os.path.expanduser("~")}
             )
         elif language in ("javascript", "js", "node"):
             result = _sp.run(
                 ["node", "-e", code],
                 capture_output=True, text=True, timeout=10,
                 cwd="/tmp",
-                env={"PATH": os.environ.get("PATH", "/usr/bin:/usr/local/bin")}
+                env={"PATH": os.environ.get("PATH", "/usr/bin:/usr/local/bin"), "HOME": os.path.expanduser("~")}
             )
         elif language in ("bash", "sh", "shell"):
             result = _sp.run(
                 ["bash", "-c", code],
                 capture_output=True, text=True, timeout=10,
                 cwd="/tmp",
-                env={"PATH": os.environ.get("PATH", "/usr/bin:/usr/local/bin")}
+                env={"PATH": os.environ.get("PATH", "/usr/bin:/usr/local/bin"), "HOME": os.path.expanduser("~")}
             )
         else:
             return jsonify({"error": f"Unsupported language: {language}"})
@@ -371,8 +394,7 @@ def api_open_claude():
 
 @app.route("/api/send_to_claude", methods=["POST"])
 def api_send_to_claude():
-    """Open a new Claude Code terminal with code pre-loaded as a prompt."""
-    import subprocess as _sp
+    """Run Claude Code review as a background task, stream output to camera panel."""
     import tempfile
 
     data = request.get_json(force=True)
@@ -384,7 +406,6 @@ def api_send_to_claude():
         return jsonify({"error": "No code provided"})
 
     # Write code to a temp file so Claude Code can read it
-    # (avoids shell escaping issues with large code blocks)
     tmp = tempfile.NamedTemporaryFile(
         mode="w", suffix=f".{language}", prefix="hal_artifact_",
         dir="/tmp", delete=False
@@ -392,28 +413,44 @@ def api_send_to_claude():
     tmp.write(code)
     tmp.close()
 
-    from core.tools.delegation import _find_claude_bin
-    claude_bin = _find_claude_bin()
+    # Submit as a background task (streams output via SSE)
+    task_desc = f"Review and improve the code in {tmp.name} — it is a {language} {title}. Read the file first, then suggest improvements."
+    hal_dir = os.path.dirname(os.path.abspath(__file__))
+    task = engine.task_runner.submit(task_desc, hal_dir)
 
-    # Build the prompt as positional argument (no --prompt flag)
-    prompt = f"Review and improve the code in {tmp.name} — it is a {language} {title}. Read the file first."
-    # Escape single quotes for shell safety
-    safe_prompt = prompt.replace("'", "'\\''")
+    # Store the task ID for the camera panel viewer
+    engine._claude_output_task = task.id
 
-    from core.platform import platform
-    # Open terminal with claude + prompt as positional arg
-    # Use home directory as working dir (universally trusted, no trust prompt)
-    import os
-    home_dir = os.path.expanduser("~")
-    result = platform.open_terminal(
-        f'"{claude_bin}" \'{safe_prompt}\'',
-        home_dir
-    )
+    return jsonify({"ok": True, "file": tmp.name, "task_id": task.id})
 
-    if "Failed" in result:
-        return jsonify({"error": result})
 
-    return jsonify({"ok": True, "file": tmp.name})
+@app.route("/api/claude_output")
+def api_claude_output():
+    """Get the current Claude Code output for the camera panel viewer."""
+    task_id = getattr(engine, "_claude_output_task", None)
+    if not task_id:
+        return jsonify({"active": False, "output": "", "status": "idle"})
+
+    task = engine.task_runner.get_task(task_id)
+    if not task:
+        return jsonify({"active": False, "output": "", "status": "idle"})
+
+    from dataclasses import asdict
+    t = asdict(task)
+    output = ""
+    if t["status"] == "running":
+        output = t["progress"] or "Starting Claude Code..."
+    elif t["status"] == "completed":
+        output = t["result"] or "(no output)"
+    elif t["status"] == "failed":
+        output = t["error"] or "Task failed"
+
+    return jsonify({
+        "active": t["status"] in ("running", "queued"),
+        "output": output[:5000],
+        "status": t["status"],
+        "task_id": task_id,
+    })
 
 
 # ── Orchestrator API ──────────────────────────────────────

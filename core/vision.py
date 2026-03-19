@@ -32,6 +32,11 @@ class Vision:
         self._face_cascade = cv2.CascadeClassifier(cascade_path)
         self._last_faces = []  # smooth face tracking
 
+        # Background blur (privacy filter — off by default, toggle via UI)
+        self.blur_background = False
+        self._blur_strength = 45  # must be odd number
+        self._last_blur_mask = None  # cached mask for performance
+
     def start(self) -> bool:
         """Open webcam and begin background frame capture."""
         self.cap = cv2.VideoCapture(cfg.CAMERA_INDEX)
@@ -60,6 +65,8 @@ class Vision:
                     self._detect_faces(frame)
 
                 hud_frame = frame.copy()
+                if self.blur_background:
+                    hud_frame = self._apply_background_blur(hud_frame)
                 self._draw_face_tracking(hud_frame)
                 hud_bytes = self._encode_raw(hud_frame)
 
@@ -81,13 +88,51 @@ class Vision:
         )
         if len(faces) > 0:
             self._last_faces = faces
+            self._last_blur_mask = None  # invalidate cached mask
         # Fade out after 15 frames (~0.75s) of no detection
         elif hasattr(self, '_no_face_count'):
             self._no_face_count += 1
             if self._no_face_count > 15:
                 self._last_faces = []
+                self._last_blur_mask = None
         else:
             self._no_face_count = 0
+
+    def _apply_background_blur(self, frame):
+        """Blur everything except detected faces for privacy.
+        Uses a cached mask that only updates when faces change (every 3rd frame)."""
+        h, w = frame.shape[:2]
+
+        if not self._last_faces or len(self._last_faces) == 0:
+            # No faces — blur entire frame (fast, no mask needed)
+            return cv2.GaussianBlur(frame, (self._blur_strength, self._blur_strength), 0)
+
+        # Rebuild mask only when faces update (every 3rd frame via _detect_faces)
+        # or when resolution changes
+        if (self._last_blur_mask is None or
+                self._last_blur_mask.shape[0] != h or
+                self._last_blur_mask.shape[1] != w):
+            mask = np.zeros((h, w), dtype=np.float32)
+            for (x, y, fw, fh) in self._last_faces:
+                cx, cy = x + fw // 2, y + fh // 2
+                rx = int(fw * 1.2)
+                ry = int(fh * 1.6)
+                cy_shifted = cy + int(fh * 0.3)
+                cv2.ellipse(mask, (cx, cy_shifted), (rx, ry), 0, 0, 360, 1.0, -1)
+            mask = cv2.GaussianBlur(mask, (51, 51), 0)
+            self._last_blur_mask = np.stack([mask] * 3, axis=-1)
+
+        # Fast blur — use smaller kernel for performance
+        blurred = cv2.GaussianBlur(frame, (self._blur_strength, self._blur_strength), 0)
+
+        # Blend using cached mask
+        mask_3ch = self._last_blur_mask
+        result = cv2.addWeighted(frame, 1.0, blurred, 0.0, 0)  # init
+        np.multiply(frame, mask_3ch, out=result, casting='unsafe')
+        inv_mask = 1.0 - mask_3ch
+        blurred_part = (blurred.astype(np.float32) * inv_mask).astype(np.uint8)
+        cv2.add(result, blurred_part, dst=result)
+        return result
 
     def _draw_face_tracking(self, frame):
         """Draw red tracking grid overlay on detected faces."""
