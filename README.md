@@ -40,7 +40,7 @@ A local, multimodal AI agent that **sees** you via webcam, **hears** your voice,
 | **Act** | 40 cross-platform tools — shell, apps, files, web search, memory, clipboard, app automation, Claude Code delegation, background tasks, artifacts, multi-agent orchestration |
 | **Chat** | Terminal-style chat with streaming responses, 35 slash commands (categorized menu, keyboard nav), mic button — type or speak to HAL |
 | **Disambiguate** | Smart choice sheet UI — HAL presents numbered options, user clicks to select |
-| **Integrate** | MCP server exposes 20 tools to Claude Code/Desktop for bidirectional AI collaboration |
+| **Integrate** | MCP server exposes 21 tools to Claude Code/Desktop for bidirectional AI collaboration |
 | **Remember** | Typed persistent memory — facts, decisions, preferences, session summaries |
 | **Know** | Knowledge base from local files + remote llms.txt URLs loaded at boot |
 | **Co-Work** | Background task runner, artifact workspace, multi-agent orchestration, cross-agent context handoff |
@@ -123,6 +123,7 @@ HAL auto-detects your OS and uses the right system commands:
 | WiFi | networksetup | netsh wlan | nmcli |
 | Apps | open -a + .app scan | start + Start Menu scan | gtk-launch + .desktop scan |
 | Terminal | AppleScript Terminal | Windows Terminal / cmd | gnome-terminal / konsole |
+| Embedded Terminal | ✅ xterm.js + PTY | ❌ External only | ✅ xterm.js + PTY |
 
 No `#ifdef`, no separate builds — one `pip install`, one `python server.py`.
 
@@ -269,7 +270,9 @@ Access at **http://localhost:9000** after starting the server.
 | **Slash commands** | 35 categorized commands with keyboard navigation — type `/` to open menu |
 | **Choice sheet** | Slide-up modal for disambiguation — auto-detects when HAL presents numbered options |
 | **Task queue** | Collapsible panel showing background tasks and agents with live status |
-| **Workspace** | Tabbed artifact panel — code, diagrams, HTML — appears when artifacts are created |
+| **Workspace** | Tabbed artifact panel — code, diagrams, HTML — stacks above chat when artifacts are created |
+| **Embedded terminal** | Full interactive xterm.js terminal (PTY-backed) — run shell, Claude Code, review artifacts in-app (macOS/Linux) |
+| **Resizable layout** | Drag handles between columns to resize HAL, workspace, and chat panels |
 | **Power button** | Circular SVG power icon in top toolbar — activates/deactivates HAL |
 | **Status bar** | Connection status, timestamp, version |
 | **Boot greeting** | Time-aware creative HAL-style greeting with 20 randomized boot lines |
@@ -286,7 +289,7 @@ The UI uses a sci-fi industrial aesthetic — brushed metal bezels, LED indicato
 HAL9000/
 ├── server.py              # Flask web server + API endpoints (localhost only)
 ├── hal9000.py             # HAL engine — lifecycle, main loop, browser audio
-├── hal_mcp_server.py      # MCP server for Claude Code/Desktop integration (20 tools)
+├── hal_mcp_server.py      # MCP server for Claude Code/Desktop integration (21 tools)
 ├── config.py              # Settings + env loading with safe parsing
 ├── requirements.txt
 ├── .env.example
@@ -300,6 +303,7 @@ HAL9000/
 │   ├── memory_store.py    # Typed memory store with auto-migration
 │   ├── task_runner.py     # Async background task queue for Claude Code
 │   ├── orchestrator.py    # Multi-agent coordinator with conflict detection
+│   ├── terminal_server.py # Embedded WebSocket terminal (xterm.js PTY bridge, port 9001)
 │   ├── platform/           # Cross-platform OS abstraction (auto-detected)
 │   │   ├── __init__.py     # Auto-detect: Darwin → mac, Windows → windows, Linux → linux
 │   │   ├── base.py         # Abstract PlatformAPI interface (15 methods)
@@ -350,6 +354,8 @@ HAL has been security-hardened:
 | **AppleScript escaping** | All user strings escaped before osascript interpolation |
 | **App action blocklist** | `app_action` blocks `do shell script`, `system events`, etc. |
 | **Localhost binding** | Flask binds to `127.0.0.1` by default (override with `HAL_HOST`) |
+| **Code exec guard** | `/api/run` only accepts requests from localhost (127.0.0.1 / ::1) |
+| **WebSocket origin check** | Terminal WebSocket validates origin header — rejects cross-site connections |
 | **Input length limits** | Chat input capped at 2000 chars |
 | **Secret file blocking** | `read_file` refuses to read `.env`, `credentials.json`, etc. |
 | **Safe config parsing** | Malformed env vars fall back to defaults instead of crashing |
@@ -379,6 +385,7 @@ All settings in `.env`. See `.env.example` for the full list.
 | `TASK_TIMEOUT` | `600` | Background task timeout (seconds) |
 | `MAX_CONCURRENT_TASKS` | `2` | Max parallel background tasks |
 | `MAX_AGENTS` | `4` | Max orchestrated agents |
+| `HAL_TERMINAL_PORT` | `9001` | WebSocket port for embedded terminal |
 | `HAL_HOST` | `127.0.0.1` | Server bind address (use `0.0.0.0` for LAN access) |
 
 ---

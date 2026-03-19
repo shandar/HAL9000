@@ -2218,18 +2218,29 @@
       });
     }
 
-    // ── Claude Code — open embedded terminal ─────────
+    // ── Claude Code — open embedded terminal (fallback: external terminal) ─────
     async function openClaudeCode() {
       if (!isRunning) return;
       const claudeBtn = document.querySelector('.claude-btn');
       claudeBtn.style.opacity = '0.4';
       claudeBtn.style.pointerEvents = 'none';
       try {
-        // Open interactive terminal in the camera panel
+        // Try embedded terminal first (macOS/Linux)
         openTerminal();
         showToast('info', 'Terminal', 'Terminal opened', 2000);
       } catch (err) {
-        showToast('error', 'Terminal', err.message);
+        // Fallback: open external terminal (Windows or if WebSocket fails)
+        try {
+          const result = await fetch('/api/open_claude', { method: 'POST' });
+          const data = await result.json();
+          if (data.error) {
+            showToast('error', 'Claude Code', data.error);
+          } else {
+            showToast('info', 'Claude Code', 'External terminal opened', 2000);
+          }
+        } catch (err2) {
+          showToast('error', 'Claude Code', err2.message);
+        }
       } finally {
         setTimeout(() => {
           claudeBtn.style.opacity = '';
@@ -3721,7 +3732,9 @@
 
         halTermWs.onerror = () => {
           dot.className = 'claude-output-dot error';
-          title.textContent = 'TERMINAL — ERROR';
+          title.textContent = 'TERMINAL — NOT AVAILABLE';
+          halTerminal.write('\r\n\x1b[33mEmbedded terminal not available on this platform.\x1b[0m\r\n');
+          halTerminal.write('\x1b[33mUse the external terminal instead.\x1b[0m\r\n');
         };
 
         // Send user input to PTY
