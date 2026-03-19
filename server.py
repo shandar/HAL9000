@@ -400,7 +400,7 @@ def api_open_claude():
 
 @app.route("/api/send_to_claude", methods=["POST"])
 def api_send_to_claude():
-    """Run Claude Code review as a background task, stream output to camera panel."""
+    """Save artifact to temp file, return path + claude binary for terminal."""
     import tempfile
 
     data = request.get_json(force=True)
@@ -411,7 +411,7 @@ def api_send_to_claude():
     if not code.strip():
         return jsonify({"error": "No code provided"})
 
-    # Write code to a temp file so Claude Code can read it
+    # Write code to a temp file
     tmp = tempfile.NamedTemporaryFile(
         mode="w", suffix=f".{language}", prefix="hal_artifact_",
         dir="/tmp", delete=False
@@ -419,15 +419,15 @@ def api_send_to_claude():
     tmp.write(code)
     tmp.close()
 
-    # Submit as a background task (streams output via SSE)
-    task_desc = f"Review and improve the code in {tmp.name} — it is a {language} {title}. Read the file first, then suggest improvements."
-    hal_dir = os.path.dirname(os.path.abspath(__file__))
-    task = engine.task_runner.submit(task_desc, hal_dir)
+    # Find claude binary
+    from core.tools.delegation import _find_claude_bin
+    claude_bin = _find_claude_bin()
 
-    # Store the task ID for the camera panel viewer
-    engine._claude_output_task = task.id
-
-    return jsonify({"ok": True, "file": tmp.name, "task_id": task.id})
+    return jsonify({
+        "ok": True,
+        "tmp_file": tmp.name,
+        "claude_bin": claude_bin,
+    })
 
 
 @app.route("/api/claude_output")
@@ -544,6 +544,23 @@ def api_stream():
 
 if __name__ == "__main__":
     startup_check()
+
+    # Start embedded terminal WebSocket server
+    try:
+        from core.terminal_server import start_terminal_server, WS_PORT
+        result = start_terminal_server()
+        if result is None:
+            print("[HAL] Embedded terminal not available on this platform")
+        else:
+            print(f"[HAL] Terminal WebSocket server started on port {WS_PORT}")
+    except OSError as e:
+        if "Address already in use" in str(e):
+            print(f"[HAL] Terminal port in use — set HAL_TERMINAL_PORT in .env to use a different port")
+        else:
+            print(f"[HAL] Terminal server failed: {e}")
+    except Exception as e:
+        print(f"[HAL] Terminal server failed: {e}")
+
     print(f"\n  HAL9000 Control Panel → http://localhost:{cfg.SERVER_PORT}\n")
     host = os.environ.get("HAL_HOST", "127.0.0.1")
     app.run(

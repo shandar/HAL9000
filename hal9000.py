@@ -90,20 +90,28 @@ class HALEngine:
         # Multi-agent orchestrator (co-work Phase 4)
         self.orchestrator = Orchestrator(self.task_runner)
 
-    # ── User name ─────────────────────────────────────
+    # ── User name (cached — refreshed every 60s) ────────
+
+    _cached_user_name: str = ""
+    _cached_user_name_time: float = 0.0
 
     @staticmethod
     def _get_user_name() -> str:
-        """Get the user's name from persistent memory, or empty string if unknown."""
+        """Get the user's name from persistent memory (cached 60s)."""
+        now = time.time()
+        if HALEngine._cached_user_name and (now - HALEngine._cached_user_name_time) < 60:
+            return HALEngine._cached_user_name
+
         store = get_store()
         # Search for name entries
         matches = store.search("operator of HAL9000", type="fact")
         for m in matches:
-            # Extract name from "The user is X, creator and operator..."
             content = m.content
             if "The user is " in content:
                 name = content.split("The user is ")[1].split(",")[0].strip()
                 if name:
+                    HALEngine._cached_user_name = name
+                    HALEngine._cached_user_name_time = now
                     return name
         # Also check for explicit name facts
         matches = store.search("name is", type="fact")
@@ -113,6 +121,8 @@ class HALEngine:
                 if len(parts) > 1:
                     name = parts[1].split(".")[0].split(",")[0].strip().title()
                     if name and len(name) > 1:
+                        HALEngine._cached_user_name = name
+                        HALEngine._cached_user_name_time = now
                         return name
         return ""
 
@@ -725,6 +735,7 @@ class HALEngine:
             "speech_id": self._speech_id,
             "processing": self._processing,
             "blur": bool(self.vision and self.vision.blur_background),
+            "user_name": self._get_user_name(),
         }
 
 

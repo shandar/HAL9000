@@ -13,8 +13,26 @@
   <title>HAL 9000</title>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script>mermaid.initialize({ startOnLoad: false, theme: 'dark' });</script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Global scrollbar — dark theme everywhere */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+    * { scrollbar-width: thin; scrollbar-color: var(--red-dim) transparent; }
+
+    /* xterm.js scrollbar override */
+    .xterm-viewport::-webkit-scrollbar { width: 4px; }
+    .xterm-viewport::-webkit-scrollbar-track { background: transparent; }
+    .xterm-viewport::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
+    .xterm-viewport::-webkit-scrollbar-thumb:hover { background: var(--red); }
+    .xterm-viewport { scrollbar-width: thin; scrollbar-color: var(--red-dim) transparent; }
 
     :root {
       --bg: #050507;
@@ -41,6 +59,40 @@
       overflow: hidden;
     }
 
+    /* ── Column resize handles (overlay approach) ── */
+    .col-resize-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      cursor: col-resize;
+      background: transparent;
+      z-index: 50;
+      transition: background 0.2s;
+    }
+    .col-resize-handle:hover,
+    .col-resize-handle.dragging {
+      background: var(--red-dim);
+    }
+    .col-resize-handle::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 3px;
+      height: 40px;
+      border-radius: 2px;
+      background: var(--border);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .col-resize-handle:hover::after,
+    .col-resize-handle.dragging::after {
+      opacity: 1;
+      background: var(--red);
+    }
+
     /* ── Full viewport grid ──────────────────────── */
     .dashboard {
       display: grid;
@@ -50,6 +102,7 @@
       height: 100vh;
       padding: 8px;
       gap: 8px;
+      position: relative;
     }
 
     /* ── Top bar — brushed metal header ─────────── */
@@ -79,6 +132,12 @@
       align-items: center;
       gap: 10px;
       margin-right: auto;
+    }
+
+    .top-bar-date {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
     }
 
     .top-bar-title {
@@ -1225,9 +1284,18 @@
     .workspace-content::-webkit-scrollbar-track { background: transparent; }
     .workspace-content::-webkit-scrollbar-thumb { background: var(--red-dim); border-radius: 2px; }
 
-    /* ── 3-column layout when artifacts exist ── */
+    /* ── When artifacts exist: workspace + chat stack vertically in right column ── */
     .dashboard.has-artifacts {
-      grid-template-columns: 1fr 1fr 2fr;
+      grid-template-columns: 1fr 2fr;
+    }
+    .dashboard.has-artifacts .workspace-panel {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+    .dashboard.has-artifacts .chat-panel {
+      flex: 1;
+      min-height: 0;
     }
 
     /* ── Task Queue Panel ──────────────────────── */
@@ -1253,34 +1321,35 @@
     }
 
     .task-badge {
-      background: var(--red-dim);
-      color: var(--red);
-      font-size: 0.55rem;
-      padding: 1px 5px;
+      background: var(--green);
+      color: var(--bg);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 7px;
       border-radius: 8px;
-      min-width: 16px;
+      min-width: 18px;
       text-align: center;
     }
 
-    .task-list { padding: 4px 8px 6px; }
+    .task-list { padding: 6px 10px 8px; }
 
     .task-card {
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 6px;
-      border-radius: 3px;
-      font-size: 0.58rem;
-      color: var(--text-dim);
-      background: rgba(255,255,255,0.01);
-      margin-bottom: 3px;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--text);
+      background: rgba(255,255,255,0.02);
+      margin-bottom: 4px;
     }
 
     .task-card:hover { background: rgba(255,255,255,0.03); }
 
     .task-dot {
-      width: 6px;
-      height: 6px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
     }
@@ -1304,8 +1373,8 @@
     }
 
     .task-time {
-      font-size: 0.55rem;
-      color: #333344;
+      font-size: 0.7rem;
+      color: var(--text-dim);
       flex-shrink: 0;
     }
 
@@ -1333,7 +1402,7 @@
       min-height: 0;
     }
 
-    .dashboard.has-artifacts .workspace-panel { display: flex; }
+    /* workspace-panel display handled by .has-artifacts rules above */
 
     .workspace-tabs {
       display: flex;
@@ -1820,15 +1889,23 @@
 
     /* ── Responsive — stack on small screens ──── */
     @media (max-width: 768px) {
-      .dashboard {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto 1fr auto;
-        overflow-y: auto;
+      /* HAL is a desktop application — mobile layout is not supported */
+      body::before {
+        content: 'HAL 9000 requires a desktop browser.';
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        color: var(--red);
+        font-family: var(--mono);
+        font-size: 1rem;
+        z-index: 9999;
+        text-align: center;
+        padding: 2rem;
       }
-      body { overflow: auto; height: auto; }
-      .cam-panel { min-height: 200px; }
-      .top-bar { flex-wrap: wrap; }
-      .tb-voice-label { display: none; }
+      .dashboard { display: none; }
     }
   </style>
 </head>
@@ -1841,6 +1918,8 @@
       <div class="top-bar-left">
         <span class="top-bar-title">HAL 9000</span>
         <span id="hal-status-label">Offline</span>
+        <span class="tb-divider"></span>
+        <span class="top-bar-date" id="top-bar-date"></span>
       </div>
 
       <div class="tb-divider"></div>
@@ -1890,14 +1969,15 @@
         <span class="cam-offline" id="cam-offline-label">Camera offline</span>
         <img class="cam-video" id="cam-video" alt="HAL Vision" style="display:none" />
 
-        <!-- Claude Code output viewer (replaces camera when active) -->
+        <!-- Claude Code terminal (replaces camera when active) -->
         <div class="claude-output-viewer" id="claude-output-viewer" style="display:none">
           <div class="claude-output-header">
-            <div class="claude-output-dot"></div>
-            <span>CLAUDE CODE</span>
+            <div class="claude-output-dot" id="terminal-dot"></div>
+            <span id="terminal-title">TERMINAL</span>
             <button class="claude-output-close" onclick="closeClaudeOutput()" title="Close">✕</button>
           </div>
-          <pre class="claude-output-body" id="claude-output-body">Connecting to Claude Code...</pre>
+          <div id="terminal-container" style="flex:1;overflow:hidden;"></div>
+          <pre class="claude-output-body" id="claude-output-body" style="display:none">Connecting to Claude Code...</pre>
         </div>
 
         <!-- HUD overlays -->
@@ -1933,15 +2013,14 @@
       </div>
     </div>
 
-    <!-- Workspace / Artifacts (hidden until artifacts exist) -->
-    <div class="workspace-panel" id="workspace-panel">
-      <div class="workspace-tabs" id="workspace-tabs"></div>
-      <div class="workspace-actions" id="workspace-actions"></div>
-      <div class="workspace-content" id="workspace-content"></div>
-    </div>
-
     <!-- Right column -->
     <div class="right-col">
+      <!-- Workspace / Artifacts (hidden until artifacts exist) -->
+      <div class="workspace-panel" id="workspace-panel">
+        <div class="workspace-tabs" id="workspace-tabs"></div>
+        <div class="workspace-actions" id="workspace-actions"></div>
+        <div class="workspace-content" id="workspace-content"></div>
+      </div>
       <!-- Chat window -->
       <div class="chat-panel" style="position:relative;">
         <div class="panel-header">Chat</div>
@@ -1988,6 +2067,10 @@
       <span id="bottom-time"></span>
       <span>HAL 9000 v1.1</span>
     </div>
+
+    <!-- Resize handles (absolute overlays) -->
+    <div class="col-resize-handle" id="resize-handle-1" title="Drag to resize"></div>
+    <div class="col-resize-handle" id="resize-handle-2" title="Drag to resize" style="display:none;"></div>
 
   </div>
 
@@ -2135,22 +2218,18 @@
       });
     }
 
-    // ── Claude Code — open CLI in Terminal (direct tool call, no brain) ─────────
+    // ── Claude Code — open embedded terminal ─────────
     async function openClaudeCode() {
       if (!isRunning) return;
       const claudeBtn = document.querySelector('.claude-btn');
       claudeBtn.style.opacity = '0.4';
       claudeBtn.style.pointerEvents = 'none';
       try {
-        const result = await fetch('/api/open_claude', { method: 'POST' });
-        const data = await result.json();
-        if (data.error) {
-          showToast('error', 'Claude Code', data.error);
-        } else {
-          showToast('info', 'Claude Code', 'Terminal opened', 2000);
-        }
+        // Open interactive terminal in the camera panel
+        openTerminal();
+        showToast('info', 'Terminal', 'Terminal opened', 2000);
       } catch (err) {
-        showToast('error', 'Claude Code', err.message);
+        showToast('error', 'Terminal', err.message);
       } finally {
         setTimeout(() => {
           claudeBtn.style.opacity = '';
@@ -2398,9 +2477,15 @@
         micStream = null;
       }
 
-      // Stop waveform
+      // Stop waveform and clear residual bars
       wfMicActive = false;
       micAnalyser = null;
+      waveformWrap.classList.remove('active');
+      const _cvs = document.getElementById('waveformCanvas');
+      if (_cvs) {
+        const _ctx = _cvs.getContext('2d');
+        _ctx.clearRect(0, 0, _cvs.width, _cvs.height);
+      }
       chatMicBtn.classList.remove('listening');
 
       if (micChunks.length < 2) {
@@ -2947,7 +3032,7 @@
       div.className = 'msg ' + role;
 
       const roleLabel = role === 'hal' ? 'HAL'
-        : role === 'user' ? 'YOU'
+        : role === 'user' ? (window._halUserName || 'YOU')
         : role === 'tool' ? 'TOOL'
         : 'SYS';
 
@@ -3036,6 +3121,11 @@
     function applyStatus(s) {
       isRunning = s.running;
 
+      // Set user name for chat labels
+      if (s.user_name) {
+        window._halUserName = s.user_name.split(' ')[0].toUpperCase();
+      }
+
       halImage.classList.toggle('off', !s.running);
       halImage.classList.toggle('active', s.running);
       halPanel.classList.toggle('active', s.running);
@@ -3119,11 +3209,16 @@
     // Terminal removed — all logs go to chat window
 
     // ── Timestamps ─────────────────────────────────
+    const topBarDate = document.getElementById('top-bar-date');
     function updateTimestamps() {
       const now = new Date();
       const ts = now.toISOString().replace('T', ' ').substring(0, 19);
       camTimestamp.textContent = ts;
       bottomTime.textContent = ts;
+      // Top bar: day and date
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      topBarDate.textContent = days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
     }
     setInterval(updateTimestamps, 1000);
     updateTimestamps();
@@ -3265,6 +3360,8 @@
         currentArtifacts = artifacts;
         if (artifacts.length > 0) {
           dashboard.classList.add('has-artifacts');
+          const rh2 = document.getElementById('resize-handle-2');
+          if (rh2) rh2.style.display = '';
           // Always activate the newest artifact when a new one is added
           const isNew = artifacts.length > prevCount;
           if (isNew || !activeArtifactId || !artifacts.find(a => a.id === activeArtifactId)) {
@@ -3274,6 +3371,8 @@
           renderArtifact();
         } else {
           dashboard.classList.remove('has-artifacts');
+          const rh2 = document.getElementById('resize-handle-2');
+          if (rh2) rh2.style.display = 'none';
           activeArtifactId = null;
         }
       }).catch(() => {});
@@ -3357,6 +3456,8 @@
       }
       if (currentArtifacts.length === 0) {
         dashboard.classList.remove('has-artifacts');
+        const rh2 = document.getElementById('resize-handle-2');
+        if (rh2) rh2.style.display = 'none';
       }
       renderWorkspaceTabs();
       renderArtifact();
@@ -3424,13 +3525,9 @@
       const a = currentArtifacts.find(x => x.id === activeArtifactId);
       if (!a) return;
 
-      // Copy code to clipboard first
-      try {
-        await navigator.clipboard.writeText(a.content);
-      } catch (e) { /* clipboard may fail in non-secure context */ }
+      showToast('info', 'Sending', 'Opening terminal with code review...', 2000);
 
-      showToast('info', 'Sending', 'Sending code to Claude Code...', 2000);
-
+      // Save artifact to temp file via API, then open terminal with claude reviewing it
       try {
         const resp = await fetch('/api/send_to_claude', {
           method: 'POST',
@@ -3444,28 +3541,38 @@
         const data = await resp.json();
         if (data.error) {
           showToast('error', 'Failed', data.error, 3000);
-        } else {
-          // Open the camera panel with Claude output viewer
-          openClaudeOutput(data.task_id);
+          return;
         }
+
+        // Open interactive terminal with claude command
+        const claudeBin = data.claude_bin || 'claude';
+        const tmpFile = data.tmp_file || '';
+        const lang = a.language || a.type || 'code';
+        const cmd = `cd ~ && ${claudeBin} "Review and improve the code in ${tmpFile} — it is a ${lang} ${a.title}. Read the file first."`;
+        openTerminal(cmd);
       } catch (e) {
         showToast('error', 'Failed', 'Could not send to Claude Code: ' + e.message, 3000);
       }
     }
 
     function openClaudeOutput(taskId) {
-      // Expand camera panel (even if vision is off)
-      camPanel.classList.remove('inactive');
-
-      // Hide camera elements, show Claude viewer
-      const offlineLabel = document.getElementById('cam-offline-label');
+      // Use read-only mode for background task output
+      terminalMode = false;
       const viewer = document.getElementById('claude-output-viewer');
+      const container = document.getElementById('terminal-container');
       const body = document.getElementById('claude-output-body');
-      const dot = viewer.querySelector('.claude-output-dot');
+      const dot = document.getElementById('terminal-dot');
+      const title = document.getElementById('terminal-title');
+      const offlineLabel = document.getElementById('cam-offline-label');
+
+      camPanel.classList.remove('inactive');
       if (offlineLabel) offlineLabel.style.display = 'none';
       viewer.style.display = 'flex';
+      container.style.display = 'none';
+      body.style.display = '';
       body.textContent = 'Connecting to Claude Code...\n';
       dot.className = 'claude-output-dot';
+      title.textContent = 'CLAUDE CODE';
 
       // Poll for output every 1.5s
       if (claudeOutputInterval) clearInterval(claudeOutputInterval);
@@ -3481,12 +3588,12 @@
 
           if (data.status === 'completed') {
             dot.className = 'claude-output-dot done';
-            viewer.querySelector('span').textContent = 'CLAUDE CODE — DONE';
+            title.textContent = 'CLAUDE CODE — DONE';
             clearInterval(claudeOutputInterval);
             claudeOutputInterval = null;
           } else if (data.status === 'failed') {
             dot.className = 'claude-output-dot error';
-            viewer.querySelector('span').textContent = 'CLAUDE CODE — FAILED';
+            title.textContent = 'CLAUDE CODE — FAILED';
             clearInterval(claudeOutputInterval);
             claudeOutputInterval = null;
           }
@@ -3495,7 +3602,163 @@
         }
       }, 1500);
 
-      // Reposition overlays since panel size changed
+      wfResize();
+    }
+
+    // ── Interactive Terminal (xterm.js + WebSocket) ─────
+    let halTerminal = null;
+    let halTermWs = null;
+    let halTermFit = null;
+    let halTermResizeObs = null;
+    let terminalMode = false; // true = interactive xterm, false = read-only output
+
+    function openTerminal(initialCmd) {
+      terminalMode = true;
+      const viewer = document.getElementById('claude-output-viewer');
+      const container = document.getElementById('terminal-container');
+      const body = document.getElementById('claude-output-body');
+      const dot = document.getElementById('terminal-dot');
+      const title = document.getElementById('terminal-title');
+      const offlineLabel = document.getElementById('cam-offline-label');
+
+      // Show panel
+      camPanel.classList.remove('inactive');
+      if (offlineLabel) offlineLabel.style.display = 'none';
+      viewer.style.display = 'flex';
+      container.style.display = '';
+      body.style.display = 'none';
+      dot.className = 'claude-output-dot';
+      title.textContent = 'TERMINAL';
+
+      // Dispose previous terminal
+      if (halTerminal) {
+        halTerminal.dispose();
+        halTerminal = null;
+      }
+      if (halTermWs) {
+        halTermWs.close();
+        halTermWs = null;
+      }
+
+      // Create xterm.js instance
+      halTerminal = new Terminal({
+        theme: {
+          background: '#0a0a10',
+          foreground: '#c8c8d0',
+          cursor: '#ff1744',
+          cursorAccent: '#0a0a10',
+          selectionBackground: 'rgba(255, 23, 68, 0.3)',
+          black: '#0a0a10',
+          red: '#ff1744',
+          green: '#00e676',
+          yellow: '#ffc107',
+          blue: '#00bcff',
+          magenta: '#e040fb',
+          cyan: '#00bcff',
+          white: '#c8c8d0',
+        },
+        fontFamily: "'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace",
+        fontSize: 13,
+        cursorBlink: true,
+        cursorStyle: 'block',
+        scrollback: 5000,
+        allowProposedApi: true,
+      });
+
+      // Load addons
+      halTermFit = new FitAddon.FitAddon();
+      halTerminal.loadAddon(halTermFit);
+      halTerminal.loadAddon(new WebLinksAddon.WebLinksAddon());
+
+      // Attach to DOM
+      container.innerHTML = '';
+      halTerminal.open(container);
+
+      // Fit after layout settles, then send size to PTY
+      function fitAndResize() {
+        if (!halTermFit || !halTerminal) return;
+        try {
+          halTermFit.fit();
+          // Send resize to PTY via WebSocket
+          if (halTermWs && halTermWs.readyState === WebSocket.OPEN) {
+            halTermWs.send(`\x1b[8;${halTerminal.rows};${halTerminal.cols}t`);
+          }
+        } catch(e) {}
+      }
+      setTimeout(fitAndResize, 100);
+      setTimeout(fitAndResize, 300);
+      setTimeout(fitAndResize, 600);
+
+      // Connect WebSocket to PTY server
+      try {
+        halTermWs = new WebSocket('ws://127.0.0.1:9001');
+
+        halTermWs.onopen = () => {
+          dot.className = 'claude-output-dot done';
+          title.textContent = 'TERMINAL — CONNECTED';
+
+          // Fit and send size after connection
+          setTimeout(() => {
+            fitAndResize();
+            // Send initial command if provided
+            if (initialCmd) {
+              setTimeout(() => {
+                halTermWs.send(initialCmd + '\n');
+              }, 300);
+            }
+          }, 200);
+        };
+
+        halTermWs.onmessage = (e) => {
+          halTerminal.write(e.data);
+        };
+
+        halTermWs.onclose = () => {
+          dot.className = 'claude-output-dot error';
+          title.textContent = 'TERMINAL — DISCONNECTED';
+          halTerminal.write('\r\n\x1b[31m[Disconnected]\x1b[0m\r\n');
+        };
+
+        halTermWs.onerror = () => {
+          dot.className = 'claude-output-dot error';
+          title.textContent = 'TERMINAL — ERROR';
+        };
+
+        // Send user input to PTY
+        halTerminal.onData(data => {
+          if (halTermWs && halTermWs.readyState === WebSocket.OPEN) {
+            halTermWs.send(data);
+          }
+        });
+
+        // Handle resize
+        halTerminal.onResize(({ cols, rows }) => {
+          if (halTermWs && halTermWs.readyState === WebSocket.OPEN) {
+            halTermWs.send(`\x1b[8;${rows};${cols}t`);
+          }
+        });
+
+      } catch (e) {
+        halTerminal.write(`\r\n\x1b[31m[Failed to connect: ${e.message}]\x1b[0m\r\n`);
+      }
+
+      // Debounced resize — wait 300ms after last resize event before sending to PTY
+      let _termResizeTimer = null;
+      if (halTermResizeObs) { halTermResizeObs.disconnect(); halTermResizeObs = null; }
+      halTermResizeObs = new ResizeObserver(() => {
+        if (!halTermFit || !halTerminal) return;
+        // Fit xterm locally (instant, no PTY signal)
+        try { halTermFit.fit(); } catch(e) {}
+        // Debounce the PTY resize signal
+        clearTimeout(_termResizeTimer);
+        _termResizeTimer = setTimeout(() => {
+          if (halTermWs && halTermWs.readyState === WebSocket.OPEN && halTerminal) {
+            halTermWs.send(`\x1b[8;${halTerminal.rows};${halTerminal.cols}t`);
+          }
+        }, 300);
+      });
+      halTermResizeObs.observe(container);
+
       wfResize();
     }
 
@@ -3504,6 +3767,23 @@
         clearInterval(claudeOutputInterval);
         claudeOutputInterval = null;
       }
+
+      // Clean up terminal
+      if (halTermResizeObs) {
+        halTermResizeObs.disconnect();
+        halTermResizeObs = null;
+      }
+      if (halTermWs) {
+        halTermWs.close();
+        halTermWs = null;
+      }
+      if (halTerminal) {
+        halTerminal.dispose();
+        halTerminal = null;
+      }
+      halTermFit = null;
+      terminalMode = false;
+
       const viewer = document.getElementById('claude-output-viewer');
       const offlineLabel = document.getElementById('cam-offline-label');
       viewer.style.display = 'none';
@@ -3893,6 +4173,103 @@
         .then(reg => { if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' }); })
         .catch(() => {});
     }
+
+    // ── Column Resize Handles (overlay approach) ──────
+    (function() {
+      const db = document.querySelector('.dashboard');
+      const h1 = document.getElementById('resize-handle-1');
+      const h2 = document.getElementById('resize-handle-2');
+      const leftCol = document.querySelector('.left-col');
+      const rightCol = document.querySelector('.right-col');
+      const wsPanel = document.getElementById('workspace-panel');
+      let dragging = null;
+      let startX = 0;
+      let startWidths = {};
+
+      // Position handles at column boundaries
+      function positionHandles() {
+        if (!leftCol) return;
+        const dbRect = db.getBoundingClientRect();
+        const leftRect = leftCol.getBoundingClientRect();
+        // h1 sits at the right edge of left-col
+        h1.style.left = (leftRect.right - dbRect.left - 4) + 'px';
+        h1.style.top = (leftRect.top - dbRect.top) + 'px';
+        h1.style.height = leftRect.height + 'px';
+
+        if (h2 && wsPanel && wsPanel.offsetParent !== null) {
+          const wsRect = wsPanel.getBoundingClientRect();
+          h2.style.left = (wsRect.right - dbRect.left - 4) + 'px';
+          h2.style.top = (wsRect.top - dbRect.top) + 'px';
+          h2.style.height = wsRect.height + 'px';
+          h2.style.display = '';
+        } else if (h2) {
+          h2.style.display = 'none';
+        }
+      }
+
+      // Reposition on resize
+      const _posObs = new ResizeObserver(positionHandles);
+      _posObs.observe(db);
+      setTimeout(positionHandles, 100);
+
+      function onDown(e, handle) {
+        e.preventDefault();
+        dragging = handle;
+        startX = e.clientX || e.touches[0].clientX;
+        // Capture current pixel widths from computed grid
+        const cols = getComputedStyle(db).gridTemplateColumns.split(/\s+/).map(v => parseFloat(v));
+        startWidths = { cols: cols };
+        handle.classList.add('dragging');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+      }
+
+      h1.addEventListener('mousedown', e => onDown(e, h1));
+      h1.addEventListener('touchstart', e => onDown(e, h1), { passive: false });
+      h2.addEventListener('mousedown', e => onDown(e, h2));
+      h2.addEventListener('touchstart', e => onDown(e, h2), { passive: false });
+
+      function onMove(e) {
+        if (!dragging) return;
+        const x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+        const dx = x - startX;
+        const cols = [...startWidths.cols];
+        const minCol = 200;
+        const hasArtifacts = db.classList.contains('has-artifacts');
+
+        if (dragging === h1) {
+          // Resize left-col (col 0) vs next col (col 1 in 2-col, or col 1 in 3-col)
+          const nextIdx = 1;
+          const newLeft = Math.max(minCol, Math.min(cols[0] + dx, db.clientWidth * 0.5));
+          const delta = newLeft - cols[0];
+          cols[0] = newLeft;
+          cols[nextIdx] = Math.max(minCol, cols[nextIdx] - delta);
+        } else if (dragging === h2 && hasArtifacts && cols.length >= 3) {
+          // Resize workspace (col 1) vs chat (col 2) in 3-col mode
+          const newWs = Math.max(minCol, Math.min(cols[1] + dx, db.clientWidth * 0.6));
+          const delta = newWs - cols[1];
+          cols[1] = newWs;
+          cols[2] = Math.max(minCol, cols[2] - delta);
+        }
+
+        db.style.gridTemplateColumns = cols.map(c => c + 'px').join(' ');
+        positionHandles();
+        if (typeof wfResize === 'function') wfResize();
+      }
+
+      function onUp() {
+        if (!dragging) return;
+        dragging.classList.remove('dragging');
+        dragging = null;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('mouseup', onUp);
+      document.addEventListener('touchend', onUp);
+    })();
   </script>
 </body>
 </html>
