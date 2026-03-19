@@ -37,12 +37,12 @@ A local, multimodal AI agent that **sees** you via webcam, **hears** your voice,
 | **Hear** | Browser mic recording (Web Audio API, live waveform, silence detection) + Whisper STT (API or local faster-whisper) |
 | **Think** | Multi-provider LLM (GPT-4o, Claude, Gemini, **Ollama**) with function calling |
 | **Speak** | 3 voice providers — Edge TTS (free/fast), ElevenLabs (paid/best), XTTS (local/cloned) |
-| **Act** | 40 cross-platform tools — shell, apps, files, web search, memory, clipboard, app automation, Claude Code delegation, background tasks, artifacts, multi-agent orchestration |
+| **Act** | 43 cross-platform tools — shell, apps, files, web search, memory, clipboard, app automation, Claude Code delegation, background tasks, artifacts, multi-agent orchestration |
 | **Chat** | Terminal-style chat with streaming responses, 35 slash commands (categorized menu, keyboard nav), mic button — type or speak to HAL |
 | **Disambiguate** | Smart choice sheet UI — HAL presents numbered options, user clicks to select |
 | **Integrate** | MCP server exposes 21 tools to Claude Code/Desktop for bidirectional AI collaboration |
 | **Remember** | Typed persistent memory — facts, decisions, preferences, session summaries |
-| **Know** | Knowledge base from local files + remote llms.txt URLs loaded at boot |
+| **Know** | Knowledge upload (drag-drop or button) — PDFs, docs, code, images. BM25 keyword search, deep-read or skim modes. Also loads local files + remote llms.txt URLs at boot |
 | **Co-Work** | Background task runner, artifact workspace, multi-agent orchestration, cross-agent context handoff |
 
 ---
@@ -57,7 +57,7 @@ A local, multimodal AI agent that **sees** you via webcam, **hears** your voice,
 │            ├──→ Brain (LLM + function calling)           │
 │  Browser ──┘       │              │                       │
 │  Mic + Chat        ▼              ▼                       │
-│                 Voice          Tools (40)                 │
+│                 Voice          Tools (43)                 │
 │           (Edge/11Labs/XTTS) (OS agent layer)            │
 │                   │                                      │
 │                   ▼                                      │
@@ -311,7 +311,7 @@ HAL9000/
 │   │   ├── windows.py      # Windows: PowerShell, WMI, Toast, PIL.ImageGrab
 │   │   └── linux.py        # Linux: pactl, xclip, notify-send, brightnessctl
 │   │
-│   ├── tools/              # Tool registry + 40 tools across 8 domain modules
+│   ├── tools/              # Tool registry + 43 tools across 8 domain modules
 │   │   ├── __init__.py     # Registry, execute(), format converters, security
 │   │   ├── shell.py        # run_shell (whitelisted commands)
 │   │   ├── apps.py         # open/quit/list apps, open URLs, app_action (cross-platform)
@@ -321,9 +321,9 @@ HAL9000/
 │   │   ├── memory.py       # remember, recall, forget, list_memories, save_session
 │   │   ├── delegation.py   # claude_code, background_task, orchestrate, agents (cross-platform)
 │   │   └── artifacts.py    # create_artifact, update_artifact
-│   └── knowledge.py       # Knowledge loader (files + URLs)
+│   └── knowledge.py       # Knowledge loader (files + URLs) + upload ingestion + BM25 search
 │
-├── knowledge/             # Drop .md/.txt files here — HAL reads at boot
+├── knowledge/             # Drop files here or upload via UI — HAL indexes at boot + runtime
 │   ├── sources.txt        # Remote URLs to fetch (llms.txt, etc.)
 │   └── *.txt              # Local knowledge files
 │
