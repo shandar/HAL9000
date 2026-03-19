@@ -64,6 +64,7 @@ class HALEngine:
         self._session_start = time.time()
         self._session_tools_ran: list[str] = []
         self._session_decisions: list[str] = []
+        self._session_summarized = False  # guard against duplicate summaries
 
         # Processing guard — prevents concurrent tool/action calls
         self._processing = False
@@ -252,6 +253,10 @@ class HALEngine:
 
     def summarize_session(self) -> dict:
         """Generate and persist a session summary to typed memory."""
+        if self._session_summarized:
+            return {"id": "", "summary": "Session already summarized."}
+        self._session_summarized = True
+
         duration = int(time.time() - self._session_start)
 
         # Collect user/HAL exchanges from the log

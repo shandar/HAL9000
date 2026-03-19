@@ -61,6 +61,9 @@ def create_artifact(title: str, type: str, content: str, language: str = "") -> 
 
     with _engine_ref._artifact_lock:
         _engine_ref._artifacts.append(artifact)
+        # Cap at 50 artifacts to prevent unbounded memory growth
+        if len(_engine_ref._artifacts) > 50:
+            _engine_ref._artifacts = _engine_ref._artifacts[-50:]
         _engine_ref._artifact_version += 1
 
     return f"Artifact '{title}' created (id: {artifact['id']}, type: {type})"

@@ -36,14 +36,26 @@ class Task:
 
 
 def _find_claude_bin() -> str:
-    """Locate the claude CLI binary."""
+    """Locate the claude CLI binary (cross-platform)."""
+    import platform as _plat
     home = os.path.expanduser("~")
-    for candidate in [
-        os.path.join(home, ".local/bin/claude"),
-        "/opt/homebrew/bin/claude",
-        "/usr/local/bin/claude",
-        os.path.join(home, ".npm-global/bin/claude"),
-    ]:
+
+    if _plat.system() == "Windows":
+        candidates = [
+            os.path.join(home, ".local", "bin", "claude.exe"),
+            os.path.join(home, "AppData", "Roaming", "npm", "claude.cmd"),
+            os.path.join(home, "AppData", "Roaming", "npm", "claude"),
+            os.path.join(os.environ.get("ProgramFiles", ""), "claude", "claude.exe"),
+        ]
+    else:
+        candidates = [
+            os.path.join(home, ".local/bin/claude"),
+            "/opt/homebrew/bin/claude",
+            "/usr/local/bin/claude",
+            os.path.join(home, ".npm-global/bin/claude"),
+        ]
+
+    for candidate in candidates:
         if os.path.isfile(candidate):
             return candidate
     return "claude"
@@ -73,6 +85,14 @@ class TaskRunner:
         with self._lock:
             self._tasks[task.id] = task
             self._queue.append(task.id)
+            # Evict oldest completed/failed/cancelled tasks to cap at 100
+            if len(self._tasks) > 100:
+                removable = [
+                    tid for tid, t in self._tasks.items()
+                    if t.status in ("completed", "failed", "cancelled")
+                ]
+                for tid in removable[:len(self._tasks) - 100]:
+                    del self._tasks[tid]
 
         self._try_start_next()
         return task

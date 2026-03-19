@@ -330,8 +330,14 @@ def api_tools():
 
 @app.route("/api/run", methods=["POST"])
 def api_run_code():
-    """Execute code in a sandboxed subprocess. Returns stdout/stderr."""
+    """Execute code in a sandboxed subprocess. Returns stdout/stderr.
+    Restricted to localhost requests only for security."""
     import subprocess as _sp
+
+    # Security: only allow requests from localhost
+    remote = request.remote_addr
+    if remote not in ("127.0.0.1", "::1", "localhost"):
+        return jsonify({"error": "Code execution is only available from localhost"}), 403
 
     data = request.get_json(force=True)
     code = data.get("code", "")

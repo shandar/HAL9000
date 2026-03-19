@@ -55,6 +55,14 @@ class Orchestrator:
 
         with self._lock:
             self._agents[agent.id] = agent
+            # Evict oldest completed agents to cap at 50
+            if len(self._agents) > 50:
+                removable = [
+                    aid for aid, a in self._agents.items()
+                    if a.status in ("completed", "failed", "cancelled")
+                ]
+                for aid in removable[:len(self._agents) - 50]:
+                    del self._agents[aid]
 
         # Monitor completion in background
         thread = threading.Thread(

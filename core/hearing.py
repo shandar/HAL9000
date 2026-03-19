@@ -14,7 +14,6 @@ from typing import Optional
 
 import numpy as np
 import pyaudio
-from openai import OpenAI
 
 from config import cfg
 
@@ -43,6 +42,7 @@ class Hearing:
             self.client = None
             self._init_faster_whisper()
         else:
+            from openai import OpenAI
             self.client = OpenAI(api_key=cfg.OPENAI_API_KEY)
             print("[HAL Hearing] STT: OpenAI Whisper API")
 
@@ -64,10 +64,12 @@ class Hearing:
             print("[HAL Hearing] ERROR: faster-whisper not installed. Run: pip install faster-whisper")
             print("[HAL Hearing] Falling back to Whisper API...")
             self._stt_provider = "whisper_api"
+            from openai import OpenAI
             self.client = OpenAI(api_key=cfg.OPENAI_API_KEY)
         except Exception as e:
             print(f"[HAL Hearing] ERROR loading faster-whisper: {e}")
             self._stt_provider = "whisper_api"
+            from openai import OpenAI
             self.client = OpenAI(api_key=cfg.OPENAI_API_KEY)
 
     # ── Main API: listen_once (mic button) ────────────

@@ -6,7 +6,7 @@ import subprocess
 import time
 
 from core.platform import platform
-from core.tools import tool, _escape_applescript
+from core.tools import tool
 
 # Engine reference — set by server.py at startup to avoid circular import
 _engine_ref = None
