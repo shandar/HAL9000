@@ -826,12 +826,13 @@ chatInput.addEventListener('keydown', (e) => {
 });
 
 chatInput.addEventListener('input', () => {
-  chatInput.style.overflow = 'hidden';
+  chatInput.style.overflowY = 'hidden';
   chatInput.style.height = 'auto';
-  const h = Math.min(chatInput.scrollHeight, 80);
+  const natural = chatInput.scrollHeight;
+  const h = Math.min(natural, 80);
   chatInput.style.height = h + 'px';
-  // Only allow scroll when content exceeds max-height
-  if (chatInput.scrollHeight > 80) chatInput.style.overflowY = 'auto';
+  // Only allow scroll when content truly exceeds max-height
+  if (natural > 80) chatInput.style.overflowY = 'auto';
 
   // Show/hide command menu
   const val = chatInput.value;

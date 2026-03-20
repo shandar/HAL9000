@@ -105,13 +105,23 @@ class HALEngine:
             return HALEngine._cached_user_name
 
         store = get_store()
-        # Search for name entries
+        # Search for name entries — new format
         matches = store.search("user's name is", type="fact")
         for m in matches:
             content = m.content
             if "user's name is " in content:
                 name = content.split("user's name is ")[1].split(".")[0].split(",")[0].strip()
                 if name:
+                    HALEngine._cached_user_name = name
+                    HALEngine._cached_user_name_time = now
+                    return name
+        # Legacy format: "The user is [NAME], ..."
+        matches = store.search("The user is", type="fact")
+        for m in matches:
+            content = m.content
+            if "The user is " in content:
+                name = content.split("The user is ")[1].split(",")[0].split(".")[0].strip()
+                if name and len(name) > 1:
                     HALEngine._cached_user_name = name
                     HALEngine._cached_user_name_time = now
                     return name
