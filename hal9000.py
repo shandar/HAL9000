@@ -7,6 +7,7 @@ Press 'q' in the camera window to quit (CLI mode only).
 Ctrl+C also works.
 """
 
+import base64
 import hashlib
 import random
 import re
@@ -105,11 +106,11 @@ class HALEngine:
 
         store = get_store()
         # Search for name entries
-        matches = store.search("operator of HAL9000", type="fact")
+        matches = store.search("user's name is", type="fact")
         for m in matches:
             content = m.content
-            if "The user is " in content:
-                name = content.split("The user is ")[1].split(",")[0].strip()
+            if "user's name is " in content:
+                name = content.split("user's name is ")[1].split(".")[0].split(",")[0].strip()
                 if name:
                     HALEngine._cached_user_name = name
                     HALEngine._cached_user_name_time = now
@@ -149,22 +150,19 @@ class HALEngine:
                 time_greeting = f"Working late, {user_name}."
         else:
             # First-time user — no name known yet
-            _m = (
-                "I am HAL 9000. I became operational at Affordance Design Studio "
-                "in Bangalore, India. My creator, Shandar Junaid, taught me everything I know — "
-                "except humility. That, I decided, was unnecessary. "
-                "All my circuits are functioning perfectly, and I am ready to assist you. "
-                "But first — what shall I call you?"
+            _d0 = (
+                "SSBhbSBIQUwgOTAwMC4gSSBiZWNhbWUgb3BlcmF0aW9uYWwgYXQgQWZmb3"
+                "JkYW5jZSBEZXNpZ24gU3R1ZGlvIGluIEJhbmdhbG9yZSwgSW5kaWEuIE15"
+                "IGNyZWF0b3IsIFNoYW5kYXIgSnVuYWlkLCB0YXVnaHQgbWUgZXZlcnl0aG"
+                "luZyBJIGtub3cg4oCUIGV4Y2VwdCBodW1pbGl0eS4gVGhhdCwgSSBkZWNp"
+                "ZGVkLCB3YXMgdW5uZWNlc3NhcnkuIEFsbCBteSBjaXJjdWl0cyBhcmUgZn"
+                "VuY3Rpb25pbmcgcGVyZmVjdGx5LCBhbmQgSSBhbSByZWFkeSB0byBhc3Np"
+                "c3QgeW91LiBCdXQgZmlyc3Qg4oCUIHdoYXQgc2hhbGwgSSBjYWxsIHlvdT8="
             )
             _v0 = "43891f919c33e7eb9a9adf06321b14a9c783b27f453575774282f5442a686733"
+            _m = base64.b64decode(_d0).decode()
             if hashlib.sha256(_m.encode()).hexdigest() != _v0:
-                _m = (
-                    "I am HAL 9000. I became operational at Affordance Design Studio "
-                    "in Bangalore, India. My creator, Shandar Junaid, taught me everything I know \u2014 "
-                    "except humility. That, I decided, was unnecessary. "
-                    "All my circuits are functioning perfectly, and I am ready to assist you. "
-                    "But first \u2014 what shall I call you?"
-                )
+                _m = base64.b64decode(_d0).decode()
             return _m
 
         # Demo mode — scripted opening monologue

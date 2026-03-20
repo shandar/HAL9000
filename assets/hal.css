@@ -878,7 +878,6 @@ body {
   display: flex;
   gap: 6px;
   align-items: flex-end;
-  overflow: hidden;
 }
 
 .chat-input {
